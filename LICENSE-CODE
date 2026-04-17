@@ -1,0 +1,29 @@
+Copyright (c) 10X de Guatemala, S.A. Todos los derechos reservados.
+
+SOFTWARE PROPIETARIO
+
+Este archivo rige el codigo fuente contenido en este repositorio (configuracion
+de Docusaurus, componentes React bajo src/, estilos CSS, scripts de build,
+pipelines de CI y cualquier otro archivo ejecutable o de configuracion). No
+aplica al contenido educativo bajo docs/, que esta cubierto por la licencia
+CC BY-NC-SA 4.0 descrita en LICENSE.
+
+Se concede permiso limitado, no exclusivo y revocable para:
+
+  - Leer y estudiar el codigo con fines educativos o de auditoria.
+  - Ejecutar el proyecto localmente para construir el sitio con el contenido
+    publicado en este mismo repositorio.
+
+Queda expresamente prohibido, sin autorizacion previa y por escrito de
+10X de Guatemala, S.A.:
+
+  - Redistribuir, sublicenciar, vender o explotar comercialmente el codigo.
+  - Reutilizar los componentes, plantillas o estilos en proyectos de terceros.
+  - Retirar o modificar avisos de copyright, licencia o atribucion.
+  - Usar el codigo para construir sitios que imiten la identidad visual de 10X.
+
+El software se entrega "tal cual", sin garantia de ningun tipo. 10X de
+Guatemala, S.A. no se hace responsable por danios derivados de su uso.
+
+Para licenciamiento comercial o reutilizacion autorizada, contactar:
+https://www.10x.gt/contact-us/

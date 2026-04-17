@@ -1,0 +1,30 @@
+Copyright (c) 10X de Guatemala, S.A.
+
+Este repositorio combina tres tipos de activos, cada uno con su propia licencia:
+
+1. CONTENIDO (documentacion en docs/, imagenes y diagramas en docs/**/img/,
+   textos del sitio)
+
+   Bajo licencia Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+   International (CC BY-NC-SA 4.0).
+
+   Texto legal:  https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+   Resumen:      https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+
+   En resumen: se permite compartir y adaptar con atribucion a 10X de Guatemala,
+   sin uso comercial, y las obras derivadas deben distribuirse con la misma
+   licencia.
+
+2. CODIGO FUENTE (configuracion de Docusaurus, componentes React bajo src/,
+   estilos, scripts de build y pipelines de CI)
+
+   Propietario. Vease LICENSE-CODE.
+
+3. MARCAS Y LOGOS (nombre "10X", "10X de Guatemala", logotipos e identidad
+   visual en static/img/logo-*, banners con marca)
+
+   Marcas registradas de 10X de Guatemala, S.A. Su uso no esta cubierto por
+   las licencias anteriores y requiere autorizacion expresa por escrito.
+
+Para usos comerciales del contenido, uso de marca o licenciamiento alternativo
+del codigo, contactar: https://www.10x.gt/contact-us/
