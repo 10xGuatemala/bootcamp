@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://bootcamp.10x.gt/sitemap.xml

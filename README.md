@@ -89,10 +89,9 @@ Este repositorio combina tres tipos de activos, cada uno con su propia licencia:
 | Activo | Licencia | Resumen |
 |--------|----------|---------|
 | **Contenido** (`docs/`, diagramas, textos) | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es) | Compartir y adaptar con atribución a 10X, sin uso comercial, obras derivadas con la misma licencia. |
-| **Código fuente** (componentes, estilos, CI) | Propietario — ver [`LICENSE-CODE`](./LICENSE-CODE) | Lectura y ejecución local permitidas; redistribución y reutilización requieren autorización. |
 | **Marcas y logos** (nombre "10X", identidad visual) | Marcas registradas de 10X de Guatemala, S.A. | Su uso requiere autorización expresa. |
 
-Detalle completo en [`LICENSE`](./LICENSE). Para usos comerciales, licenciamiento del código o uso de marca, [escríbenos](https://www.10x.gt/contact-us/).
+Detalle completo en [`LICENSE`](./LICENSE). Para usos comerciales o uso de marca, [escríbenos](https://www.10x.gt/contact-us/).
 
 ---
 

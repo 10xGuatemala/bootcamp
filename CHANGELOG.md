@@ -7,6 +7,13 @@ y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 3.0.1 - 2026-04-17
+
+### Changed
+
+- Allowlist del mirror público reducida a `docs/`, `README.public.md`, `LICENSE` y `CHANGELOG.md`. Se excluyen `static/`, `sidebars.ts` y `LICENSE-CODE` porque son específicos del sitio o del código, no del contenido.
+- `README.public.md` sin referencia a `LICENSE-CODE` (ya no se publica en el mirror).
+
 ## 3.0.0 - 2026-04-17
 
 Release mayor. Consolida la reestructura de contenido (+2 categorías), el rediseño visual alineado a marca 10X, el upgrade de toolchain (Docusaurus 3.10 + pnpm) y la apertura del repo a un mirror público en GitHub bajo licenciamiento triple.
