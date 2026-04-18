@@ -7,6 +7,12 @@ sidebar_position: 1
 
 Crear APIs web eficientes y seguras es esencial para cualquier aplicación moderna. En este curso, exploraremos cómo desarrollar Web APIs con .NET Core siguiendo buenas prácticas generales que aseguren mantenibilidad, escalabilidad y seguridad. Si estás comenzando o deseas mejorar tus habilidades, este curso es clave para iniciarte.
 
+:::info Alcance: implementación, no requerimientos
+Los ejemplos de este módulo — clases, atributos, DTOs, `DbContext`, inyección de dependencias — pertenecen al **Cómo** (diseño técnico e implementación). No son historias de usuario ni requerimientos funcionales; son la **solución técnica** que sigue al *Qué* definido en [5. Documentación y requerimientos](../../documentacion-y-requerimientos/01-de-la-idea-al-release.md).
+
+Cuando veas un controlador con `[Authorize(Roles = "...")]` o un servicio con un `DbContext` inyectado, interpreta esos detalles como **ejemplos de implementación** para un requerimiento ya aprobado — no como la forma correcta de describir un requerimiento.
+:::
+
 ## Módulos del curso
 
 <DocCardList />

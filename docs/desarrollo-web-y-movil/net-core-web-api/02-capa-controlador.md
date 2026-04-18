@@ -9,6 +9,15 @@ La capa de controlador en un proyecto de API REST es la interfaz principal entre
 
 ## Ejemplo Básico de un Controlador
 
+:::note Trazabilidad Qué → Cómo
+El controlador siguiente **implementa** dos requerimientos funcionales:
+
+- **RF-01:** *Como administrador de RR.HH., quiero registrar un nuevo empleado para dar de alta su expediente en el sistema.*
+- **RF-02:** *Como usuario autenticado, quiero consultar los datos de un empleado por su identificador para verificar su información.*
+
+Lo que ves en el código — `[Authorize(Roles = "...")]`, `EmpleadoRequest`, `CreatedAtAction` — son **decisiones técnicas** que satisfacen esos requerimientos. El requerimiento no dicta "usa `[Authorize]`"; dicta "solo el rol de RR.HH. puede registrar empleados", y el controlador traduce esa regla a código.
+:::
+
 ```csharp
 [Route("api/[controller]")]
 [Authorize]

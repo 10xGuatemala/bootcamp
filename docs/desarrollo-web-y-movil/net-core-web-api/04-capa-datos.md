@@ -7,6 +7,10 @@ sidebar_label: 1.2.4 La Capa de Datos en un Backend API REST
 
 La capa de datos en un backend API REST es responsable de la interacción directa con la base de datos. Incluye las entidades que representan las tablas de la base de datos y el contexto de datos (DbContext), encargado de gestionar la conexión y las operaciones CRUD. Su diseño permite mantener un acceso a datos limpio y desacoplado de la lógica de negocio, promoviendo así una arquitectura más organizada y mantenible.
 
+:::note Qué vs Cómo en esta capa
+El **requerimiento** es que el sistema persista datos de forma confiable y recuperable. La **decisión técnica** que adoptamos aquí — usar Entity Framework Core, un `DbContext` y anotaciones de mapeo — es una forma válida de satisfacer ese requerimiento, no la única. Equipos con restricciones distintas podrían elegir Dapper, procedimientos almacenados, o un repositorio sobre ADO.NET sin cambiar el *Qué*.
+:::
+
 Para implementar esta capa de forma eficiente, es recomendable utilizar Entity Framework Core (EF Core), un framework de mapeo objeto-relacional (ORM) para .NET. EF Core permite trabajar con bases de datos relacionales mediante clases y objetos, eliminando la necesidad de escribir consultas SQL directamente. Esto facilita un diseño más natural y expresivo, mejora la mantenibilidad del código y reduce la complejidad asociada al acceso a datos.
 
 ---

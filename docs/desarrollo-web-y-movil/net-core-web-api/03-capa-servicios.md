@@ -17,6 +17,12 @@ Un servicio en una API REST se encarga de implementar la lógica de negocio de l
 
 El siguiente ejemplo muestra cómo crear un servicio llamado `EmpleadoService` que proporciona funcionalidades para crear, buscar y eliminar empleados.
 
+:::note Trazabilidad Qué → Cómo
+El requerimiento funcional detrás de este servicio es: *"el sistema debe permitir crear, consultar y eliminar expedientes de empleados, persistiendo los datos de forma confiable"*. Ese es el **Qué**.
+
+El uso de `ApplicationDbContext`, la inyección por constructor, el mapeo `EmpleadoDTO → Empleado` y la llamada a `SaveChangesAsync` son el **Cómo** — decisiones de diseño técnico (Entity Framework Core + inyección de dependencias) que podrían reemplazarse por Dapper, un repositorio, o un ORM distinto sin cambiar el requerimiento.
+:::
+
 ```csharp
 /// <summary>
 /// Servicio que proporciona la lógica de negocio para gestionar empleados.

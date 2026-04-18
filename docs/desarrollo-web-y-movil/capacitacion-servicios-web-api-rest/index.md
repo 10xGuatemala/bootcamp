@@ -7,6 +7,10 @@ sidebar_position: 1
 
 Este curso ofrece una guía completa para el diseño y desarrollo de APIs REST profesionales, eficientes y seguras. A lo largo del curso, aprenderás los principios fundamentales y las mejores prácticas para construir servicios web escalables, mantenibles y fáciles de integrar para otros desarrolladores. Diseñado específicamente para desarrolladores y arquitectos de software, este curso es ideal para quienes desean iniciarse en la creación de APIs RESTful de alta calidad y aprovechar su potencial en entornos modernos de desarrollo.
 
+:::info Alcance: diseño técnico, no requerimientos
+Los ejemplos de este módulo — endpoints, payloads JSON, códigos HTTP, esquemas de autenticación — son **decisiones de diseño técnico** (el *Cómo*) que siguen a un requerimiento funcional (el *Qué*) ya definido en [5. Documentación y requerimientos](../../documentacion-y-requerimientos/01-de-la-idea-al-release.md). La firma de un endpoint no es un requerimiento; es la forma en que se implementa un requerimiento.
+:::
+
 ## Módulos del curso
 
 <DocCardList />

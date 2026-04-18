@@ -5,6 +5,18 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.2.0 - 2026-04-18
+
+### Added
+
+- **Nuevo módulo [3.1.6 Artefactos de diseño para agentes](docs/diseno-ux-ui/fundamentos-ux-ui/06-artefactos-para-agentes.md)** que cierra la brecha entre el módulo de UX/UI y la promesa de procesabilidad por IA. Entrega cuatro artefactos copiables: plantilla `DESIGN.md` (equivalente de `CLAUDE.md` para diseño), `design-tokens.json` en formato Design Tokens Community Group, plantilla de brief de componente y tres prompts canónicos (wireframe textual, generación de componente, revisión heurística). Incluye bloque estructurado para agentes y glosario con referencias primarias (Nielsen Norman Group, WCAG 2.2, Style Dictionary).
+
+### Changed
+
+- **Resuelto conflicto de nomenclatura Qué vs Cómo** entre los módulos de Documentación/Requerimientos (sección 5) y Desarrollo (sección 1):
+  - Nota `:::info Alcance:...` en los index de [net-core-web-api](docs/desarrollo-web-y-movil/net-core-web-api/index.md) y [capacitacion-servicios-web-api-rest](docs/desarrollo-web-y-movil/capacitacion-servicios-web-api-rest/index.md) aclarando que los ejemplos son implementación (el *Cómo*), no requerimientos (el *Qué*).
+  - Bloques `:::note Trazabilidad Qué → Cómo` en [02-capa-controlador.md](docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md), [03-capa-servicios.md](docs/desarrollo-web-y-movil/net-core-web-api/03-capa-servicios.md) y [04-capa-datos.md](docs/desarrollo-web-y-movil/net-core-web-api/04-capa-datos.md) que enuncian explícitamente el requerimiento funcional detrás del código y aclaran que las decisiones técnicas (EF Core, `[Authorize]`, DTOs) son una forma válida — no la única — de satisfacerlo.
+
 ## 3.1.2 - 2026-04-18
 
 ### Fixed
