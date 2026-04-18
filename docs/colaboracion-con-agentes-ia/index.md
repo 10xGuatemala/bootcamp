@@ -36,8 +36,8 @@ Un **archivo de contexto** es un documento en la raíz del repositorio que le di
 |---|-------|------------------------------------|
 | **Qué es** | Receta reutilizable para *una tarea* | Mapa general *del proyecto* |
 | **Alcance** | Una acción concreta (redactar manual, migrar schema) | Todo el repo (estructura, reglas, comandos) |
-| **Se invoca** | Explícitamente: *"usa la skill X para hacer Y"* | Implícitamente: el agente lo lee en cada sesión |
-| **Dónde vive** | Archivo dedicado (ej. `skills/redactar-manual.md`) o sección del CLAUDE.md | `CLAUDE.md` o `AGENTS.md` en la raíz del repo |
+| **Se invoca** | Por descripción: el agente la activa cuando la tarea coincide con el `description` de la skill. También se puede invocar explícitamente (*"usa la skill X"*) | Implícitamente: el agente lo lee en cada sesión |
+| **Dónde vive** | Directorio dedicado: `skills/<nombre-skill>/SKILL.md` (+ scripts o plantillas opcionales en la misma carpeta) | `CLAUDE.md` o `AGENTS.md` en la raíz del repo |
 | **Cuántos hay** | Muchos — uno por tipo de tarea recurrente | Uno por repositorio (a veces uno por subproyecto) |
 | **Ejemplo típico** | "Generar un manual de usuario a partir de una captura" | "Este proyecto usa .NET 8, MySQL, tests en xUnit; antes de codear, documenta el requerimiento en `releases/vX.Y.Z.md`" |
 

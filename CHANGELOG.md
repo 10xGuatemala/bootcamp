@@ -7,6 +7,13 @@ y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 3.0.2 - 2026-04-17
+
+### Fixed
+
+- Tabla Skill vs CLAUDE.md en la landing de "Colaboración con Agentes de IA": la fila "Se invoca" ahora describe que las skills se activan por `description` (con invocación explícita como alternativa), y la fila "Dónde vive" refleja la estructura oficial `skills/<nombre>/SKILL.md` en lugar de un archivo suelto.
+- Typo `CancelationToken` → `CancellationToken` en el módulo de seguridad al ejecutar herramientas externas.
+
 ## 3.0.1 - 2026-04-17
 
 ### Changed

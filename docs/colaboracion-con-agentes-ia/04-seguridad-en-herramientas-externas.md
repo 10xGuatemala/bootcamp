@@ -100,7 +100,7 @@ Todo subproceso debe tener:
 
 - **Timeout máximo**. Si vence, se cancela.
 - **Árbol de procesos**: cuando matas el proceso, mata también a sus hijos (los spawns internos no deben sobrevivir).
-- **Señales correctas**: primero una señal suave (SIGTERM / CancelationToken), espera unos segundos, luego forzada.
+- **Señales correctas**: primero una señal suave (SIGTERM / CancellationToken), espera unos segundos, luego forzada.
 - **Logging del cierre**: dejar constancia de cancelaciones; son útiles para debuggear flakiness.
 
 ## Aislamiento
