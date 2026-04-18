@@ -19,5 +19,6 @@ Los módulos cubren los principios esenciales del diseño UX/UI aplicados al des
 **Contenido:**
 
 - [3.1 Fundamentos UX/UI](./fundamentos-ux-ui/index.md)
+- [3.2 Sistemas de Diseño e Implementación](./sistemas-de-diseno/index.md)
 
 </div>

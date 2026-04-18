@@ -5,6 +5,21 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.3.0 - 2026-04-18
+
+### Added
+
+- **Nueva subcategoría [3.2 Sistemas de Diseño e Implementación](docs/diseno-ux-ui/sistemas-de-diseno/index.md)** — el puente entre UX/UI y código, con 4 módulos:
+  - **3.2.1 Design tokens y estándares** — formato DTCG, Style Dictionary, `DESIGN.md`.
+  - **3.2.2 Arquitectura de componentes** — Atomic Design, contratos, mapeo a React/Blazor.
+  - **3.2.3 Handoff técnico** — spec de pantalla, los 7 estados, 3 breakpoints, 3 prompts canónicos.
+  - **3.2.4 UX writing para interfaces dinámicas** — microcopy, i18n con ICU MessageFormat, claridad para LLMs.
+- **Carpeta [`examples/`](docs/diseno-ux-ui/sistemas-de-diseno/examples/README.md)** con artefactos reales copiables al proyecto del estudiante: `DESIGN.md.example`, `design-tokens.json.example`, `style-dictionary.config.json.example`, `component-brief.md.example`, `Button.tsx.example`, `Button.razor.example`, `screen-spec.md.example` y 3 prompts canónicos. Excluidos del build de Docusaurus vía `exclude: ['**/examples/**']`.
+
+### Changed
+
+- El anterior **3.1.6 Artefactos de diseño para agentes** (introducido en 3.2.0) se disuelve: su contenido se reparte entre 3.2.1 (tokens + `DESIGN.md`), 3.2.2 (brief de componente) y 3.2.3 (prompts canónicos). La subcategoría **3.1 Fundamentos UX/UI** queda enfocada en teoría; la práctica vive en 3.2.
+
 ## 3.2.0 - 2026-04-18
 
 ### Added

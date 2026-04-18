@@ -1,0 +1,21 @@
+Lee DESIGN.md, design-tokens.json y la spec adjunta.
+
+Tarea: implementar [NombrePantalla] según la spec.
+
+Stack:
+- [React 18 + TypeScript / Blazor / Vue 3]
+- [Tailwind v4 / CSS Modules / Styled Components]
+- [Testing: Vitest + Testing Library / bUnit / Jest]
+
+Restricciones:
+- Solo tokens de design-tokens.json. Si falta un valor, detén y pregunta.
+- Cubre TODOS los estados de la spec (default, loading, empty, error, ...).
+- Componentes reutilizados se importan; no se duplican.
+- Incluye pruebas de: render, estados, navegación por teclado.
+- No introduzcas dependencias nuevas sin justificarlo.
+
+Entrega:
+1. Código de la pantalla.
+2. Código de componentes nuevos (si los hay) con sus briefs.
+3. Pruebas.
+4. Lista de decisiones tomadas fuera de la spec — para revisión humana.

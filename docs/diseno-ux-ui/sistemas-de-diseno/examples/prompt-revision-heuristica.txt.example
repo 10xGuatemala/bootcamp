@@ -1,0 +1,21 @@
+Actúa como revisor UX. Lee DESIGN.md antes de responder.
+
+Tarea: revisión heurística de [captura / URL / descripción de pantalla] contra:
+- 10 heurísticas de Nielsen.
+- WCAG 2.2 nivel AA.
+- La tabla de 7 estados de nuestro sistema (default, hover, focus, active, disabled, loading, empty/error).
+
+Entrega una tabla ordenada de severidad mayor a menor:
+
+| Heurística | Severidad (0-4) | Observación | Recomendación |
+
+Severidad:
+- 0: no aplica
+- 1: cosmético
+- 2: menor, corregible cuando se pueda
+- 3: mayor, alta prioridad
+- 4: catastrófico — bloquea flujo o vulnera accesibilidad
+
+Si falta contexto para juzgar algo, dilo explícitamente ("no puedo evaluar el
+estado de error sin ver cómo se ve cuando la API falla"). No inventes datos
+que no veas.

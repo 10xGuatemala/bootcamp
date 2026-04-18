@@ -15,6 +15,5 @@
 - [3.1.3 ¿Qué es UI?](./03-que-es-ui.md)
 - [3.1.4 Diferencias entre UX/UI](./04-diferencia.md)
 - [3.1.5 Convenciones de UI consistentes](./05-convenciones-de-ui-consistentes.md)
-- [3.1.6 Artefactos de diseño para agentes](./06-artefactos-para-agentes.md)
 
 </div>

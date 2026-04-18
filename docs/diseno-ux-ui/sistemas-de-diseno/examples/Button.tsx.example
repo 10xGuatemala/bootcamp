@@ -1,0 +1,37 @@
+import React from "react";
+
+type Variant = "primary" | "secondary" | "ghost";
+type Size = "sm" | "md" | "lg";
+
+interface ButtonProps {
+  variant?: Variant;
+  size?: Size;
+  loading?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export function Button({
+  variant = "primary",
+  size = "md",
+  loading = false,
+  disabled = false,
+  children,
+  onClick,
+}: ButtonProps) {
+  return (
+    <button
+      className={`btn btn--${variant} btn--${size}`}
+      disabled={disabled || loading}
+      aria-busy={loading}
+      onClick={onClick}
+    >
+      {loading ? <Spinner size={size} /> : children}
+    </button>
+  );
+}
+
+function Spinner({ size }: { size: Size }) {
+  return <span className={`spinner spinner--${size}`} aria-hidden="true" />;
+}
