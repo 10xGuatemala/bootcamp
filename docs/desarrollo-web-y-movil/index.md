@@ -18,8 +18,9 @@ La categoría cubre desde el diseño de servicios web tipo API REST y la constru
 
 **Contenido:**
 
-- [index](./capacitacion-servicios-web-api-rest/)
-- [index](./fundamentos-sonarqube/)
-- [index](./net-core-web-api/)
+- [1.1 Diseño de Servicios Web de tipo API REST](./capacitacion-servicios-web-api-rest/index.md)
+- [1.2 Desarrollo de Web APIs en .NET Core](./net-core-web-api/index.md)
+- [1.3 Fundamentos de Análisis Estático con SonarQube](./fundamentos-sonarqube/index.md)
+- [1.4 Modernización de sistemas legacy](./modernizacion-legacy/01-costo-oculto-del-legacy.md)
 
 </div>

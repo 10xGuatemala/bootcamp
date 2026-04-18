@@ -5,6 +5,12 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.1.2 - 2026-04-18
+
+### Fixed
+
+- Índice de categorías padre en GitHub mostraba "index" como texto de enlace y apuntaba a rutas de carpeta (`./foo/`) que rompían el build de Docusaurus. Ahora usa el `label` de la subcategoría y enlaza al `index.md` correspondiente. Afecta `desarrollo-web-y-movil`, `diseno-ux-ui`, `gestion-proyectos` e `inteligencia-negocio`. También agrega la entrada faltante de "Modernización de sistemas legacy".
+
 ## 3.1.1 - 2026-04-18
 
 ### Changed

@@ -18,7 +18,7 @@ Los módulos cubren los conceptos base de BI y el diseño de visualizaciones que
 
 **Contenido:**
 
-- [index](./introduccion-bi/)
-- [index](./introduccion-visualizacion-datos/)
+- [2.1 Introducción a la Inteligencia de Negocio](./introduccion-bi/index.md)
+- [2.2 Introducción a la Visualización de Datos](./introduccion-visualizacion-datos/index.md)
 
 </div>

@@ -18,8 +18,8 @@ Los módulos cubren los fundamentos de la gestión de proyectos aplicados a equi
 
 **Contenido:**
 
-- [Introducción](./agilidad-y-scrum/)
-- [Introducción](./ciclo-del-proyecto/)
-- [index](./fundamentos-de-proyectos/)
+- [4.1 Fundamentos de la Gestión de Proyectos](./fundamentos-de-proyectos/index.md)
+- [4.2 Agilidad y Scrum](./agilidad-y-scrum/index.md)
+- [4.3 Ciclo del proyecto](./ciclo-del-proyecto/index.md)
 
 </div>
