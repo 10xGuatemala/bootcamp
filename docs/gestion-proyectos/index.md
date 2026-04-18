@@ -12,6 +12,14 @@ Los módulos cubren los fundamentos de la gestión de proyectos aplicados a equi
 
 ## Módulos del curso
 
-import DocCardList from '@theme/DocCardList';
-
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [Introducción](./agilidad-y-scrum/)
+- [Introducción](./ciclo-del-proyecto/)
+- [index](./fundamentos-de-proyectos/)
+
+</div>

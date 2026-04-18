@@ -4,8 +4,6 @@ title: Context engineering y CLAUDE.md
 sidebar_label: 6.2 Context engineering y CLAUDE.md
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Context engineering: el archivo que decide la calidad del agente
 
 Cuando trabajas con un agente de IA en un repositorio, hay un factor que determina más que casi ningún otro la calidad de sus resultados: **qué información encuentra al arrancar**. A ese trabajo de preparar, organizar y mantener esa información se le llama **context engineering**.
@@ -102,6 +100,25 @@ El caso de `DESIGN.md` es especialmente interesante: permite que un agente produ
 
 **Regla de cuándo separar:** si la sección correspondiente en `CLAUDE.md` supera ~80 líneas o dos o tres equipos distintos la consultan con fines diferentes, muévela a un archivo de dominio y deja un enlace desde el principal.
 
+## Glosario
+
+**Context engineering** *(Context engineering)* — disciplina de preparar, organizar y mantener la información que un agente encuentra al arrancar una tarea. Se apoya en técnicas de prompt engineering descritas en la [documentación oficial de Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview).
+
+**CLAUDE.md / AGENTS.md** *(Agent memory file)* — archivo de contexto del repositorio; fuente autoritativa de convenciones, arquitectura y comandos. Claude Code lo carga automáticamente al iniciar una sesión ([Claude Code docs](https://docs.claude.com/en/docs/claude-code/overview)).
+
+**Archivo de dominio** *(Domain-specific context file)* — archivo separado (`SECURITY.md`, `TESTING.md`, `DESIGN.md`) al que el archivo principal hace referencia cuando un tema tiene reglas densas; patrón sugerido para mantener la memoria del agente escalable ([Claude Code docs](https://docs.claude.com/en/docs/claude-code/overview)).
+
+**Exploración innecesaria** *(Unnecessary exploration)* — síntoma de contexto incompleto: el agente lee múltiples archivos para entender lo que debería estar declarado. Anthropic recomienda *"be clear and direct"* en sus [guías de prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) para evitar este comportamiento.
+
+**Archivo diario** *(Ephemeral notes — antipattern)* — antipatrón en que el contexto acumula notas temporales en vez de reglas permanentes; contrasta con la recomendación de [Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) de mantener el contexto estable y reutilizable.
+
+**Monorepo** *(Monorepo)* — repositorio con varios paquetes; puede requerir un archivo de contexto por paquete cuando los dominios difieren, patrón soportado por la carga jerárquica de `CLAUDE.md` en [Claude Code](https://docs.claude.com/en/docs/claude-code/overview).
+
+:::info Referencias primarias
+- [Claude Code documentation](https://docs.claude.com/en/docs/claude-code/overview) — referencia oficial sobre memoria del agente y `CLAUDE.md`.
+- [Anthropic · Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — prácticas para contexto claro y directo.
+:::
+
 ---
 
 <div className="agent-block">
@@ -133,9 +150,8 @@ El caso de `DESIGN.md` es especialmente interesante: permite que un agente produ
 - Dejar el archivo sin owner.
 
 **Referencias cruzadas:**
-- [03 · Arquitectura orientada a skills](./03-arquitectura-orientada-a-skills.md)
-- [04 · Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
-
+- [6.3 Arquitectura orientada a skills](./03-arquitectura-orientada-a-skills.md)
+- [6.4 Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
 </div>
 
 ---

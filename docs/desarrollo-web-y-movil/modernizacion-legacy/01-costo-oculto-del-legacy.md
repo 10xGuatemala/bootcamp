@@ -1,9 +1,8 @@
 ---
 sidebar_position: 1
 title: El costo oculto del software legacy
+sidebar_label: 1.4.1 El costo oculto del software legacy
 ---
-
-import AuthorCredit from '@site/src/components/AuthorCredit';
 
 # El costo oculto del software legacy
 
@@ -109,6 +108,26 @@ Un proyecto de modernización sin métricas es un proyecto sin brújula. Define 
 
 Esos números convierten una migración en algo auditable, no solo sentido.
 
+## Glosario
+
+**Legacy** *(Legacy system)* — sistema que no puede evolucionar al ritmo que el negocio necesita, independiente de su edad cronológica.
+
+**Deuda técnica** *(Technical debt)* — costo acumulado por decisiones de desarrollo que priorizaron velocidad sobre calidad o diseño sostenible.
+
+**Conocimiento tribal** *(Tribal knowledge)* — información crítica que reside en la memoria de pocas personas y no está documentada.
+
+**Rewrite** *(Rewrite)* — reescritura total de un sistema; suele ser costosa y riesgosa comparada con un enfoque incremental.
+
+**Caja negra** *(Black box)* — componente cuyo funcionamiento interno nadie entiende plenamente, aunque se usa a diario.
+
+**Pasivo técnico** *(Technical liability)* — sistema cuyo costo de mantenimiento supera el valor que aporta al negocio.
+
+:::info Referencias primarias
+- [Martin Fowler · Strangler Fig Application](https://martinfowler.com/bliki/StranglerFigApplication.html) — patrón de modernización incremental.
+- [Michael Feathers · Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/) — técnicas para intervenir código legacy.
+- [ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar) — radar de prácticas y tecnologías actuales.
+:::
+
 ---
 
 <div className="agent-block">
@@ -143,9 +162,8 @@ Esos números convierten una migración en algo auditable, no solo sentido.
 - Omitir la dimensión humana (conocimiento tribal, rotación).
 
 **Referencias cruzadas:**
-- [02 · Migración progresiva (strangler fig)](./02-migracion-progresiva.md)
-- [02 · Context engineering](../../colaboracion-con-agentes-ia/02-context-engineering-claude-md.md)
-
+- [1.4.2 Migración progresiva (strangler fig)](./02-migracion-progresiva.md)
+- [6.2 Context engineering y CLAUDE.md](../../colaboracion-con-agentes-ia/02-context-engineering-claude-md.md)
 </div>
 
 ---

@@ -4,8 +4,6 @@ title: Diseño de prompts y verificación
 sidebar_label: 6.5 Diseño de prompts y verificación
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Diseño de prompts y verificación
 
 Un prompt es un encargo. Si el encargo es ambiguo, el resultado será ambiguo. Si el encargo no trae forma de verificar, no sabrás si se cumplió. Esta lección cubre cómo redactar prompts útiles y cómo cerrar el ciclo con verificación real.
@@ -151,6 +149,29 @@ Salida: sección insertada en el archivo indicado.
 1. El prompt cabe en una pantalla y se puede leer en voz alta.
 2. Puedes decir de antemano qué comando o revisión **decide** si el trabajo está aceptado.
 
+## Glosario
+
+**Prompt** *(Prompt)* — encargo escrito al modelo. Anthropic recomienda *"be clear, direct, and detailed"* como primera técnica en su [guía oficial de prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview).
+
+**Criterios de aceptación** *(Acceptance criteria)* — condiciones verificables (build, tests, comportamiento observable) que deciden si el trabajo está terminado; mejores prácticas en [Anthropic · Prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) y en la [guía de OpenAI](https://platform.openai.com/docs/guides/prompt-engineering) enfatizan articular el resultado esperado.
+
+**Niveles de verificación** *(Verification levels)* — sintáctica (compila) → unitaria → integración → funcional → de intención; salto de niveles suele pagar caro. Concepto alineado con *"ask for verification steps"* de [OpenAI prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering).
+
+**Verificación de intención** *(Intent verification)* — nivel más alto: comprobar que el cambio resuelve el problema de negocio, no solo que compila. Anthropic lo describe como cerrar el *"verification loop"* del agente ([prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)).
+
+**Subagente** *(Subagent)* — agente invocado por otro agente; reporta lo que *intentó* hacer, no necesariamente el estado real. Patrón *orchestrator-workers* documentado por Anthropic.
+
+**Ejecutor** *(Executor)* — rol de agente rápido y económico que ejecuta el trabajo repetitivo en cada turno; diferenciación de modelos por costo/capacidad recomendada en [Anthropic · prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview).
+
+**Revisor** *(Reviewer / Evaluator)* — rol de agente fuerte invocado *on-demand* para validar decisiones críticas; patrón *evaluator-optimizer* en la taxonomía de agentes de Anthropic.
+
+**Contexto compartido** *(Shared context)* — conversación, herramientas e historial que leen y escriben ambos agentes en el patrón ejecutor + revisor; permite la coherencia descrita en [OpenAI prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering).
+
+:::info Referencias primarias
+- [Anthropic · Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — guía oficial de técnicas de prompts con Claude.
+- [OpenAI · Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) — referencia comparativa de técnicas generales.
+:::
+
 ---
 
 <div className="agent-block">
@@ -185,9 +206,8 @@ Salida: sección insertada en el archivo indicado.
 - Creer ciegamente el reporte de un subagente sin comprobar estado real.
 
 **Referencias cruzadas:**
-- [01 · Fundamentos de colaboración con agentes](./01-fundamentos-colaboracion-agentes.md)
-- [02 · Context engineering](./02-context-engineering-claude-md.md)
-
+- [6.1 Fundamentos de colaboración con agentes](./01-fundamentos-colaboracion-agentes.md)
+- [6.2 Context engineering y CLAUDE.md](./02-context-engineering-claude-md.md)
 </div>
 
 ---

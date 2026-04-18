@@ -4,8 +4,6 @@ title: Arquitectura orientada a skills
 sidebar_label: 6.3 Arquitectura orientada a skills
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Arquitectura orientada a skills
 
 Los proyectos que colaboran bien con agentes tienden a compartir una forma: están construidos como **unidades reutilizables, orquestadas por un núcleo pequeño**. Esa forma también se presta a que un agente la entienda, la extienda y, cuando conviene, la convierta en una *skill* de su propio toolkit.
@@ -125,6 +123,30 @@ Una convención útil cuando el equipo habla español pero usa herramientas ingl
 2. **Agregar un caso no toca el orquestador.** Implica que los módulos son de verdad reutilizables.
 3. **Los efectos laterales son explícitos.** No hay "magia" que el agente tenga que descubrir.
 
+## Glosario
+
+**Orquestador** *(Orchestrator)* — componente que decide qué módulos ejecutar, en qué orden y con qué timeouts. En la taxonomía de [Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) corresponde al patrón *orchestrator-workers*.
+
+**Módulo** *(Module)* — unidad reutilizable que hace una sola cosa bien, con contrato explícito de entradas, salidas y efectos. Principio de diseño implícito en la [documentación de Anthropic](https://docs.anthropic.com/) sobre herramientas bien definidas.
+
+**Skill** *(Agent Skill)* — paquete reutilizable que extiende las capacidades de un agente; Anthropic lo define como *"a way to teach Claude new capabilities using a structured folder"* ([Claude · Agent Skills overview](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview)).
+
+**Data-driven** *(Data-driven configuration)* — diseño en que la configuración vive en archivos de datos (JSON/YAML) validados por esquema en lugar de código; facilita mantenimiento y auditoría de herramientas y skills ([Claude · Agent Skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview)).
+
+**Placeholder validado** *(Validated placeholder)* — marcador `{name}` en una plantilla que solo se sustituye por un valor previamente validado, nunca por texto crudo; práctica recomendada en la [documentación de Anthropic](https://docs.anthropic.com/) para prevenir inyección en herramientas.
+
+**Fingerprint** *(Fingerprint / Dedup hash)* — hash canónico de una salida usado para deduplicar hallazgos que varios módulos pueden reportar; técnica estándar en orquestación de herramientas externas.
+
+**Contrato del módulo** *(Module contract / Tool schema)* — declaración explícita de entradas, salidas, efectos laterales, errores y recursos máximos; equivalente al *tool schema* JSON usado por Claude en [tool use](https://docs.anthropic.com/).
+
+**Árbol de procesos** *(Process tree)* — conjunto de procesos hijos creados por un subproceso; debe terminarse completo al cancelar para evitar *zombies* y consumo de recursos.
+
+:::info Referencias primarias
+- [Claude · Agent Skills overview](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) — referencia oficial sobre skills como unidades reutilizables.
+- [Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — patrones arquitectónicos (orchestrator-workers, routing, etc.).
+- [Anthropic Documentation](https://docs.anthropic.com/) — referencia general sobre tool use y diseño de agentes.
+:::
+
 ---
 
 <div className="agent-block">
@@ -158,9 +180,8 @@ Una convención útil cuando el equipo habla español pero usa herramientas ingl
 - Duplicar salidas porque no hay fingerprint.
 
 **Referencias cruzadas:**
-- [02 · Context engineering](./02-context-engineering-claude-md.md)
-- [04 · Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
-
+- [6.2 Context engineering y CLAUDE.md](./02-context-engineering-claude-md.md)
+- [6.4 Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
 </div>
 
 ---

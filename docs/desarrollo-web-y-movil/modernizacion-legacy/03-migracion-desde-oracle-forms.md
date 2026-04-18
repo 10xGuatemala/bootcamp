@@ -1,9 +1,8 @@
 ---
 sidebar_position: 3
 title: Migración desde Oracle Forms
+sidebar_label: 1.4.3 Migración desde Oracle Forms
 ---
-
-import AuthorCredit from '@site/src/components/AuthorCredit';
 
 # Migración desde Oracle Forms
 
@@ -120,6 +119,28 @@ Instrumenta antes de optimizar. Un sistema que no se puede observar tampoco se p
 
 Cuida la seguridad en el primer sprint. El legacy probablemente tenía credenciales embebidas en scripts, contraseñas en archivos planos y conexiones sin cifrar. La migración es el único momento en que reemplazar todo eso es políticamente barato — después, cualquier cambio de seguridad se convierte en un proyecto por separado.
 
+## Glosario
+
+**Oracle Forms** *(Oracle Forms)* — herramienta cliente-servidor de Oracle para construir pantallas de negocio fuertemente acopladas a la base de datos.
+
+**PL/SQL** *(Procedural Language / SQL)* — lenguaje procedural de Oracle para lógica en base de datos; típico repositorio de reglas en sistemas Forms.
+
+**Forms Builder** *(Oracle Forms Builder)* — IDE original para diseñar pantallas Forms; dependencia crítica cuando la documentación es escasa.
+
+**Coexistencia de datos** *(Data coexistence)* — estrategia en la que legacy y nuevo sistema comparten base de datos durante la migración.
+
+**Idempotencia** *(Idempotence)* — propiedad por la cual ejecutar una operación múltiples veces produce el mismo efecto que ejecutarla una vez.
+
+**Observabilidad** *(Observability)* — capacidad del sistema de exponer su estado interno a través de logs, métricas y trazas.
+
+**Credencial embebida** *(Hardcoded credential)* — contraseña o secreto en el código fuente o en archivos planos; riesgo severo de seguridad.
+
+:::info Referencias primarias
+- [Martin Fowler · Strangler Fig Application](https://martinfowler.com/bliki/StranglerFigApplication.html) — migración incremental aplicable a Forms.
+- [Michael Feathers · Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/) — intervención segura en código antiguo.
+- [ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar) — estado del arte en modernización.
+:::
+
 ---
 
 <div className="agent-block">
@@ -158,10 +179,9 @@ Cuida la seguridad en el primer sprint. El legacy probablemente tenía credencia
 - Arrastrar credenciales embebidas y conexiones inseguras al nuevo sistema.
 
 **Referencias cruzadas:**
-- [El costo oculto del software legacy](./01-costo-oculto-del-legacy.md)
-- [Migración progresiva (strangler fig)](./02-migracion-progresiva.md)
-- [Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
-
+- [1.4.1 El costo oculto del software legacy](./01-costo-oculto-del-legacy.md)
+- [1.4.2 Migración progresiva (strangler fig)](./02-migracion-progresiva.md)
+- [1.1.4 Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
 </div>
 
 ---

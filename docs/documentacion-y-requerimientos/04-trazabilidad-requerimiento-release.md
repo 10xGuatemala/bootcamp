@@ -4,8 +4,6 @@ title: Trazabilidad requerimiento → release
 sidebar_label: 5.4 Trazabilidad requerimiento → release
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Trazabilidad: del requerimiento al release
 
 Un equipo maduro no solo entrega software. También puede **responder, en cualquier momento**, tres preguntas:
@@ -183,9 +181,8 @@ Si estos cuatro puntos están en su lugar, una sola pregunta natural obtiene una
 - Requerimientos en documentos sin identificador estable.
 
 **Referencias cruzadas:**
-- [02 · Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
-- [03 · Manuales de usuario final](./03-manuales-de-usuario-final.md)
-
+- [5.2 Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
+- [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md)
 </div>
 
 ---

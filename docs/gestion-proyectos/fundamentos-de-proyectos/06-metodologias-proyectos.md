@@ -1,8 +1,13 @@
+---
+sidebar_position: 6
+sidebar_label: 4.1.6 Metodologías y Estándares para la Gestión de Proyectos
+---
+
 # Metodologías y Estándares para la Gestión de Proyectos
 
 En la gestión de proyectos, las metodologías y estándares son guías fundamentales para estructurar, planificar y ejecutar proyectos de manera eficiente. Este módulo explora las principales metodologías y estándares, incluyendo PMBOK®, PRINCE2, Ágil e IPMA, explicando sus características y los contextos donde son más útiles.
 
-## 6.1 Principales Metodologías, Prácticas, Frameworks y Estándares
+## Principales metodologías, prácticas, frameworks y estándares
 
 A continuación, se presentan las principales aproximaciones utilizadas en la gestión de proyectos, clasificadas según su tipo y características.
 
@@ -42,7 +47,7 @@ A continuación, se presentan las principales aproximaciones utilizadas en la ge
   - **Contexto Ideal:** Proyectos que requieren un enfoque integral en competencias técnicas y habilidades blandas.
   - **Enlace oficial:** [IPMA](https://www.ipma.world)
 
-## 6.2 Comparación de Metodologías y Estándares
+## Comparación de metodologías y estándares
 
 | **Nombre**         | **Tipo**             | **Enfoque**                  | **Contexto Ideal**                              | **Enlace Oficial**                          |
 |--------------------|---------------------|-----------------------------|------------------------------------------------|--------------------------------------------|
@@ -53,7 +58,7 @@ A continuación, se presentan las principales aproximaciones utilizadas en la ge
 
 ---
 
-## 6.3 ¿Cómo Elegir la Metodología Adecuada?
+## ¿Cómo elegir la metodología adecuada?
 
 1. **Analiza las Características del Proyecto:**
    - ¿Es un proyecto predecible o hay incertidumbre en los requisitos?
@@ -91,3 +96,68 @@ Estas recomendaciones están basadas en características generales de las metodo
 :::
 
 Entender las metodologías y estándares disponibles es fundamental para elegir el enfoque más adecuado según el proyecto y la organización. Este conocimiento permite estructurar el trabajo de manera eficiente, asegurando una mayor probabilidad de éxito.
+
+## Glosario
+
+**PMBOK** *(Project Management Body of Knowledge)* — estándar del PMI; su [séptima edición](https://www.pmi.org/pmbok-guide-standards) está organizada en 12 principios y 8 dominios de desempeño aplicables a enfoques predictivos, híbridos y adaptativos.
+
+**PRINCE2** *(Projects IN Controlled Environments)* — metodología basada en procesos, enfocada en justificación de negocio y control continuo ([Axelos](https://www.axelos.com/prince2)).
+
+**Ágil** *(Agile)* — enfoque iterativo e incremental que prioriza colaboración, adaptación al cambio y entrega continua de valor ([Agile Alliance](https://www.agilealliance.org)).
+
+**Scrum** *(Scrum)* — framework ágil ligero basado en sprints, roles (PO, SM, Devs) y eventos definidos ([Scrum Guide 2020](https://scrumguides.org/)).
+
+**Kanban** *(Kanban)* — método visual para gestionar flujo de trabajo continuo limitando WIP.
+
+**SAFe** *(Scaled Agile Framework)* — framework para escalar prácticas ágiles a nivel de programa y portafolio ([Scaled Agile](https://scaledagile.com/)).
+
+**IPMA** *(International Project Management Association)* — asociación europea con estándar basado en competencias individuales técnicas, contextuales y de comportamiento ([IPMA](https://www.ipma.world)).
+
+**Híbrido** *(Hybrid)* — combinación de enfoques predictivos y adaptativos adaptada al contexto del proyecto.
+
+:::info Referencias primarias
+- [PMBOK Guide séptima edición (PMI)](https://www.pmi.org/pmbok-guide-standards) — principios y dominios de desempeño.
+- [Scrum Guide 2020](https://scrumguides.org/) — definición oficial de Scrum.
+- [Agile Alliance](https://www.agilealliance.org) — comunidad y referencias sobre prácticas ágiles.
+- [Axelos · PRINCE2](https://www.axelos.com/prince2) — referencia oficial de la metodología.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** seleccionar la metodología o estándar más adecuado para un proyecto según su contexto y las partes interesadas.
+
+**Entradas:**
+- Características del proyecto (predictibilidad, volumen de cambios).
+- Restricciones organizacionales (gobernanza, cultura).
+- Familiaridad del equipo y stakeholders con marcos disponibles.
+- Requisitos de reporte y trazabilidad.
+
+**Pasos:**
+1. Caracterizar el proyecto: predecible, exploratorio o mixto.
+2. Revisar estándares y frameworks candidatos (PMBOK, PRINCE2, Scrum, Kanban, SAFe, IPMA).
+3. Contrastar contra restricciones y cultura organizacional.
+4. Evaluar familiaridad del equipo y costo de adopción.
+5. Proponer marco principal y adaptaciones necesarias (posible híbrido).
+6. Documentar decisión y criterios para revisarla.
+
+**Salidas:**
+- Recomendación de marco con justificación.
+- Lista de adaptaciones y prácticas complementarias.
+- Plan de transición o capacitación si aplica.
+
+**Errores comunes:**
+- Elegir marco por moda y no por ajuste al contexto.
+- Aplicar Scrum a proyectos con alcance rígido y contrato cerrado.
+- Imponer PMBOK puro en equipos maduros ágiles sin necesidad.
+- Ignorar la familiaridad y la capacidad de adopción del equipo.
+
+**Referencias cruzadas:**
+- [4.1.4 Procesos Clave en la Gestión de Proyectos](./04-proceso-clave-proyectos.md)
+- [4.2.4 PMBOK y Scrum — integración](../agilidad-y-scrum/04-pmbok-scrum-integracion.md)
+- [4.1.5 Gestión del Cambio y Resolución de Problemas](./05-gestion-cambio.md)
+</div>
+

@@ -1,3 +1,8 @@
+---
+sidebar_position: 5
+sidebar_label: 3.1.5 Convenciones de UI consistentes
+---
+
 # Convenciones de UI consistentes
 
 Diseñar una pantalla bonita es un buen principio; diseñar **cientos de pantallas que se sientan como la misma aplicación** es el verdadero trabajo de UI. Las convenciones — acuerdos compartidos sobre cómo se ven y se comportan los elementos — son lo que distingue a un producto que transmite precisión y madurez de uno que transmite ruido e improvisación.
@@ -118,3 +123,65 @@ La séptima pregunta es la más importante: **las convenciones existen para que 
 Cuando un agente de IA genera o modifica pantallas, necesita las mismas convenciones que el equipo humano — pero expresadas en un archivo que pueda leer antes de actuar. El patrón habitual es un `DESIGN.md` en la raíz del repositorio con paleta, tipografía, tokens, reglas de componentes y ejemplos de "sí/no". Sin ese archivo, el agente interpola desde patrones genéricos y el resultado se siente ajeno a la marca.
 
 Una referencia útil de cómo se ve ese archivo en productos reales es [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md), que cura `DESIGN.md` extraídos de 68+ sitios. El detalle de cómo integrar este archivo al flujo del agente se trata en [6.2 · Context engineering y CLAUDE.md](../../colaboracion-con-agentes-ia/02-context-engineering-claude-md.md).
+
+## Glosario
+
+**Convención de UI** *(UI convention)* — acuerdo compartido sobre apariencia y comportamiento de elementos en un producto.
+
+**Token de diseño** *(Design token)* — valor semántico (color, tamaño, espaciado) reutilizable en lugar de literales hardcoded.
+
+**Paleta semántica** *(Semantic palette)* — asignación de colores a roles (primary, destructive, muted) en vez de nombres cromáticos.
+
+**Jerarquía tipográfica** *(Typographic hierarchy)* — sistema de pesos y tamaños que comunica la importancia relativa del contenido.
+
+**Sistema de diseño** *(Design system)* — conjunto de tokens, componentes y guías que permite escalar la UI con consistencia.
+
+**Componente propio** *(Custom component)* — envoltorio sobre elementos nativos que centraliza estilos, estados y comportamientos.
+
+**DESIGN.md** *(Design.md file)* — archivo de referencia con paleta, tipografía y reglas que un agente de IA puede consultar antes de generar UI.
+
+:::info Referencias primarias
+- [Material Design](https://m3.material.io/) — sistema de diseño de Google.
+- [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) — guías de interfaces de Apple.
+- [W3C · WCAG 2.2](https://www.w3.org/TR/WCAG22/) — estándar de accesibilidad web.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** establecer convenciones de UI que mantengan coherencia visual y funcional a medida que el producto crece.
+
+**Entradas:**
+- Identidad de marca y principios visuales.
+- Librería de iconos, tipografías y componentes candidatos.
+- Requisitos de accesibilidad y contraste.
+- Alcance del producto y cantidad de pantallas previstas.
+
+**Pasos:**
+1. Acordar una familia única de iconos y su tamaño base.
+2. Definir tokens de color semánticos y prohibir valores literales en código.
+3. Establecer jerarquía tipográfica con pesos y tamaños limitados.
+4. Crear componentes propios para formularios y acciones críticas.
+5. Redactar un `DESIGN.md` con paleta, tipografía, reglas y ejemplos "sí/no".
+6. Aplicar la lista de verificación antes de aprobar cada pantalla.
+7. Revisar consistencia cuando un agente de IA genere o modifique pantallas.
+
+**Salidas:**
+- `DESIGN.md` versionado en el repositorio.
+- Sistema de tokens y componentes base.
+- Checklist de revisión pre-aprobación.
+
+**Errores comunes:**
+- Repetir valores de color literales en múltiples archivos.
+- Mezclar familias de iconos o pesos tipográficos sin control.
+- Usar elementos nativos de formulario en productos que crecerán.
+- Delegar UI a un agente sin un `DESIGN.md` de referencia.
+
+**Referencias cruzadas:**
+- [3.1.3 ¿Qué es UI?](./03-que-es-ui.md)
+- [3.1.4 Diferencias entre UX/UI](./04-diferencia.md)
+- [6.2 Context engineering y CLAUDE.md](../../colaboracion-con-agentes-ia/02-context-engineering-claude-md.md)
+</div>

@@ -12,6 +12,12 @@ Los módulos cubren los principios esenciales del diseño UX/UI aplicados al des
 
 ## Módulos del curso
 
-import DocCardList from '@theme/DocCardList';
-
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [index](./fundamentos-ux-ui/)
+
+</div>

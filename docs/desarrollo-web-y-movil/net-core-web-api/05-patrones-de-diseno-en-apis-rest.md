@@ -1,3 +1,8 @@
+---
+sidebar_position: 5
+sidebar_label: 1.2.5 Patrones de diseño en APIs REST
+---
+
 # Patrones de diseño en APIs REST
 
 Una API REST bien escrita tiene una deuda silenciosa con los patrones de diseño. No los menciona en ningún lado, pero sin ellos aparece la duplicación: filtros que se copian y pegan entre servicios, métodos de creación de entidades que repiten las mismas validaciones, clases de catálogo que son casi idénticas salvo por un par de líneas. En cuanto un proyecto tiene tres o cuatro módulos de negocio, esa duplicación se convierte en fricción diaria.
@@ -155,6 +160,32 @@ Los patrones no son decoración. Si un código lineal resuelve el problema del d
 
 Los patrones estructurales se justifican cuando el sistema cruza el umbral de varios módulos que deben coordinarse. Mientras la API sea un solo dominio bien delimitado, basta con los cinco primeros.
 
+## Glosario
+
+**Strategy** *(Strategy pattern)* — patrón que encapsula algoritmos intercambiables; útil para filtros y reglas que varían por contexto.
+
+**Factory** *(Factory pattern)* — patrón que concentra la creación de objetos complejos en un solo punto con reglas y validaciones compartidas.
+
+**Builder** *(Builder pattern)* — patrón que construye objetos complejos paso a paso mediante una API fluida y valida al final.
+
+**Template Method** *(Template Method pattern)* — patrón con clase base que define el flujo y hooks para variaciones específicas.
+
+**Máquina de estados** *(State machine)* — estructura que declara explícitamente los estados válidos y sus transiciones permitidas.
+
+**Repository** *(Repository pattern)* — abstracción sobre el acceso a datos que desacopla los servicios del mecanismo concreto de persistencia.
+
+**Arquitectura dirigida por eventos** *(Event-driven architecture)* — estilo donde los módulos publican y consumen eventos para reducir acoplamiento directo.
+
+**Specification** *(Specification pattern)* — encapsulamiento de reglas de negocio reutilizables consultables desde varios servicios.
+
+**Decorator** *(Decorator pattern)* — composición de funcionalidades transversales (logging, caching) sobre un servicio sin modificarlo.
+
+:::info Referencias primarias
+- [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
+- [ASP.NET Core docs](https://learn.microsoft.com/en-us/aspnet/core/) — guías de APIs web.
+- [Martin Fowler · Patterns of Enterprise Application Architecture](https://martinfowler.com/books/eaa.html) — referencia clásica de patrones.
+:::
+
 ---
 
 <div className="agent-block">
@@ -189,8 +220,7 @@ Los patrones estructurales se justifican cuando el sistema cruza el umbral de va
 - Copiar `ApplyFilters` entre servicios en lugar de extraer estrategias.
 
 **Referencias cruzadas:**
-- [Arquitectura de Backend API REST en .NET Core](./01-arquitectura-de-backend.md)
-- [La Capa de Servicios en un Backend API REST](./03-capa-servicios.md)
-- [Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
-
+- [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)
+- [1.2.3 La Capa de Servicios en un Backend API REST](./03-capa-servicios.md)
+- [1.1.4 Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
 </div>

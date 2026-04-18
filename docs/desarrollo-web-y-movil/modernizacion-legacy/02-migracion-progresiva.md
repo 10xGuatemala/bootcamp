@@ -1,9 +1,8 @@
 ---
 sidebar_position: 2
 title: Migración progresiva (strangler fig)
+sidebar_label: 1.4.2 Migración progresiva (strangler fig)
 ---
-
-import AuthorCredit from '@site/src/components/AuthorCredit';
 
 # Migración progresiva: el patrón strangler fig
 
@@ -119,6 +118,26 @@ Una migración larga necesita gobernanza ligera pero constante:
 - **Dueño único** del proyecto de migración, no comité.
 - **Visibilidad a negocio**: dashboards o one-pagers que muestren el avance sin tecnicismos.
 
+## Glosario
+
+**Strangler Fig** *(Strangler Fig Pattern)* — patrón de migración incremental que envuelve el sistema legacy y redirige gradualmente funcionalidad al nuevo, descrito por [Martin Fowler](https://martinfowler.com/bliki/StranglerFigApplication.html).
+
+**Fachada** *(Facade)* — componente que expone una interfaz unificada y oculta la complejidad del legacy y del nuevo sistema detrás.
+
+**Big bang** *(Big-bang migration)* — estrategia de migración de todo el sistema en una sola entrega; alto riesgo y contraria al enfoque strangler.
+
+**Dominio** *(Bounded context)* — área funcional coherente del negocio que puede migrarse como unidad independiente.
+
+**Rollback** *(Rollback)* — vuelta atrás segura a la versión previa cuando la nueva implementación falla.
+
+**Shadow traffic** *(Shadow traffic)* — envío del mismo request a legacy y a la nueva implementación para comparar resultados sin impactar al usuario.
+
+:::info Referencias primarias
+- [Martin Fowler · Strangler Fig Application](https://martinfowler.com/bliki/StranglerFigApplication.html) — definición canónica del patrón.
+- [Michael Feathers · Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/) — técnicas de intervención segura en legacy.
+- [ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar) — prácticas recomendadas de modernización.
+:::
+
 ---
 
 <div className="agent-block">
@@ -154,9 +173,8 @@ Una migración larga necesita gobernanza ligera pero constante:
 - Reproducir el legacy sin repensar el diseño.
 
 **Referencias cruzadas:**
-- [01 · El costo oculto del software legacy](./01-costo-oculto-del-legacy.md)
-- [04 · Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
-
+- [1.4.1 El costo oculto del software legacy](./01-costo-oculto-del-legacy.md)
+- [1.1.4 Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
 </div>
 
 ---

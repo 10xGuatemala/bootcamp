@@ -1,3 +1,8 @@
+---
+sidebar_position: 4
+sidebar_label: 1.2.4 La Capa de Datos en un Backend API REST
+---
+
 # La Capa de Datos en un Backend API REST
 
 La capa de datos en un backend API REST es responsable de la interacción directa con la base de datos. Incluye las entidades que representan las tablas de la base de datos y el contexto de datos (DbContext), encargado de gestionar la conexión y las operaciones CRUD. Su diseño permite mantener un acceso a datos limpio y desacoplado de la lógica de negocio, promoviendo así una arquitectura más organizada y mantenible.
@@ -237,16 +242,16 @@ var empleados = context.Empleados
 
 Dependiendo del proveedor de la base de datos que se esté utilizando, se pueden emplear diferentes librerías para conectarse y gestionar las operaciones de acceso a datos. A continuación se presentan las librerías más populares para algunos de los sistemas de gestión de bases de datos más comunes:
 
-### 1. Oracle
+### Oracle
 
 - **Oracle Entity Framework Core**: Para trabajar con Oracle mediante Entity Framework Core, se puede utilizar la librería `Oracle.EntityFrameworkCore` proporcionada por Oracle.
 
-### 2. MySQL
+### MySQL
 
 - **Pomelo.EntityFrameworkCore.MySql**: Es una librería popular y de código abierto para utilizar Entity Framework Core con MySQL.
 - **MySql.Data.EntityFrameworkCore**: Proporcionada por Oracle, es otra opción para trabajar con MySQL en .NET.
 
-### 3. PostgreSQL
+### PostgreSQL
 
 - **Npgsql.EntityFrameworkCore.PostgreSQL**: `Npgsql` es la librería más común para trabajar con PostgreSQL en .NET y soporta Entity Framework Core.
 
@@ -261,3 +266,67 @@ Estas librerías permiten que Entity Framework Core se comunique con diferentes 
 - **Mapeo de Entidades y Vistas**: Incluye el uso de anotaciones como `Key`, `PrimaryKey`, `Keyless`, `Required`, y `MaxLength` para definir la estructura y características de las tablas y vistas, lo cual facilita la representación y manipulación de datos estructurados y no estructurados directamente desde la base de datos.
 
 Con estos conceptos, puedes estructurar una capa de datos robusta que facilite la interacción con la base de datos de manera segura y eficiente, asegurando que los datos se gestionen adecuadamente a lo largo de las diferentes capas de la aplicación.
+
+## Glosario
+
+**Entity Framework Core** *(EF Core)* — ORM oficial de Microsoft para .NET que mapea clases a tablas y traduce LINQ a SQL.
+
+**ORM** *(Object-Relational Mapper)* — herramienta que traduce entre objetos y registros de una base de datos relacional.
+
+**`DbContext`** *(DbContext)* — clase que representa una sesión con la base de datos; gestiona conexión, seguimiento y operaciones.
+
+**`DbSet`** *(DbSet)* — colección que representa una tabla o vista consultable dentro del `DbContext`.
+
+**Clave compuesta** *(Composite key)* — clave primaria formada por más de una columna; se declara con `[PrimaryKey]`.
+
+**`[Keyless]`** *(Keyless entity)* — atributo que permite mapear vistas o resultados sin clave primaria.
+
+**LINQ** *(Language Integrated Query)* — sintaxis de consulta integrada en C# utilizada para traducir expresiones a SQL.
+
+**Consulta parametrizada** *(Parameterized query)* — consulta cuyos valores se pasan como parámetros para evitar inyección SQL.
+
+:::info Referencias primarias
+- [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
+- [Entity Framework Core docs](https://learn.microsoft.com/en-us/ef/core/) — guía oficial de EF Core.
+- [EF Core · Modeling](https://learn.microsoft.com/en-us/ef/core/modeling/) — modelado de entidades y mapeos.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** modelar la capa de datos de una API REST en .NET Core con Entity Framework Core aplicando buenas prácticas de mapeo y acceso.
+
+**Entradas:**
+- Modelo de dominio y relaciones entre entidades.
+- Proveedor de base de datos (SQL Server, MySQL, PostgreSQL, Oracle).
+- Cadena de conexión y política de configuración por entorno.
+- Vistas o consultas agregadas que deban exponerse.
+
+**Pasos:**
+1. Crear entidades con atributos de mapeo (`[Key]`, `[Required]`, `[MaxLength]`, `[Column]`, `[Table]`).
+2. Definir claves compuestas con `[PrimaryKey(...)]` cuando aplique.
+3. Implementar el `DbContext` con los `DbSet` correspondientes y registrarlo en `Program.cs`.
+4. Mapear vistas a DTOs con `[Keyless]` para consultas agregadas.
+5. Escribir consultas LINQ preferentemente y parametrizar cualquier consulta SQL directa.
+6. Configurar la cadena de conexión por variables de entorno en producción.
+7. Seleccionar el provider adecuado (`Pomelo.EntityFrameworkCore.MySql`, `Npgsql`, `Oracle.EntityFrameworkCore`).
+
+**Salidas:**
+- Entidades y `DbContext` listos para operaciones CRUD.
+- Estrategia de mapeo de vistas y DTOs de lectura.
+- Configuración segura de conexiones por entorno.
+
+**Errores comunes:**
+- Concatenar parámetros en consultas SQL directas (riesgo de inyección).
+- Exponer entidades `DbContext` como DTOs de la API.
+- Almacenar la cadena de conexión con credenciales en `appsettings.json` de producción.
+- Olvidar `[Keyless]` en vistas, causando errores de modelado.
+
+**Referencias cruzadas:**
+- [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)
+- [1.2.3 La Capa de Servicios en un Backend API REST](./03-capa-servicios.md)
+- [1.2.5 Patrones de diseño en APIs REST](./05-patrones-de-diseno-en-apis-rest.md)
+</div>

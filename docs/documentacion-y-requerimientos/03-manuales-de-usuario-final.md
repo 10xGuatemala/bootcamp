@@ -4,8 +4,6 @@ title: Manuales de usuario final
 sidebar_label: 5.3 Manuales de usuario final
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Manuales de usuario final
 
 Un manual técnico y un manual de usuario persiguen objetivos distintos. El primero ayuda a un equipo a implementar; el segundo ayuda a una persona a **operar con confianza**, incluso si nunca va a entender cómo funciona por dentro.
@@ -43,7 +41,7 @@ mindmap
 
 ## Los tres principios que no fallan
 
-### 1. Habla de tareas, no de pantallas
+### Habla de tareas, no de pantallas
 
 Un usuario rara vez abre un manual para "conocer la aplicación". Lo abre porque necesita **hacer algo específico**: emitir una factura, aprobar un cambio, recuperar una contraseña. La estructura del manual debe reflejar eso.
 
@@ -53,7 +51,7 @@ Un usuario rara vez abre un manual para "conocer la aplicación". Lo abre porque
 | *"Menú de administración"* | *"Cómo otorgar permisos a un nuevo empleado"* |
 | *"Formulario de login"* | *"Cómo recuperar el acceso si olvidaste tu contraseña"* |
 
-### 2. Orden: tarea → requisitos → pasos → resultado → recuperación
+### Orden: tarea → requisitos → pasos → resultado → recuperación
 
 La estructura interna de cada sección debería ser casi mecánica:
 
@@ -83,7 +81,7 @@ La factura aparece en el listado de "Facturas del día".
 
 Este patrón es reconocible para cualquier lector y fácil de generar para un agente.
 
-### 3. Verifica con un usuario real, no con el que escribió
+### Verifica con un usuario real, no con el que escribió
 
 Un manual que el autor considera "claro" rara vez es claro para quien nunca vio la aplicación. Ritual de validación:
 
@@ -293,6 +291,28 @@ Una vez registrada la skill, invocarla es tan simple como:
 
 El agente genera la sección siguiendo las reglas sin que el equipo tenga que repetirlas cada vez.
 
+## Glosario
+
+**Manual de usuario** *(User manual / End-user documentation)* — documento orientado a tareas dirigido a usuarios finales. El [framework Diátaxis](https://diataxis.fr/) lo clasifica dentro de las categorías *tutorial* y *how-to guide*, distinguiéndolo de *reference* y *explanation*.
+
+**Manual técnico** *(Technical / Developer documentation)* — documentación para equipos de implementación. En [Diátaxis](https://diataxis.fr/) corresponde principalmente a *reference* y *explanation*.
+
+**Tutorial** *(Tutorial)* — *"una lección que toma al estudiante por la mano a través de una serie de pasos para completar un proyecto"* ([Diátaxis · Tutorials](https://diataxis.fr/tutorials/)); orientado al aprendizaje, no a la tarea concreta.
+
+**How-to guide** *(How-to guide)* — *"receta para alcanzar un objetivo específico"* ([Diátaxis · How-to guides](https://diataxis.fr/how-to-guides/)); orientada a usuarios que ya saben lo básico y necesitan resolver algo concreto.
+
+**Voz y tono** *(Voice and tone)* — conjunto de decisiones editoriales que definen cómo se dirige la documentación al lector. La [Google Developer Documentation Style Guide](https://developers.google.com/style) recomienda *"be conversational and friendly without being frivolous"* y el [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/) promueve *"warm and relaxed, crisp and clear, ready to lend a hand"*.
+
+**Accesibilidad en documentación** *(Accessible documentation)* — prácticas que aseguran que el manual sea utilizable por personas con discapacidad; incluye texto alternativo, contraste y estructura semántica. Guía oficial en [Microsoft Writing Style Guide · Accessibility](https://learn.microsoft.com/en-us/style-guide/welcome/).
+
+**Internacionalización (i18n)** *(Internationalization)* — diseñar contenido para que pueda traducirse sin rehacerlo; incluye evitar modismos, usar fechas ISO y separar texto de imágenes. Recomendaciones en la [Google Developer Documentation Style Guide](https://developers.google.com/style).
+
+:::info Referencias primarias
+- [Diátaxis framework](https://diataxis.fr/) — taxonomía canónica de documentación técnica (tutorial / how-to / reference / explanation).
+- [Google Developer Documentation Style Guide](https://developers.google.com/style) — estándar abierto de estilo para docs técnicos.
+- [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/) — guía editorial de Microsoft, gratuita y accesible.
+:::
+
 ---
 
 <div className="agent-block">
@@ -328,9 +348,8 @@ El agente genera la sección siguiendo las reglas sin que el equipo tenga que re
 - Olvidar versionar el manual.
 
 **Referencias cruzadas:**
-- [01 · De la idea al release](./01-de-la-idea-al-release.md)
-- [04 · Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
-
+- [5.1 De la idea al release](./01-de-la-idea-al-release.md)
+- [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
 </div>
 
 ---

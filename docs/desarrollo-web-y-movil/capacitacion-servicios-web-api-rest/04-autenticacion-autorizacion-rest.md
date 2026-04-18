@@ -1,10 +1,15 @@
+---
+sidebar_position: 4
+sidebar_label: 1.1.4 Autenticación y Autorización en APIs RESTful
+---
+
 # Autenticación y Autorización en APIs RESTful
 
 Este módulo presenta los conceptos fundamentales de autenticación y autorización en el contexto de APIs RESTful y cómo aplicar buenas prácticas para garantizar la seguridad de la API, incluyendo los controles transversales que aplican cuando una **SPA** la consume desde el navegador.
 
 ## Contenido
 
-### 1. Introducción a la Autenticación y Autorización
+### Introducción a la Autenticación y Autorización
 
 - **Autenticación**: Proceso de verificación de identidad del usuario o entidad que *intenta acceder al servicio*.
 - **Autorización**: Proceso de determinar los permisos o acceso que tiene un *usuario autenticado* para acceder a ciertos recursos de la API.
@@ -12,7 +17,7 @@ Este módulo presenta los conceptos fundamentales de autenticación y autorizaci
 
 ![autorización y autenticacion](./img/autenticacion-autorizacion-01.png)
 
-### 2. Tipos de Autenticación Comunes en APIs RESTful
+### Tipos de Autenticación Comunes en APIs RESTful
 
 #### 2.1 Autenticación Básica
 
@@ -199,7 +204,7 @@ sequenceDiagram
 - **Aislamiento del estado parcial.** Entre paso 1 y paso 4 el servidor puede mantener un desafío temporal (identificador + código + intentos restantes), preferentemente en caché con expiración automática. Nunca emitir un token "de paso" que el cliente pueda usar para consumir recursos.
 - **Auditoría.** Registrar intentos de validación (éxito y fallo) con marca de tiempo, IP y agente — insumo clave para detectar ataques dirigidos.
 
-### 3. Tokens de Autenticación
+### Tokens de Autenticación
 
 #### 3.1 JWT (JSON Web Token)
 
@@ -235,7 +240,7 @@ Un token bien firmado pero con `iss` desconocido o `aud` distinto al de la API d
 - **Revocación:** los JWT son *stateless* por diseño, pero un caso real (logout, cambio de contraseña, usuario baneado) requiere invalidación. Opciones: lista de tokens revocados en caché, sesiones de corta duración, o `jti` (JWT ID) contra una lista negra.
 - **Alcance mínimo (`scope`):** emitir tokens con el conjunto más pequeño de permisos necesarios para la operación.
 
-### 4. Principios de Autorización
+### Principios de Autorización
 
 #### 4.1 Roles y Permisos
 
@@ -259,7 +264,7 @@ Un token bien firmado pero con `iss` desconocido o `aud` distinto al de la API d
 }
 ```
 
-### 5. Buenas Prácticas de Seguridad
+### Buenas Prácticas de Seguridad
 
 - **Utilizar SSL**: Asegúrate de que todas las comunicaciones entre el cliente y el servidor se realicen mediante SSL (Secure Sockets Layer) para cifrar los datos transmitidos y protegerlos contra ataques de interceptación.
 - **Utilizar autenticación por medio de tokens de seguridad**: Implementar autenticación basada en tokens para evitar la necesidad de almacenar sesiones en el servidor, proporcionando así un método más seguro y escalable.
@@ -327,7 +332,7 @@ Los controles de seguridad solo aprenden del uso real si se miden. La API deber�
 
 Estos datos alimentan alertas (ej. "más de 50 `401` por minuto en login" o "tasa de `403` diez veces superior al promedio en endpoint X") que permiten detener un ataque en curso antes de que se convierta en compromiso.
 
-### 6. Casos de Uso Comunes
+### Casos de Uso Comunes
 
 #### 6.1 Autenticación de Usuario para Recursos Restringidos
 
@@ -336,3 +341,73 @@ Estos datos alimentan alertas (ej. "más de 50 `401` por minuto en login" o "tas
 #### 6.2 Diferentes Permisos para Distintos Roles de Usuario
 
 - Diferentes roles (por ejemplo, **administrador**, **usuario estándar**) tienen distintos niveles de acceso. Los permisos específicos que cada rol tiene deben ser definidos claramente para evitar accesos no autorizados a recursos críticos.
+
+## Glosario
+
+**Autenticación** *(Authentication)* — proceso de verificar la identidad del usuario o sistema que intenta acceder a la API.
+
+**Autorización** *(Authorization)* — proceso de determinar qué acciones puede realizar un usuario ya autenticado.
+
+**JWT** *(JSON Web Token)* — estándar para representar claims entre partes de forma firmada ([RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519)).
+
+**Bearer token** *(Bearer token)* — token cuyo poseedor puede acceder a los recursos; se envía en `Authorization: Bearer <token>` según [RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750).
+
+**Cookie HttpOnly** *(HttpOnly cookie)* — cookie inaccesible para JavaScript (`document.cookie`), usada para mitigar XSS sobre tokens.
+
+**MFA** *(Multi-Factor Authentication)* — exigencia de dos o más factores de distinta naturaleza (sabes / tienes / eres) para autenticar.
+
+**CORS** *(Cross-Origin Resource Sharing)* — mecanismo del navegador que controla qué orígenes pueden consumir una API desde otro dominio.
+
+**CSRF** *(Cross-Site Request Forgery)* — ataque que aprovecha cookies de sesión para ejecutar acciones no deseadas en nombre del usuario.
+
+**Rate limiting** *(Rate limiting)* — límite al número de peticiones por ventana de tiempo; respuesta típica `429 Too Many Requests`.
+
+**Scope** *(Scope)* — alcance de permisos asociado a un token; limita las operaciones que puede ejecutar.
+
+:::info Referencias primarias
+- [RFC 7519 JSON Web Token](https://datatracker.ietf.org/doc/html/rfc7519) — especificación oficial de JWT.
+- [RFC 6750 Bearer Token Usage](https://datatracker.ietf.org/doc/html/rfc6750) — uso de tokens Bearer en OAuth 2.0.
+- [OWASP API Security Top 10](https://owasp.org/API-Security/) — riesgos críticos en APIs.
+- [Fetch · CORS protocol](https://fetch.spec.whatwg.org/#http-cors-protocol) — especificación CORS del WHATWG.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** diseñar el esquema de autenticación y autorización de una API REST considerando clientes navegador y no-navegador.
+
+**Entradas:**
+- Tipos de clientes que consumirán la API (SPA, móvil, CLI, servidor).
+- Requisitos de MFA, roles y alcances.
+- Nivel de riesgo de los endpoints expuestos.
+- Políticas de seguridad vigentes (TLS, rotación de claves, auditoría).
+
+**Pasos:**
+1. Elegir transporte del token: cookie `HttpOnly; Secure; SameSite` para navegador; `Authorization: Bearer` para clientes no-navegador.
+2. Definir claims JWT a validar (`iss`, `aud`, `exp`, `sub`, `jti`) y algoritmo de firma.
+3. Configurar expiración corta de tokens de acceso y refresh tokens con alcance restringido.
+4. Incorporar MFA donde el riesgo lo justifique, con ventana, reintentos y cooldown.
+5. Aplicar rate limiting a login, MFA, registro y recuperación de contraseña.
+6. Blindar CORS y CSRF cuando la sesión viaje por cookies.
+7. Validar permisos en el servidor en cada endpoint, sin confiar en el cliente.
+8. Instrumentar observabilidad (`401`, `403`, `429`, MFA fallido) para detección temprana.
+
+**Salidas:**
+- Esquema de autenticación documentado por tipo de cliente.
+- Políticas de rotación, expiración y revocación de tokens.
+- Métricas y alertas asociadas a autenticación y autorización.
+
+**Errores comunes:**
+- Almacenar tokens en `localStorage` o `sessionStorage`.
+- Aceptar tokens con `alg: none` o sin validar `aud`/`iss`.
+- Tratar la autorización del cliente como control de seguridad.
+- Omitir rate limiting en endpoints sensibles como login o reset de contraseña.
+
+**Referencias cruzadas:**
+- [1.1.2 Componentes Básicos de un Servicio Web tipo API REST](./02-componentes-basicos-api-rest.md)
+- [1.3.5 SAST y SCA en la fase de validación](../fundamentos-sonarqube/05-sast-y-sca-en-validacion.md)
+- [6.4 Seguridad al ejecutar herramientas externas](../../colaboracion-con-agentes-ia/04-seguridad-en-herramientas-externas.md)
+</div>

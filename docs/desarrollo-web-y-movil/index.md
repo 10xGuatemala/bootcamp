@@ -12,6 +12,14 @@ La categoría cubre desde el diseño de servicios web tipo API REST y la constru
 
 ## Módulos del curso
 
-import DocCardList from '@theme/DocCardList';
-
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [index](./capacitacion-servicios-web-api-rest/)
+- [index](./fundamentos-sonarqube/)
+- [index](./net-core-web-api/)
+
+</div>

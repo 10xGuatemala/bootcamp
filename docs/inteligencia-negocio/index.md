@@ -12,6 +12,13 @@ Los módulos cubren los conceptos base de BI y el diseño de visualizaciones que
 
 ## Módulos del curso
 
-import DocCardList from '@theme/DocCardList';
-
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [index](./introduccion-bi/)
+- [index](./introduccion-visualizacion-datos/)
+
+</div>

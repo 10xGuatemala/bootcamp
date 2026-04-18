@@ -1,3 +1,8 @@
+---
+sidebar_position: 4
+sidebar_label: 1.3.4 Integración de SonarQube en el ciclo DevOps
+---
+
 # Integración de SonarQube en el ciclo DevOps
 
 SonarQube y sus componentes —**SonarScanner**, **SonarLint** y el **SonarQube Server**— pueden integrarse de manera efectiva en el flujo de DevOps, automatizando el control de calidad y seguridad desde la codificación hasta el despliegue.
@@ -33,3 +38,63 @@ Puedes explorar un proyecto real que ya está integrado con SonarCloud y GitHub:
 - 💻 **Código fuente en GitHub:** [github.com/10xGuatemala/DiezX.Api.Commons](https://github.com/10xGuatemala/DiezX.Api.Commons)
 
 Este ejemplo te ayudará a visualizar cómo se conectan los componentes de SonarQube con los pipelines de CI/CD en un proyecto profesional.
+
+## Glosario
+
+**DevOps** *(DevOps)* — conjunto de prácticas que integran desarrollo y operaciones para entregar software de forma continua y confiable.
+
+**CI/CD** *(Continuous Integration / Continuous Delivery)* — prácticas de integración y entrega continua que automatizan build, prueba y despliegue.
+
+**Pipeline** *(Pipeline)* — flujo automatizado de etapas (build, test, análisis, deploy) que ejecuta cada cambio de código.
+
+**Pull request** *(Pull request / Merge request)* — propuesta de cambio en un repositorio que puede requerir aprobación automática y humana antes del merge.
+
+**Dashboard** *(Dashboard)* — panel con métricas consolidadas; en SonarQube muestra estado de calidad por proyecto y rama.
+
+**Token de scanner** *(Scanner token)* — credencial que autentica al SonarScanner contra el SonarQube Server; debe rotarse y almacenarse como secreto.
+
+:::info Referencias primarias
+- [SonarQube · DevOps integration](https://docs.sonarsource.com/sonarqube/latest/) — guía oficial de integración.
+- [OWASP Top 10](https://owasp.org/Top10/) — categorías de riesgo para reglas del pipeline.
+- [CWE Top 25](https://cwe.mitre.org/top25/) — debilidades críticas a bloquear.
+- [NIST SSDF](https://csrc.nist.gov/Projects/ssdf) — prácticas seguras en el SDLC.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** integrar SonarQube en el ciclo DevOps para que la calidad y seguridad del código sean parte del flujo continuo.
+
+**Entradas:**
+- Pipeline de CI/CD existente.
+- Repositorio de código con control de versiones.
+- Quality Profile y Quality Gate configurados.
+- Credenciales y acceso al SonarQube Server o SonarCloud.
+
+**Pasos:**
+1. Instalar SonarLint en los IDEs del equipo para retroalimentación local.
+2. Configurar SonarScanner en el pipeline para ejecutar análisis por cada push o pull request.
+3. Publicar resultados al SonarQube Server y exponerlos en el pull request.
+4. Aplicar el Quality Gate como criterio bloqueante antes del merge o despliegue.
+5. Monitorear el dashboard de forma continua y revisar tendencias.
+6. Iterar reglas y umbrales según los hallazgos recurrentes.
+
+**Salidas:**
+- Pipeline CI/CD con análisis automático integrado.
+- Quality Gate aplicado antes de merge o despliegue.
+- Dashboard compartido para visibilidad del equipo.
+
+**Errores comunes:**
+- Ejecutar el scanner solo en ramas principales y perder feedback temprano.
+- Permitir merge aunque el Quality Gate falle.
+- No rotar credenciales del token del scanner.
+- Desvincular SonarLint de la configuración del servidor.
+
+**Referencias cruzadas:**
+- [1.3.1 Introducción a SonarQube](./01-introduccion-sonarqube.md)
+- [1.3.3 Aplicación Práctica](./03-aplicacion-practica.md)
+- [1.3.5 SAST y SCA en la fase de validación](./05-sast-y-sca-en-validacion.md)
+</div>

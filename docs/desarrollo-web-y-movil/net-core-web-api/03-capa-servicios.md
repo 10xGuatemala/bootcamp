@@ -1,3 +1,8 @@
+---
+sidebar_position: 3
+sidebar_label: 1.2.3 La Capa de Servicios en un Backend API REST
+---
+
 # La Capa de Servicios en un Backend API REST
 
 Los servicios en un backend API REST encapsulan la lógica de negocio y sirven como la capa intermedia entre los controladores y la capa de acceso a datos. Esta separación de responsabilidades promueve un diseño más limpio y modular, facilitando el mantenimiento y la escalabilidad del sistema.
@@ -96,7 +101,7 @@ En el ejemplo anterior, el servicio utiliza `EmpleadoDTO` para transferir datos 
 
 Existen diferentes formas de inyectar un servicio en la aplicación. La inyección de dependencias permite que un servicio tenga acceso a otras clases necesarias (como el contexto de base de datos) sin acoplarse fuertemente a ellas.
 
-### 1. Inyección de Dependencias sin Interfaz
+### Inyección de Dependencias sin Interfaz
 
 La forma más sencilla de inyectar un servicio es directamente sin interfaz. En el ejemplo anterior, `EmpleadoService` se inyecta directamente en el controlador:
 
@@ -114,7 +119,7 @@ public class EmpleadosController : ControllerBase
 
 Esta forma de inyección es útil cuando la implementación del servicio no tiene variaciones y no se espera sustituir `EmpleadoService` por otra implementación en el futuro.
 
-### 2. Inyección de Dependencias con Interfaz
+### Inyección de Dependencias con Interfaz
 
 En aplicaciones más complejas, es una buena práctica definir una interfaz para los servicios. Esto permite cambiar la implementación del servicio sin afectar al código que lo consume, facilitando la realización de pruebas unitarias o el uso de mocks.
 
@@ -196,15 +201,15 @@ app.MapControllers();
 app.Run();
 ```
 
-### 1. `AddScoped`
+### `AddScoped`
 
 `AddScoped` registra un servicio con un ciclo de vida por solicitud. Cada vez que se recibe una solicitud HTTP, se crea una nueva instancia del servicio. Este enfoque es ideal para servicios que contienen lógica que no debería compartirse entre diferentes solicitudes concurrentes.
 
-### 2. `AddTransient`
+### `AddTransient`
 
 `AddTransient` registra un servicio con un ciclo de vida transitorio, lo que significa que se crea una nueva instancia cada vez que el servicio es solicitado. Este enfoque es adecuado para servicios ligeros y sin estado, donde una nueva instancia por cada uso es beneficiosa.
 
-### 3. `AddSingleton`
+### `AddSingleton`
 
 `AddSingleton` registra un servicio con un ciclo de vida único durante toda la vida útil de la aplicación. Es decir, se crea una única instancia del servicio cuando se inyecta por primera vez y se comparte en toda la aplicación. Este tipo de inyección es útil para servicios que contienen lógica que se puede compartir sin restricciones entre solicitudes, como cachés en memoria.
 
@@ -224,3 +229,65 @@ app.Run();
 - **Buenas Prácticas**: Mantener métodos simples, utilizar DTOs, manejar excepciones y seguir el principio de separación de responsabilidades.
 
 Con estas prácticas y conceptos, puedes estructurar la capa de servicios de una API REST de manera efectiva, asegurando un código modular, limpio y fácil de mantener.
+
+## Glosario
+
+**Servicio de aplicación** *(Application service)* — clase que implementa la lógica de negocio y coordina el acceso a datos.
+
+**DTO** *(Data Transfer Object)* — objeto que transporta datos entre capas sin exponer la estructura interna del modelo.
+
+**Inyección de dependencias** *(Dependency injection)* — técnica para proveer colaboradores por constructor en lugar de instanciarlos dentro de la clase.
+
+**`AddScoped`** *(Scoped lifetime)* — ciclo de vida que crea una instancia por solicitud HTTP; adecuado para servicios con `DbContext`.
+
+**`AddTransient`** *(Transient lifetime)* — ciclo de vida que crea una instancia nueva en cada resolución; ideal para servicios sin estado.
+
+**`AddSingleton`** *(Singleton lifetime)* — instancia única compartida durante toda la vida de la aplicación.
+
+**Principio de inversión de dependencias** *(Dependency Inversion Principle)* — principio SOLID que favorece depender de abstracciones en lugar de implementaciones concretas.
+
+:::info Referencias primarias
+- [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
+- [ASP.NET Core · Dependency injection](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) — guía oficial de DI.
+- [Entity Framework Core docs](https://learn.microsoft.com/en-us/ef/core/) — referencia de EF Core.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** encapsular la lógica de negocio en la capa de servicios de una API REST en .NET Core con buenas prácticas de diseño e inyección de dependencias.
+
+**Entradas:**
+- Requerimientos funcionales y reglas de negocio del dominio.
+- DTOs definidos para transferencia entre capas.
+- Contexto de datos (`DbContext`) del proyecto.
+- Política de ciclo de vida de los servicios (Scoped, Transient, Singleton).
+
+**Pasos:**
+1. Crear una clase de servicio con responsabilidad única por dominio (p. ej. `EmpleadoService`).
+2. Exponer métodos claros de creación, consulta, actualización y eliminación.
+3. Utilizar DTOs para desacoplar la estructura interna del contrato público.
+4. Inyectar el `DbContext` y otras dependencias por constructor.
+5. Definir interfaz si se requiere sustituir la implementación o facilitar pruebas.
+6. Registrar el servicio en `Program.cs` con el ciclo de vida adecuado.
+7. Manejar excepciones y validar reglas de negocio dentro del servicio.
+
+**Salidas:**
+- Servicios con responsabilidad única y probables mediante mocks.
+- DTOs estables para comunicación entre capas.
+- Configuración de DI alineada al ciclo de vida esperado.
+
+**Errores comunes:**
+- Exponer entidades de dominio directamente al controlador.
+- Mezclar validación HTTP con reglas de negocio en el servicio.
+- Registrar servicios como Singleton cuando dependen de `DbContext`.
+- Agregar interfaces innecesarias sin necesidad de sustitución.
+
+**Referencias cruzadas:**
+- [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)
+- [1.2.2 La Capa de Controlador en un Backend API REST](./02-capa-controlador.md)
+- [1.2.4 La Capa de Datos en un Backend API REST](./04-capa-datos.md)
+</div>

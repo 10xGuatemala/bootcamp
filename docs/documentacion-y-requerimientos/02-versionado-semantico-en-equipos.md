@@ -4,8 +4,6 @@ title: Versionado semántico en equipos
 sidebar_label: 5.2 Versionado semántico en equipos
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Versionado semántico en equipos
 
 El versionado no es un detalle cosmético. Es **una forma compartida de comunicar impacto**. Cuando el equipo está alineado en qué significa subir MAJOR, MINOR o PATCH, cada release se convierte en una conversación eficiente con los equipos que consumen tu software.
@@ -35,7 +33,7 @@ Esta es la matriz que resuelve el 90% de las decisiones que vemos en proyectos r
 | Mejorar rendimiento sin cambiar contrato | Query optimizada que responde 3x más rápido | PATCH |
 | Cambiar comportamiento por defecto | Paginación pasa de 50 → 20 por página | **MAJOR** |
 
-### Cómo desambiguar los casos grises
+### Cómo decidir en los casos grises
 
 La matriz anterior cubre lo habitual. Para los casos en zona gris, aplica estos **criterios de decisión** en orden:
 
@@ -203,9 +201,8 @@ Precauciones:
 - Sin política de soporte publicada.
 
 **Referencias cruzadas:**
-- [01 · De la idea al release](./01-de-la-idea-al-release.md)
-- [04 · Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
-
+- [5.1 De la idea al release](./01-de-la-idea-al-release.md)
+- [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
 </div>
 
 ---

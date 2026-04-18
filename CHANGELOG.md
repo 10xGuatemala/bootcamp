@@ -5,7 +5,52 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 3.1.1 - 2026-04-18
+
+### Changed
+
+- Encabezados H2/H3 del cuerpo normalizados sin numeración en 51 archivos (207 encabezados). La numeración jerárquica ahora vive exclusivamente en `sidebar_label` y el sidebar; antes el cuerpo mezclaba `4.2.1.0`, `1.1` y sin numerar.
+
+### Fixed
+
+- Reemplazada "desambiguar" por "decidir" en versionado semántico (se leía forzada).
+- Título "El ciclo, a detalle" → "El ciclo paso a paso" en el módulo de idea al release.
+
+## 3.1.0 - 2026-04-18
+
+### Added
+
+- Nueva sección **Gestión ágil de proyectos** (renombrada desde "Gestión de Proyectos") con dos subcategorías:
+  - **Agilidad y Scrum** (5 módulos): manifiesto ágil, framework Scrum (roles/eventos/artefactos), niveles de planeamiento (visión → daily), integración PMBOK ↔ Scrum, y liderazgo y facilitación con los 10 principios de Shackleton aplicados a entornos ágiles.
+  - **Ciclo del proyecto** (6 módulos): plan/problema/alcance con Círculo Dorado, Product Backlog (MoSCoW + INVEST), Sprint Planning y Daily, medición con OKRs frente a métricas de actividad, retrospectivas (4Ls / Start-Stop-Continue / Mad-Sad-Glad) y cierre + lecciones aprendidas con las 18 causas recurrentes de fracaso.
+- **Glosario por módulo** al final de cada archivo, con 4–8 términos en formato `**Término** *(English)* — definición`, seguido de un bloque `:::info Referencias primarias` con enlaces canónicos (Scrum Guide 2020, PMBOK 7ª edición, OWASP LLM Top 10, Anthropic docs, Diátaxis, Kimball Group, Nielsen Norman Group, etc.). Cubre los 60+ módulos del sitio.
+- **Bloque estructurado para agentes** (`### Bloque estructurado para agentes` con Objetivo / Entradas / Pasos / Salidas / Errores comunes / Referencias cruzadas) en todos los módulos del sitio — antes solo estaba en las rutas de Colaboración con Agentes de IA y Modernización legacy.
+- Definiciones explícitas de "idea" vs "requerimiento" en el primer módulo de Documentación y Requerimientos.
+- Bloque de navegación visible en GitHub (`<div className="github-only-toc">`) en los 15 `index.md` de categoría — oculto en Docusaurus vía CSS, muestra lista de hijos con sus `sidebar_label` para facilitar la lectura del repo en el mirror público.
+- Swizzle `src/theme/MDXComponents.tsx` que registra `DocCardList` y `AuthorCredit` como componentes MDX globales. Permite eliminar las líneas de `import` de todos los `.md` y que GitHub los renderice limpios.
+
+### Changed
+
+- Etiqueta de la categoría raíz: `4. Gestión de Proyectos` → `4. Gestión ágil de proyectos`.
+- **Licencia migrada a CC BY-ND 4.0 con excepción explícita para IA**: reemplaza la estructura anterior (CC BY-NC-SA 4.0 para contenido + LICENSE-CODE propietario) por una licencia unificada basada en un estándar reconocido, más una sección que permite expresamente usar el contenido como *training data*, contexto o *retrieval* para modelos y agentes de IA, incluyendo uso comercial, con la condición de que la salida del sistema no redistribuya el contenido textualmente. El texto público ya no expone detalles de la estructura interna del proyecto (Docusaurus, React, `src/`).
+- **Sidebar rediseñado** con tipografía escalonada por nivel (categoría 0.88rem/650, subcategoría 0.82rem/550, documento hoja 0.78rem/400), familia unificada a Source Sans 3, línea guía vertical sutil en sublistas para anclar la profundidad, padding y line-height compactos para acomodar los 3 niveles de navegación sin saturar.
+- **Consistencia transversal del contenido**:
+  - Numeración `X.Y.Z` aplicada de forma uniforme en los `sidebar_label` de todos los módulos.
+  - 58 enlaces de referencias cruzadas sincronizados con el `sidebar_label` de cada archivo destino (25 archivos).
+  - Headings convertidos a *sentence case* en las rutas `fundamentos-de-proyectos/`, `introduccion-bi/` e `introduccion-visualizacion-datos/`.
+  - "SCRUM" → "Scrum", "Módulos del Curso" → "Módulos del curso", "7ma edición" → "séptima edición" (PMBOK) unificados en todo el corpus.
+  - Admonitions `:::tip` sin títulos redundantes ("TIP", "Tip:", "**Dato Relevante:**").
+  - Vocabulario: "subruta" reemplazada por "sección" (término actual).
+- Diagrama de categorías en Documentación y Requerimientos convertido a ciclo cerrado (flujo feedback del usuario y auditoría hacia la idea).
+- Valores por defecto del componente `AuthorCredit` alineados a la nueva licencia (`CC BY-ND 4.0 + excepción IA`).
+
+### Fixed
+
+- Typos: "Imporntante" → "Importante", "Manten" → "Mantén", "comunición" → "comunicación", "utiles" → "útiles", más el doble espacio tras `:::tip` en un archivo.
+
+### Removed
+
+- Experimento de badges de metadata (`nivel`, `tiempoLectura`) y el swizzle `src/theme/DocItem/Content` asociado: no rendereaba en la UI y se retiró el componente `DocMeta` por completo.
 
 ## 3.0.2 - 2026-04-17
 

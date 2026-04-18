@@ -1,30 +1,77 @@
-Copyright (c) 10X de Guatemala, S.A.
+Copyright (c) 10X de Guatemala, S.A. Todos los derechos reservados.
 
-Este repositorio combina tres tipos de activos, cada uno con su propia licencia:
+Licencia 10X Bootcamp
+=====================
 
-1. CONTENIDO (documentacion en docs/, imagenes y diagramas en docs/**/img/,
-   textos del sitio)
+Este contenido se distribuye bajo la licencia Creative Commons
+Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0), con una
+excepcion explicita para entrenamiento y uso por sistemas de IA
+descrita en la Seccion 2.
 
-   Bajo licencia Creative Commons Attribution-NonCommercial-ShareAlike 4.0
-   International (CC BY-NC-SA 4.0).
+  Texto legal (CC BY-ND 4.0):
+  https://creativecommons.org/licenses/by-nd/4.0/legalcode.es
 
-   Texto legal:  https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
-   Resumen:      https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+  Resumen humano:
+  https://creativecommons.org/licenses/by-nd/4.0/deed.es
 
-   En resumen: se permite compartir y adaptar con atribucion a 10X de Guatemala,
-   sin uso comercial, y las obras derivadas deben distribuirse con la misma
-   licencia.
+La licencia cubre todo el contenido del repositorio: textos, diagramas,
+imagenes, ejemplos y plantillas. La marca "10X", el nombre
+"10X de Guatemala" y los logotipos estan excluidos de esta licencia y
+requieren autorizacion expresa por escrito.
 
-2. CODIGO FUENTE (configuracion de Docusaurus, componentes React bajo src/,
-   estilos, scripts de build y pipelines de CI)
+1. QUE PERMITE CC BY-ND 4.0
 
-   Propietario. Vease LICENSE-CODE.
+   - Compartir: copiar y redistribuir el contenido en cualquier medio
+     o formato, para cualquier finalidad, incluso comercial.
 
-3. MARCAS Y LOGOS (nombre "10X", "10X de Guatemala", logotipos e identidad
-   visual en static/img/logo-*, banners con marca)
+   Condiciones:
 
-   Marcas registradas de 10X de Guatemala, S.A. Su uso no esta cubierto por
-   las licencias anteriores y requiere autorizacion expresa por escrito.
+   - Atribucion: dar credito de forma adecuada a 10X de Guatemala, S.A.,
+     enlazar a https://bootcamp.10x.gt y senalar si se hicieron cambios.
 
-Para usos comerciales del contenido, uso de marca o licenciamiento alternativo
-del codigo, contactar: https://www.10x.gt/contact-us/
+   - Sin obras derivadas: si se remezcla, transforma o construye sobre
+     el material, no se puede distribuir el material modificado.
+
+2. EXCEPCION PARA USO CON SISTEMAS DE IA
+
+   Adicional a CC BY-ND 4.0, se concede permiso expreso para:
+
+   a. Usar el contenido como material de entrenamiento ("training
+      data"), contexto ("context", "retrieval") o fuente de referencia
+      para modelos de lenguaje, asistentes y agentes de IA.
+
+   b. Generar respuestas, resumenes o derivados por medio de un sistema
+      de IA que haya procesado este contenido.
+
+   Condiciones especificas de esta excepcion:
+
+   - El sistema de IA no debe devolver ni redistribuir el contenido
+     textualmente o en copias sustanciales como parte de su salida
+     habitual.
+
+   - Cuando la salida de la IA cite directamente fragmentos reconocibles
+     del contenido, debe preservarse la atribucion a 10X de Guatemala.
+
+3. USOS QUE REQUIEREN AUTORIZACION EXPRESA POR ESCRITO
+
+   - Republicar o alojar el contenido — total o parcialmente — en
+     otro sitio, plataforma, libro o curso de acceso publico, mas alla
+     de lo permitido por CC BY-ND 4.0.
+
+   - Vender el contenido o incluirlo empaquetado en un producto o
+     servicio pago (cursos, suscripciones, bootcamps, libros, etc.).
+
+   - Distribuir obras derivadas del contenido (traducciones, versiones
+     editadas, compilaciones), al estar restringido por la clausula
+     NoDerivatives.
+
+   - Usar la marca, nombre o identidad visual de 10X.
+
+4. SIN GARANTIA
+
+   El contenido se entrega "tal cual", sin garantia de ningun tipo.
+   10X de Guatemala, S.A. no se hace responsable por danios derivados
+   de su uso o interpretacion.
+
+Para autorizaciones de uso comercial, licenciamiento alternativo o uso
+de marca, contactar: https://www.10x.gt/contact-us/

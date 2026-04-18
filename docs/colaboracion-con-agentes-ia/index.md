@@ -4,8 +4,6 @@ title: Introducción
 slug: /colaboracion-con-agentes-ia
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Colaboración con Agentes de IA
 
 Esta ruta reúne principios probados en proyectos reales para trabajar con **agentes de desarrollo** como [Claude Code](https://www.anthropic.com/claude-code), [Cursor](https://cursor.com/), [Codex](https://openai.com/codex/), [Antigravity](https://antigravity.google/) y [Kiro](https://kiro.dev/), entre otros. El material está redactado para **personas** y estructurado para que un agente pueda convertirlo en una *skill* reutilizable.
@@ -60,12 +58,12 @@ flowchart TB
 
 **Alternativa en lista** (accesible y útil si el diagrama no carga):
 
-1. [**01 · Fundamentos de colaboración**](./01-fundamentos-colaboracion-agentes.md) — qué hace bien un agente, cuándo delegarle.
-2. [**02 · Context engineering**](./02-context-engineering-claude-md.md) — cómo escribir un `CLAUDE.md` útil.
-3. [**03 · Arquitectura orientada a skills**](./03-arquitectura-orientada-a-skills.md) — diseñar skills reutilizables.
-4. [**04 · Seguridad al ejecutar herramientas externas**](./04-seguridad-en-herramientas-externas.md) — validación, ReDoS, timeouts.
-5. [**05 · Diseño de prompts y verificación**](./05-diseno-de-prompts-y-verificacion.md) — instrucciones claras y verificables.
-6. [**06 · Seguridad de chatbots con IA**](./06-seguridad-de-chatbots.md) — prompt injection, exposición de datos.
+1. [**6.1 Fundamentos de colaboración con agentes**](./01-fundamentos-colaboracion-agentes.md) — qué hace bien un agente, cuándo delegarle.
+2. [**6.2 Context engineering y CLAUDE.md**](./02-context-engineering-claude-md.md) — cómo escribir un `CLAUDE.md` útil.
+3. [**6.3 Arquitectura orientada a skills**](./03-arquitectura-orientada-a-skills.md) — diseñar skills reutilizables.
+4. [**6.4 Seguridad al ejecutar herramientas externas**](./04-seguridad-en-herramientas-externas.md) — validación, ReDoS, timeouts.
+5. [**6.5 Diseño de prompts y verificación**](./05-diseno-de-prompts-y-verificacion.md) — instrucciones claras y verificables.
+6. [**6.6 Seguridad de chatbots con IA**](./06-seguridad-de-chatbots.md) — prompt injection, exposición de datos.
 
 ## Cómo aprovechar este contenido
 
@@ -76,3 +74,16 @@ flowchart TB
 ---
 
 <AuthorCredit />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [6.1 Fundamentos de colaboración con agentes](./01-fundamentos-colaboracion-agentes.md)
+- [6.2 Context engineering y CLAUDE.md](./02-context-engineering-claude-md.md)
+- [6.3 Arquitectura orientada a skills](./03-arquitectura-orientada-a-skills.md)
+- [6.4 Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
+- [6.5 Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
+- [6.6 Seguridad de chatbots con IA](./06-seguridad-de-chatbots.md)
+
+</div>

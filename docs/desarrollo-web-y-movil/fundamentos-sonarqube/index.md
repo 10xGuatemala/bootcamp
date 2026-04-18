@@ -16,8 +16,18 @@ El análisis estático de código es una técnica de evaluación que examina el 
 
 Herramientas como SonarQube permiten automatizar este análisis en cada cambio del repositorio, promoviendo una cultura de calidad continua.
 
-## Módulos del Curso
-
-import DocCardList from '@theme/DocCardList';
+## Módulos del curso
 
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [1.3.1 Introducción a SonarQube](./01-introduccion-sonarqube.md)
+- [1.3.2 Conceptos Esenciales de Calidad y Seguridad](./02-conceptos-esenciales.md)
+- [1.3.3 Aplicación Práctica](./03-aplicacion-practica.md)
+- [1.3.4 Integración de SonarQube en el ciclo DevOps](./04-ciclo-devops.md)
+- [1.3.5 SAST y SCA en la fase de validación](./05-sast-y-sca-en-validacion.md)
+
+</div>

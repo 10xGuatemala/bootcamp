@@ -4,8 +4,6 @@ title: Introducción
 slug: /documentacion-y-requerimientos
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Documentación y Requerimientos
 
 Esta categoría aborda cómo una idea se convierte en un cambio **trazable**, **versionado** y **documentado** — de forma que personas y agentes de IA puedan reconstruir la historia de cualquier entrega.
@@ -55,8 +53,17 @@ Las flechas punteadas cierran el ciclo: sin retroalimentación desde producción
 
 ## Módulos del curso
 
-import DocCardList from '@theme/DocCardList';
-
 <DocCardList />
+
+<div className="github-only-toc">
+
+**Contenido:**
+
+- [5.1 De la idea al release](./01-de-la-idea-al-release.md)
+- [5.2 Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
+- [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md)
+- [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
+
+</div>
 
 <AuthorCredit />

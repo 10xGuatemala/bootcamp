@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+sidebar_label: 1.2.2 La Capa de Controlador en un Backend API REST
+---
+
 # La Capa de Controlador en un Backend API REST
 
 La capa de controlador en un proyecto de API REST es la interfaz principal entre el cliente y la lógica de negocio. Los controladores reciben las solicitudes HTTP, las procesan utilizando servicios, y devuelven respuestas al cliente. A continuación, se explicará con ejemplos simples los conceptos principales:
@@ -52,7 +57,7 @@ Este ejemplo muestra cómo definir rutas, autorizar accesos y recibir solicitude
 
 ## Explicación Detallada
 
-### 1. Cabeceras Básicas del Controlador
+### Cabeceras Básicas del Controlador
 
 - **`[Route("api/[controller]")]`**: Define la ruta base para las acciones del controlador. El patrón `[controller]` se reemplaza automáticamente por el nombre de la clase controlador (sin el sufijo "Controller"), en este caso `Empleados`.
 
@@ -67,7 +72,7 @@ return Ok(empleado); // Devuelve una respuesta HTTP 200 con el objeto empleado
 return NotFound(); // Devuelve una respuesta HTTP 404 si el empleado no se encuentra
 ```
 
-### 2. Autorización con `[Authorize]`
+### Autorización con `[Authorize]`
 
 La anotación `[Authorize]` se utiliza para restringir el acceso a ciertos controladores o métodos únicamente a usuarios autenticados. `[Authorize]` verifica si el usuario está autenticado antes de permitir el acceso a un recurso. Esto es fundamental para asegurar que solo usuarios autorizados puedan acceder a recursos sensibles o ejecutar ciertas acciones.
 
@@ -128,7 +133,7 @@ La anotación `[Authorize]` se utiliza para restringir el acceso a ciertos contr
   }
   ```
 
-### 3. Configuración de Autorización en Program.cs
+### Configuración de Autorización en Program.cs
 
 Para usar `[Authorize]`, debes configurar la autenticación y la autorización en `Program.cs`. Esto se hace para definir cómo el sistema autentica y autoriza a los usuarios. Por ejemplo:
 
@@ -155,7 +160,7 @@ app.MapControllers();
 app.Run();
 ```
 
-### 4. Uso de DTOs y Validaciones
+### Uso de DTOs y Validaciones
 
 Cuando se reciben datos a través del cuerpo de la solicitud (`[FromBody]`), lo ideal es definir una clase DTO (Data Transfer Object). Los DTO ayudan a controlar los datos que entran a la aplicación, permitiendo la validación y evitando problemas de seguridad.
 
@@ -189,7 +194,7 @@ public class EmpleadoRequest
 
 Estas validaciones aseguran que los datos enviados por el cliente cumplan con ciertos requisitos antes de ser procesados por la aplicación.
 
-### 5. Importancia de la Documentación
+### Importancia de la Documentación
 
 La documentación adecuada de los controladores y sus métodos es crucial para que otros desarrolladores puedan entender y usar tu API.
 
@@ -224,3 +229,64 @@ La documentación adecuada de los controladores y sus métodos es crucial para q
   - Implementa comentarios XML y herramientas como Swagger para facilitar la comprensión y el uso de tu API.
 
 Con estos conceptos, los desarrolladores junior pueden estructurar controladores efectivos y bien documentados, asegurando claridad y funcionalidad en una API REST. Si bien la información aquí es detallada, recomiendo avanzar paso a paso, comprendiendo primero las bases antes de abordar funcionalidades más avanzadas.
+
+## Glosario
+
+**Controlador** *(Controller)* — clase que recibe solicitudes HTTP, orquesta servicios y devuelve respuestas al cliente.
+
+**`[ApiController]`** *(ApiController attribute)* — atributo que habilita comportamientos estándar de APIs REST como validación automática de modelos.
+
+**`ControllerBase`** *(ControllerBase)* — clase base para controladores de API sin dependencias de vistas MVC.
+
+**DTO** *(Data Transfer Object)* — objeto plano usado para transportar datos entre capas y validar entradas de la API.
+
+**`[Authorize]`** *(Authorize attribute)* — atributo que restringe el acceso a usuarios autenticados y, opcionalmente, por rol o política.
+
+**JWT** *(JSON Web Token)* — token firmado que transporta afirmaciones del usuario autenticado entre cliente y servidor.
+
+**Swagger / OpenAPI** *(Swagger · OpenAPI)* — especificación y herramientas para documentar APIs REST de forma interactiva.
+
+:::info Referencias primarias
+- [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
+- [ASP.NET Core · Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/) — guía oficial de controladores Web API.
+- [ASP.NET Core · Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/introduction) — referencia de autorización.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** construir controladores .NET Core claros, seguros y documentados que delegan la lógica de negocio a los servicios.
+
+**Entradas:**
+- Recursos y operaciones a exponer.
+- DTOs de request y response.
+- Roles y políticas de autorización.
+- Servicios de aplicación disponibles para inyección.
+
+**Pasos:**
+1. Definir la ruta base con `[Route("api/[controller]")]` y habilitar `[ApiController]`.
+2. Inyectar los servicios necesarios por constructor.
+3. Aplicar `[Authorize]` a nivel de clase o método según el nivel de protección.
+4. Validar entradas con DTOs anotados (`[Required]`, `[EmailAddress]`, `[Range]`, etc.).
+5. Devolver resultados usando `Ok`, `NotFound`, `CreatedAtAction` y otros helpers de `ControllerBase`.
+6. Documentar cada endpoint con comentarios XML y exponerlo vía Swagger/OpenAPI.
+
+**Salidas:**
+- Controladores delgados, centrados en HTTP y validación.
+- DTOs y respuestas consistentes.
+- Documentación interactiva de la API.
+
+**Errores comunes:**
+- Incluir lógica de negocio en el controlador.
+- Olvidar `[Authorize]` en endpoints que manipulan datos sensibles.
+- Recibir modelos de dominio directamente en lugar de DTOs.
+- No documentar los métodos y romper la generación de Swagger.
+
+**Referencias cruzadas:**
+- [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)
+- [1.2.3 La Capa de Servicios en un Backend API REST](./03-capa-servicios.md)
+- [1.1.4 Autenticación y Autorización en APIs RESTful](../capacitacion-servicios-web-api-rest/04-autenticacion-autorizacion-rest.md)
+</div>

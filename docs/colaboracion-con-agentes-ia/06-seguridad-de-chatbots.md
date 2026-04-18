@@ -4,8 +4,6 @@ title: Seguridad de chatbots con IA
 sidebar_label: 6.6 Seguridad de chatbots con IA
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Seguridad de chatbots con IA
 
 Un chatbot con IA parece inofensivo: un cuadro de texto, un modelo de lenguaje detrás, respuestas aparentemente útiles. Pero en el momento en que ese modelo tiene acceso a **datos reales** (clientes, pedidos, cuentas) o a **acciones** (enviar correos, ejecutar consultas, tocar APIs internas), el chatbot deja de ser un juguete y pasa a ser una **superficie de ataque**.
@@ -132,6 +130,29 @@ Hay escenarios donde la respuesta correcta es no tener bot o tenerlo **solo como
 - Información regulada (salud, legal, financiera) donde una respuesta incorrecta tiene consecuencias graves.
 - Usuarios que no pueden distinguir bot de humano y pueden ser manipulados.
 
+## Glosario
+
+**Prompt injection** *(LLM01: Prompt Injection)* — primer riesgo del [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/): *"ocurre cuando prompts del usuario alteran el comportamiento o la salida del LLM de formas no previstas"*.
+
+**Indirect injection** *(Indirect Prompt Injection)* — variante documentada en [OWASP LLM01](https://owasp.org/www-project-top-10-for-large-language-model-applications/) donde la instrucción hostil viene embebida en un documento, página o recurso que el LLM procesa por encargo del usuario.
+
+**Exfiltración encubierta** *(Sensitive Information Disclosure — LLM02)* — técnica en que el atacante induce al modelo a codificar datos sensibles (emojis, base64, URLs) en su respuesta; cubierta por *LLM02: Sensitive Information Disclosure* del [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/).
+
+**Confusión de roles** *(Excessive Agency — LLM06)* — bot que actúa como si fuera el usuario o un sistema confiable sin validar autorización real; categoría *LLM06: Excessive Agency* del [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/).
+
+**Cláusula de negativa** *(Refusal clause / Guardrail)* — instrucción explícita en el prompt base para rechazar cambios de rol o revelar las instrucciones; control recomendado por OWASP y alineado con la función *GOVERN* del [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework).
+
+**Validación en tres capas** *(Defense in depth)* — patrón de *defense in depth*: validar entrada, inspeccionar salida, autorizar acción; cada capa independiente. Alineado con el [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework) y las recomendaciones del [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/).
+
+**Token maestro** *(Shared master token — antipattern)* — credencial compartida usada por el bot para todas las acciones; antipatrón contrario al principio de mínimo privilegio enunciado en [OWASP LLM06](https://owasp.org/www-project-top-10-for-large-language-model-applications/). Las credenciales deben ser por usuario.
+
+**Pruebas adversariales** *(Adversarial testing / Red-teaming)* — casos de test que emulan ataques conocidos (injection, exfiltración) para verificar las defensas; práctica central de la función *MEASURE* del [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework).
+
+:::info Referencias primarias
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — taxonomía canónica de riesgos en aplicaciones con LLMs.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — marco voluntario con cuatro funciones (Govern, Map, Measure, Manage).
+:::
+
 ---
 
 <div className="agent-block">
@@ -167,9 +188,8 @@ Hay escenarios donde la respuesta correcta es no tener bot o tenerlo **solo como
 - No definir un canal de escalamiento humano.
 
 **Referencias cruzadas:**
-- [04 · Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
-- [05 · Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
-
+- [6.4 Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
+- [6.5 Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
 </div>
 
 ---

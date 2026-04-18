@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+sidebar_label: 1.1.1 Introducción a Web Service de tipo API REST
+---
+
 # Introducción a Web Service de tipo API REST
 
 Un servicio web es una interfaz de programación que permite la comunicación entre dos aplicaciones a través de la red, utilizando protocolos como HTTP. Entre los diferentes tipos de servicios web, uno de los más utilizados es la API REST (Representational State Transfer). Esta arquitectura permite que las aplicaciones realicen operaciones como obtener, crear, actualizar o eliminar datos de manera estructurada y estandarizada. Gracias a REST, es posible integrar aplicaciones desarrolladas en diferentes plataformas para que trabajen juntas de manera eficiente y segura.
@@ -52,3 +57,64 @@ Este enfoque es especialmente útil en aplicaciones que requieren **flexibilidad
 - Layered System: La arquitectura permite capas (por ejemplo, entre cliente y servidor), lo que facilita escalabilidad y seguridad.
 
 ![Caracteristicas Rest](./img/introduccion-servicio-web-caracteristicas-rest.drawio.png)
+
+## Glosario
+
+**API REST** *(REST API)* — interfaz que expone recursos a través de HTTP siguiendo los principios definidos por Roy Fielding en su [disertación doctoral](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm).
+
+**Recurso** *(Resource)* — entidad identificable por una URI; abstracción central del estilo REST.
+
+**Stateless** *(Stateless)* — cada petición contiene toda la información necesaria; el servidor no mantiene estado de sesión entre llamadas.
+
+**Cliente-servidor** *(Client-server)* — separación de responsabilidades entre la aplicación que consume el recurso y la que lo provee.
+
+**Interoperabilidad** *(Interoperability)* — capacidad de sistemas heterogéneos de intercambiar información siguiendo contratos comunes (HTTP + JSON).
+
+**Layered system** *(Layered system)* — arquitectura en capas que permite intermediarios (proxy, caché, balanceador) sin alterar el contrato.
+
+:::info Referencias primarias
+- [RFC 7231 HTTP/1.1 Semantics and Content](https://datatracker.ietf.org/doc/html/rfc7231) — especificación oficial de semántica HTTP.
+- [Roy Fielding dissertation](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm) — definición original del estilo REST.
+- [OpenAPI Specification 3.1](https://spec.openapis.org/oas/v3.1.0) — estándar para describir APIs REST.
+- [JSON.org](https://www.json.org/) — especificación del formato JSON.
+- [OWASP API Security](https://owasp.org/API-Security/) — riesgos y buenas prácticas de seguridad en APIs.
+:::
+
+---
+
+<div className="agent-block">
+
+### Bloque estructurado para agentes
+
+**Objetivo:** decidir cuándo un servicio web tipo API REST es la arquitectura correcta para integrar sistemas o separar backend y frontend.
+
+**Entradas:**
+- Inventario de sistemas a integrar y sus tecnologías (Java, .NET, Oracle, etc.).
+- Requisitos de interoperabilidad entre plataformas.
+- Necesidad de separar lógica de negocio de la capa de presentación.
+- Restricciones de seguridad, escalabilidad y rendimiento.
+
+**Pasos:**
+1. Identificar los consumidores de la API y sus tecnologías.
+2. Evaluar si el caso se ajusta a integración entre plataformas o a separación backend/frontend.
+3. Validar el cumplimiento de los principios REST (stateless, recursos, métodos HTTP, representación).
+4. Definir formato de intercambio (JSON) y mecanismos de autenticación (por ejemplo, JWT sobre HTTPS).
+5. Dimensionar capas y cacheo para cumplir con escalabilidad y rendimiento.
+6. Documentar la arquitectura resultante para consumidores internos y externos.
+
+**Salidas:**
+- Justificación del uso de API REST sobre otras alternativas.
+- Diagrama de integración con los consumidores.
+- Lista de principios REST que debe cumplir la implementación.
+
+**Errores comunes:**
+- Exponer lógica de negocio duplicada en cada cliente en lugar de centralizarla en el backend.
+- Romper la característica stateless manteniendo sesión en el servidor.
+- No definir autenticación desde el inicio y agregarla como parche posterior.
+- Confundir "API REST" con cualquier endpoint HTTP sin aplicar sus restricciones.
+
+**Referencias cruzadas:**
+- [1.1.2 Componentes Básicos de un Servicio Web tipo API REST](./02-componentes-basicos-api-rest.md)
+- [1.1.4 Autenticación y Autorización en APIs RESTful](./04-autenticacion-autorizacion-rest.md)
+- [1.2.1 Arquitectura de Backend API Rest en .NET Core](../net-core-web-api/01-arquitectura-de-backend.md)
+</div>

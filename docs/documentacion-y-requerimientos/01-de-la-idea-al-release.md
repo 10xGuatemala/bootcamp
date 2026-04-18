@@ -4,15 +4,13 @@ title: De la idea al release
 sidebar_label: 5.1 De la idea al release
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # De la idea al release
 
 Un proyecto útil no nace en el código. Nace cuando alguien detecta un problema real y el equipo convierte esa intuición en una entrega que alguien usa. Entre ambos extremos hay una secuencia que, bien llevada, reduce ambigüedad, cuida el presupuesto y deja evidencia para auditar lo que se hizo y por qué.
 
 Esta lección describe esa secuencia con un nivel de detalle suficiente para que un equipo pequeño la ejecute sin burocracia, y un agente pueda seguirla para generar artefactos consistentes.
 
-## El ciclo, a detalle
+## El ciclo paso a paso
 
 ```mermaid
 flowchart TB
@@ -446,10 +444,9 @@ Adopta lo mínimo útil para tu tamaño. Agregar rituales sin necesidad es la fo
 - No medir en producción — el ciclo se convierte en línea recta.
 
 **Referencias cruzadas:**
-- [02 · Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
-- [03 · Manuales de usuario final](./03-manuales-de-usuario-final.md)
-- [04 · Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
-
+- [5.2 Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
+- [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md)
+- [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
 </div>
 
 ---

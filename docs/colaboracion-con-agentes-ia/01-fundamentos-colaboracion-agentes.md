@@ -4,8 +4,6 @@ title: Fundamentos de colaboración con agentes
 sidebar_label: 6.1 Fundamentos de colaboración con agentes
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Fundamentos de colaboración con agentes de IA
 
 Trabajar con un agente de IA no es lo mismo que pedirle a un asistente que responda una pregunta. Un agente **ejecuta acciones** en tu entorno (lee archivos, corre comandos, hace cambios, toma decisiones), y esas acciones tienen consecuencias reales. Esta primera lección fija el marco mental.
@@ -69,6 +67,25 @@ flowchart TB
 
 Un agente es una extensión del equipo que actúa en tu entorno. Rinde cuando le das **objetivo claro**, **contexto útil** y **forma de verificar**. Todo lo demás (productividad, seguridad, calidad) se deriva de cuidar esos tres ingredientes.
 
+## Glosario
+
+**Agente de IA** *(AI agent)* — Anthropic define agente como *"an LLM that autonomously decides what tools to use and when, operating in a loop until a task is complete"* ([Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)); sistema que ejecuta acciones sobre un entorno a partir de una intención en lenguaje natural.
+
+**Asistente clásico** *(Conversational assistant / Workflow)* — en la taxonomía de [Anthropic](https://www.anthropic.com/engineering/building-effective-agents), un *workflow* o asistente conversacional responde preguntas pero no toma decisiones autónomas sobre herramientas ni estado del entorno.
+
+**Intención** *(Intent)* — objetivo + restricciones + motivo que enmarcan lo que el equipo quiere lograr; la [documentación de Anthropic](https://docs.anthropic.com/) enfatiza describir claramente la tarea, el contexto y el resultado esperado.
+
+**Criterios de aceptación** *(Acceptance criteria)* — condiciones verificables (build verde, tests pasan, comportamiento observable) que deciden si una tarea se considera cumplida; parte esencial del diseño de tareas agénticas según [Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents).
+
+**Trust but verify** *(Trust but verify)* — práctica de comprobar el estado real del entorno aunque el agente reporte éxito; alineada con el principio de Anthropic de *"verification loops"* en [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents).
+
+**Archivo de contexto** *(Context file / Agent instructions)* — fuente de verdad compacta (`CLAUDE.md`, `AGENTS.md`) que reduce la distancia entre la intención y la acción; patrón documentado en [Claude Code · Memory](https://docs.claude.com/en/docs/claude-code/overview).
+
+:::info Referencias primarias
+- [Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — taxonomía canónica de agentes vs. workflows.
+- [Anthropic Documentation](https://docs.anthropic.com/) — referencia oficial de Claude y sus capacidades.
+:::
+
 ---
 
 <div className="agent-block">
@@ -100,9 +117,8 @@ Un agente es una extensión del equipo que actúa en tu entorno. Rinde cuando le
 - Delegar decisiones estratégicas.
 
 **Referencias cruzadas:**
-- [02 · Context engineering](./02-context-engineering-claude-md.md)
-- [05 · Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
-
+- [6.2 Context engineering y CLAUDE.md](./02-context-engineering-claude-md.md)
+- [6.5 Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
 </div>
 
 ---

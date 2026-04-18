@@ -4,8 +4,6 @@ title: Seguridad al ejecutar herramientas externas
 sidebar_label: 6.4 Seguridad al ejecutar herramientas externas
 ---
 
-import AuthorCredit from '@site/src/components/AuthorCredit';
-
 # Seguridad al ejecutar herramientas externas
 
 Cuando un agente o un orquestador **ejecuta subprocesos** (comandos de shell, herramientas externas, consultas a sistemas) con entradas que vienen de un usuario o de otro sistema, entras en territorio donde un descuido puede costar caro: *shell injection*, fuga de archivos, agotamiento de CPU por expresiones regulares maliciosas, procesos huérfanos que se quedan corriendo.
@@ -126,6 +124,30 @@ Cuando la entrada viene de un sistema público, protege también con:
 - [ ] ¿El subproceso corre con mínimo privilegio y directorio acotado?
 - [ ] ¿Hay rate limiting si la entrada es pública?
 
+## Glosario
+
+**Shell injection** *(OS Command Injection)* — ataque en que una entrada modifica el comando que se ejecuta en el shell; relacionado con *LLM07: System Prompt Leakage* y *LLM05: Improper Output Handling* en el [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/). Se previene con validación whitelist y placeholders.
+
+**Whitelist** *(Allowlist)* — lista de valores o patrones permitidos; todo lo que no cabe se rechaza. Enfoque promovido por OWASP como opuesto seguro a *blacklist/denylist*.
+
+**ReDoS** *(Regular Expression Denial of Service)* — ataque que fuerza *backtracking* exponencial en un regex mal escrito. Categoría clásica de denegación de servicio documentada por OWASP.
+
+**Backtracking catastrófico** *(Catastrophic backtracking)* — propiedad de regex como `(a+)+` o `(.*)*` que explotan en tiempo exponencial con entradas adversariales; principal causa de ReDoS.
+
+**Placeholder** *(Parameterized placeholder)* — marcador `{name}` en una plantilla de comando; solo se sustituye por valores validados. Alineado con el principio de Anthropic sobre [tool use seguro](https://docs.anthropic.com/en/docs/build-with-claude/tool-use).
+
+**Árbol de procesos** *(Process tree)* — proceso padre y todos sus hijos; al cancelar debe terminarse el árbol completo para evitar procesos huérfanos y fugas de recursos.
+
+**Mínimo privilegio** *(Principle of Least Privilege)* — principio de ejecutar procesos con los permisos estrictamente necesarios, nunca como root o admin; control crítico contra *LLM06: Excessive Agency* ([OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)).
+
+**Rate limiting** *(Rate limiting)* — límite de peticiones por unidad de tiempo por IP o usuario; responde 429 + `Retry-After` al exceder. Control de abuso recomendado en el [MCP spec](https://modelcontextprotocol.io/) para servidores de herramientas.
+
+:::info Referencias primarias
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — riesgos canónicos (LLM01 prompt injection, LLM06 excessive agency, etc.).
+- [Model Context Protocol (MCP) specification](https://modelcontextprotocol.io/) — estándar abierto para conectar herramientas externas a LLMs de forma segura.
+- [Anthropic · Tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — guía oficial de implementación segura de herramientas con Claude.
+:::
+
 ---
 
 <div className="agent-block">
@@ -162,9 +184,8 @@ Cuando la entrada viene de un sistema público, protege también con:
 - Confiar en que la UI "ya filtra" y no validar en el servidor.
 
 **Referencias cruzadas:**
-- [03 · Arquitectura orientada a skills](./03-arquitectura-orientada-a-skills.md)
-- [06 · Seguridad de chatbots con IA](./06-seguridad-de-chatbots.md)
-
+- [6.3 Arquitectura orientada a skills](./03-arquitectura-orientada-a-skills.md)
+- [6.6 Seguridad de chatbots con IA](./06-seguridad-de-chatbots.md)
 </div>
 
 ---

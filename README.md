@@ -4,7 +4,7 @@
 
 Contenido abierto y en español para desarrollar habilidades en tecnología, diseño y gestión. Redactado para aprendizaje humano y **estructurado para que agentes de IA** (Claude Code, Cursor, Codex, Antigravity, Kiro) lo conviertan en *skills* reutilizables.
 
-**Sitio en vivo:** [bootcamp.10x.gt](https://bootcamp.10x.gt) · **Autor:** [10X de Guatemala, S.A.](https://www.10x.gt) · **Licencia:** [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)
+**Sitio en vivo:** [bootcamp.10x.gt](https://bootcamp.10x.gt) · **Autor:** [10X de Guatemala, S.A.](https://www.10x.gt) · **Licencia:** [CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/deed.es) + excepción IA
 
 ---
 
@@ -82,16 +82,20 @@ Si el contenido te fue útil, compártelo con alguien que esté empezando — es
 
 ---
 
-## Licencias
+## Licencia
 
-Este repositorio combina tres tipos de activos, cada uno con su propia licencia:
+Contenido bajo [**CC BY-ND 4.0**](https://creativecommons.org/licenses/by-nd/4.0/deed.es) + excepción explícita para entrenamiento y uso por sistemas de IA.
 
-| Activo | Licencia | Resumen |
-|--------|----------|---------|
-| **Contenido** (`docs/`, diagramas, textos) | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es) | Compartir y adaptar con atribución a 10X, sin uso comercial, obras derivadas con la misma licencia. |
-| **Marcas y logos** (nombre "10X", identidad visual) | Marcas registradas de 10X de Guatemala, S.A. | Su uso requiere autorización expresa. |
+**En breve:**
 
-Detalle completo en [`LICENSE`](./LICENSE). Para usos comerciales o uso de marca, [escríbenos](https://www.10x.gt/contact-us/).
+- ✅ Leer, estudiar y citar con atribución a 10X.
+- ✅ Compartir y redistribuir el contenido **sin modificar**, con atribución.
+- ✅ Usar el contenido como material de entrenamiento, contexto o referencia para modelos y agentes de IA — **incluso con fines comerciales** — siempre que el producto final no redistribuya el contenido textualmente.
+- ❌ Distribuir obras derivadas (traducciones, versiones editadas, compilaciones) sin autorización.
+- ❌ Vender el contenido o incluirlo empaquetado en un producto o curso pago sin autorización.
+- ❌ Usar la marca, nombre o identidad visual de 10X sin autorización.
+
+Texto completo en [`LICENSE`](./LICENSE). Para autorizaciones, [escríbenos](https://www.10x.gt/contact-us/).
 
 ---
 
