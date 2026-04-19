@@ -120,5 +120,5 @@ Es útil porque asegura que el producto final cumpla con las expectativas del di
 **Referencias cruzadas:**
 - [3.1.2 ¿Qué es UX?](./02-que-es-ux.md)
 - [3.1.4 Diferencias entre UX/UI](./04-diferencia.md)
-- [3.1.5 Convenciones de UI consistentes](./05-convenciones-de-ui-consistentes.md)
+- [3.1.14 Convenciones de UI consistentes](./14-convenciones-de-ui-consistentes.md)
 </div>

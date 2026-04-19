@@ -6,7 +6,7 @@ sidebar_label: 3.2.1 Design tokens y estándares
 # Design tokens y estándares
 
 :::tip Archivos copiables
-Los ejemplos de este módulo (`DESIGN.md`, `design-tokens.json`, `config.json` de Style Dictionary) viven como archivos reales en [`examples/`](https://github.com/10xGuatemala/bootcamp/tree/main/docs/diseno-ux-ui/sistemas-de-diseno/examples). Cópialos a tu repo y adáptalos.
+La plantilla de `DESIGN.md` vive como archivo real en [`examples-md/design/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/design). Cópiala a tu repo y adáptala. Los fragmentos JSON de tokens y de configuración de Style Dictionary se muestran en los bloques de código de este módulo: pégalos directamente en tu proyecto cuando corresponda.
 :::
 
 Un sistema de diseño sin tokens es una guía de estilo decorativa: el equipo la cita en reuniones y la ignora en producción. Los **design tokens** convierten decisiones visuales (color primario, espaciado base, radio de esquinas) en **valores nombrados y versionados** que viven en un archivo, se exportan a múltiples plataformas y funcionan como fuente única de verdad para humanos y agentes.
@@ -236,8 +236,9 @@ Los sistemas de diseño se deterioran por **acumulación silenciosa**, no por de
 - Crear tokens sin tipo semántico (`color.red.600` en vez de `color.semantic.danger`).
 
 **Referencias cruzadas:**
-- [3.1.5 Convenciones de UI consistentes](../fundamentos-ux-ui/05-convenciones-de-ui-consistentes.md)
-- [3.2.2 Arquitectura de componentes](./02-arquitectura-de-componentes.md)
+- [3.1.14 Convenciones de UI consistentes](../fundamentos-ux-ui/14-convenciones-de-ui-consistentes.md)
+- [3.2.2 Wireframes y prototipado](./02-wireframes-y-prototipado.md)
+- [3.2.3 Arquitectura de componentes](./03-arquitectura-de-componentes.md)
 - [6.2 Context engineering](../../colaboracion-con-agentes-ia/02-context-engineering-claude-md.md)
 
 </div>

@@ -5,6 +5,22 @@ Todos los cambios notables de este proyecto se documentarán en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y el proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.4.0 - 2026-04-18
+
+### Added
+
+- **Nuevos módulos de Fundamentos UX/UI (3.1.5 – 3.1.13):** UX Research, Análisis de usuarios y competencia, Personas y escenarios, Arquitectura de información (con los 8 principios de Dan Brown), Pruebas de usabilidad, Psicología del color, Tipografía, Jerarquía visual y Gestalt, Accesibilidad básica.
+- **Nuevo módulo [3.2.2 Wireframes y prototipado](docs/diseno-ux-ui/sistemas-de-diseno/02-wireframes-y-prototipado.md)**.
+- **Nuevo módulo [3.2.6 Microcopy híbrido (humano + IA)](docs/diseno-ux-ui/sistemas-de-diseno/06-microcopy-hibrido-humano-ia.md)** — verbos imperativos, autonomía de contexto, errores de tres partes y `UXW_SPEC.md`.
+- **Homepage rediseñada:** proof strip con contadores animados (6 rutas, 75 cursos, 5 agentes probados) y CTA comercial hacia `10x.gt/contact-us` con animación DotMesh consistente con el header.
+- **Badges "Nuevo" y "Actualizado"** en las tarjetas de rutas del homepage.
+
+### Changed
+
+- Los `examples/` se movieron a `examples-md/` (design, agents, project) fuera del árbol de docs.
+- Mirror público a GitHub excluye `_category_.json` para no contaminar el repo público.
+- Efecto hover unificado en tarjetas (proof y rutas): línea superior naranja sólida.
+
 ## 3.3.0 - 2026-04-18
 
 ### Added

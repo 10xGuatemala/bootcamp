@@ -1,6 +1,6 @@
 ---
-sidebar_position: 5
-sidebar_label: 3.1.5 Convenciones de UI consistentes
+sidebar_position: 14
+sidebar_label: 3.1.14 Convenciones de UI consistentes
 ---
 
 # Convenciones de UI consistentes

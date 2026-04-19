@@ -12,9 +12,11 @@ Un sistema de diseño no es una guía de estilo bonita. Es la **infraestructura*
 ## Qué cubre
 
 - **Design tokens:** la fuente única de verdad para color, tipografía, espaciado y radios — versionada y exportable a cualquier plataforma.
+- **Wireframes y prototipado:** el puente entre los fundamentos UX y el sistema — de boceto a prototipo interactivo antes de codificar.
 - **Arquitectura de componentes:** cómo pensar en átomos, moléculas y organismos que luego se materializan en React, Vue o C#.
 - **Handoff técnico:** cómo documentar un diseño para que desarrollo no tenga que adivinar márgenes, estados o comportamiento responsive.
 - **UX writing:** el texto de la interfaz como parte del sistema — internacionalización, estados dinámicos y claridad para LLMs.
+- **Microcopy híbrido:** cómo redactar botones, errores y estados para que funcionen igual de bien para el usuario humano y para los agentes de IA que procesan la UI.
 
 ## Módulos del curso
 
@@ -25,9 +27,11 @@ Un sistema de diseño no es una guía de estilo bonita. Es la **infraestructura*
 **Contenido:**
 
 - [3.2.1 Design tokens y estándares](./01-design-tokens-y-estandares.md)
-- [3.2.2 Arquitectura de componentes](./02-arquitectura-de-componentes.md)
-- [3.2.3 Handoff técnico](./03-handoff-tecnico.md)
-- [3.2.4 UX writing para interfaces dinámicas](./04-ux-writing-interfaces-dinamicas.md)
+- [3.2.2 Wireframes y prototipado](./02-wireframes-y-prototipado.md)
+- [3.2.3 Arquitectura de componentes](./03-arquitectura-de-componentes.md)
+- [3.2.4 Handoff técnico](./04-handoff-tecnico.md)
+- [3.2.5 UX writing para interfaces dinámicas](./05-ux-writing-interfaces-dinamicas.md)
+- [3.2.6 Microcopy híbrido (humano + IA)](./06-microcopy-hibrido-humano-ia.md)
 
 </div>
 

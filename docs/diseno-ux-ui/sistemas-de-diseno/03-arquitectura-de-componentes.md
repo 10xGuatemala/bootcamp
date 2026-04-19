@@ -1,12 +1,12 @@
 ---
-sidebar_position: 2
-sidebar_label: 3.2.2 Arquitectura de componentes
+sidebar_position: 3
+sidebar_label: 3.2.3 Arquitectura de componentes
 ---
 
 # Arquitectura de componentes
 
-:::tip Archivos copiables
-La plantilla de brief y las implementaciones de `Button` en React y Blazor viven como archivos reales en [`examples/`](https://github.com/10xGuatemala/bootcamp/tree/main/docs/diseno-ux-ui/sistemas-de-diseno/examples).
+:::tip Archivo copiable
+La plantilla de `component-brief.md` vive como archivo real en [`examples-md/design/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/design).
 :::
 
 Un sistema de diseño sólido no se mide por cuántos componentes tiene, sino por **cuántas pantallas puede construir sin inventar uno nuevo**. Llegar ahí requiere pensar en componentes como piezas compuestas: átomos que se combinan en moléculas, moléculas que forman organismos, organismos que se ensamblan en plantillas y pantallas.
@@ -49,6 +49,25 @@ Un componente reutilizable expone un contrato. Todo lo que **no está en el cont
 5. **Efectos secundarios** — qué hace el componente al mundo: navegar, abrir modales, emitir analytics.
 
 Un componente con contrato claro puede refactorizarse sin avisar. Un componente sin contrato rompe a todos sus consumidores cada vez que toca.
+
+## Jerarquía de botones: ejemplo de criterio de diseño
+
+En una interfaz bien pensada, los botones no deberían verse iguales, porque no todas las acciones tienen la misma importancia. El botón es el caso más visible de una regla que aplica a todo el sistema: **la forma comunica la prioridad**.
+
+La convención madura distingue al menos cuatro variantes:
+
+- **Primario (sólido / relleno)** — la acción principal de la pantalla. Una sola visible a la vez. Es lo que el usuario debería hacer si no hace nada más.
+- **Secundario (contorno / outline)** — acciones alternativas con peso comparable pero no principales: "Cancelar" junto a "Guardar", "Ver detalle" junto a "Comprar".
+- **Ghost (texto / tipo enlace)** — acciones auxiliares o de navegación: "Omitir", "Ver más", acciones dentro de una fila de tabla.
+- **Destructivo** — eliminar, cancelar suscripción, borrar cuenta. Se distingue con claridad (color de error o confirmación adicional) para evitar clics accidentales.
+
+La lógica es simple: **la interfaz debe guiar decisiones**. Cuando todo se ve igual, el sistema deja de guiar. Y cuando el sistema deja de guiar, el usuario empieza a adivinar. Eso no es un problema de colores ni de CSS: es una señal de falta de criterio de diseño y de poca comprensión del usuario real.
+
+:::warning Frameworks sin criterio
+Hoy existen frameworks visuales (Material, Chakra, shadcn, Fluent, Bootstrap) que traen resueltas muchas buenas prácticas. Lo preocupante es que muchos equipos los usan sin detenerse a leer, entender y aplicar la lógica que hay detrás. Instalar `<Button variant="primary">` no sustituye a decidir cuál es la acción primaria de la pantalla — y por qué.
+:::
+
+Esta es la razón por la que este módulo no muestra código de un `Button`: el componente visual es lo fácil. Lo difícil —y lo que realmente distingue a un sistema de diseño útil— es definir **cuándo** usar cada variante y **por qué**. Eso vive en el brief, no en el JSX.
 
 ## Plantilla de brief de componente
 
@@ -95,11 +114,7 @@ Qué problema resuelve en una oración. Si requiere dos oraciones, probablemente
 - Navegable por teclado: activar con Enter y Space.
 
 ## Ejemplo de uso
-\`\`\`tsx
-<Button variant="primary" size="md" loading={saving} onClick={handleSave}>
-  Guardar cambios
-</Button>
-\`\`\`
+Acción principal del formulario ("Guardar cambios"): variante `primary`, tamaño `md`, pasa a estado `loading` mientras se envía. Una sola variante primaria visible por pantalla.
 
 ## Qué NO hace
 - No navega (para eso, `<Link>`).
@@ -114,84 +129,9 @@ Qué problema resuelve en una oración. Si requiere dos oraciones, probablemente
 - Atributo `aria-busy` presente durante loading.
 ```
 
-## Del brief al código — multiplataforma
+## Del brief al código
 
-El mismo brief se materializa en stacks distintos sin reescribirse. Lo único que cambia es la sintaxis de la plataforma; el contrato es idéntico.
-
-### React + TypeScript
-
-```tsx
-type Variant = "primary" | "secondary" | "ghost";
-type Size = "sm" | "md" | "lg";
-
-interface ButtonProps {
-  variant?: Variant;
-  size?: Size;
-  loading?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}
-
-export function Button({
-  variant = "primary",
-  size = "md",
-  loading = false,
-  disabled = false,
-  children,
-  onClick,
-}: ButtonProps) {
-  return (
-    <button
-      className={`btn btn--${variant} btn--${size}`}
-      disabled={disabled || loading}
-      aria-busy={loading}
-      onClick={onClick}
-    >
-      {loading ? <Spinner size={size} /> : children}
-    </button>
-  );
-}
-```
-
-### Blazor (C#)
-
-```razor
-@* Button.razor *@
-<button
-    class="btn btn--@Variant btn--@Size"
-    disabled="@(Disabled || Loading)"
-    aria-busy="@Loading"
-    @onclick="HandleClick">
-    @if (Loading)
-    {
-        <Spinner Size="@Size" />
-    }
-    else
-    {
-        @ChildContent
-    }
-</button>
-
-@code {
-    [Parameter] public string Variant { get; set; } = "primary";
-    [Parameter] public string Size { get; set; } = "md";
-    [Parameter] public bool Loading { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-
-    private async Task HandleClick(MouseEventArgs e)
-    {
-        if (Disabled || Loading) return;
-        await OnClick.InvokeAsync(e);
-    }
-}
-```
-
-:::note Mismo contrato, dos implementaciones
-Ambas versiones tienen las mismas 6 props, los mismos estados visuales, la misma accesibilidad. Si migraras una app de React a Blazor, los consumidores del botón no cambian conceptualmente — solo reemplazan la sintaxis. Ese es el valor real del brief.
-:::
+El brief es independiente del stack: lo que documenta —contrato, estados, accesibilidad, pruebas— se materializa igual en React, Vue, Blazor o Razor Components. Los detalles de handoff (tokens, specs, checklist de entrega a ingeniería) se cubren en el [módulo 3.2.4](./04-handoff-tecnico.md).
 
 ---
 
@@ -226,7 +166,8 @@ Ambas versiones tienen las mismas 6 props, los mismos estados visuales, la misma
 
 **Referencias cruzadas:**
 - [3.2.1 Design tokens y estándares](./01-design-tokens-y-estandares.md)
-- [3.2.3 Handoff técnico](./03-handoff-tecnico.md)
+- [3.2.2 Wireframes y prototipado](./02-wireframes-y-prototipado.md)
+- [3.2.4 Handoff técnico](./04-handoff-tecnico.md)
 
 </div>
 

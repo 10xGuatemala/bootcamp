@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4
-sidebar_label: 3.2.4 UX writing para interfaces dinámicas
+sidebar_position: 5
+sidebar_label: 3.2.5 UX writing para interfaces dinámicas
 ---
 
 # UX writing para interfaces dinámicas
@@ -199,7 +199,7 @@ Toast: Factura enviada a juan@ejemplo.com
 
 **Referencias cruzadas:**
 - [3.2.1 Design tokens y estándares](./01-design-tokens-y-estandares.md)
-- [3.2.3 Handoff técnico](./03-handoff-tecnico.md)
+- [3.2.4 Handoff técnico](./04-handoff-tecnico.md)
 - [5. Documentación y requerimientos](../../documentacion-y-requerimientos/01-de-la-idea-al-release.md)
 
 </div>

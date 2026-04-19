@@ -1,12 +1,12 @@
 ---
-sidebar_position: 3
-sidebar_label: 3.2.3 Handoff técnico
+sidebar_position: 4
+sidebar_label: 3.2.4 Handoff técnico
 ---
 
 # Handoff técnico
 
 :::tip Archivos copiables
-La plantilla de spec y los tres prompts canónicos viven como archivos reales en [`examples/`](https://github.com/10xGuatemala/bootcamp/tree/main/docs/diseno-ux-ui/sistemas-de-diseno/examples).
+La plantilla de `screen-spec.md` vive como archivo real en [`examples-md/design/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/design). Los tres prompts canónicos de handoff se muestran en los bloques de código de este módulo — cópialos a tu herramienta de IA preferida.
 :::
 
 El **handoff** es el momento en que una pantalla pasa de diseño a implementación. Hecho bien, desarrollo construye sin preguntar y el resultado coincide con lo diseñado. Hecho mal, genera semanas de *"¿cuál era el margen aquí?"*, *"¿qué pasa cuando la tabla está vacía?"*, *"¿el hover es este color o este otro?"* — y una UI inconsistente como resultado.
@@ -263,7 +263,8 @@ de error sin ver cómo se ve cuando la API falla").
 
 **Referencias cruzadas:**
 - [3.2.1 Design tokens y estándares](./01-design-tokens-y-estandares.md)
-- [3.2.2 Arquitectura de componentes](./02-arquitectura-de-componentes.md)
+- [3.2.2 Wireframes y prototipado](./02-wireframes-y-prototipado.md)
+- [3.2.3 Arquitectura de componentes](./03-arquitectura-de-componentes.md)
 - [6.5 Diseño de prompts y verificación](../../colaboracion-con-agentes-ia/05-diseno-de-prompts-y-verificacion.md)
 
 </div>

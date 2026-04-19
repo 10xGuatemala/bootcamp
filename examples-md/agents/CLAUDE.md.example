@@ -1,0 +1,48 @@
+<!-- Destino sugerido: CLAUDE.md (raíz del repo) -->
+
+# CLAUDE.md
+
+Este archivo le da contexto a Claude Code (y agentes compatibles) cuando trabajan en este repositorio. Mantén el contenido **corto, específico y verificable** — no duplica documentación de usuario.
+
+## Resumen del proyecto
+
+Describe en 2–3 líneas **qué hace** el proyecto, **stack** principal y **a quién** sirve.
+
+> Ejemplo: API REST en .NET 8 con MySQL para la gestión de pymes. Arquitectura modular con Auth (JWT + MFA) y módulos de negocio (clientes, proveedores, catálogos geográficos).
+
+## Comandos frecuentes
+
+```bash
+# Compilar
+dotnet build
+
+# Correr tests
+dotnet test
+
+# Levantar localmente
+dotnet run --project src/Api
+```
+
+## Arquitectura en una pantalla
+
+- **Capas:** Controller → Service → DbContext → Model ↔ BD.
+- **Flujo simplificado para CRUD básico:** Controller → DbContext → Model.
+- **Contextos de datos:** `DataContextAuth` (identidad), `DataContext` (negocio).
+
+## Convenciones de código
+
+- Idioma: comentarios y mensajes de UI en español; identificadores en inglés.
+- Usa `FirstOrThrowAsync` y `ToListOrThrowAsync` en consultas que deben retornar datos.
+- Prioriza Data Annotations en modelos; evita Fluent API salvo relaciones complejas.
+- Mensajes estáticos en `Configurations/*Msg.cs` (no hardcoded en controllers/services).
+
+## Qué evitar
+
+- No uses `var` cuando el tipo no sea evidente a primera vista.
+- No metas lógica de negocio en controllers.
+- No crees DTOs que dupliquen la entidad 1:1 sin razón.
+
+## Referencias cruzadas
+
+- [DESIGN.md](./DESIGN.md) — tokens de diseño y estándares de UI.
+- [AGENTS.md](./AGENTS.md) — convenciones multi-agente.
