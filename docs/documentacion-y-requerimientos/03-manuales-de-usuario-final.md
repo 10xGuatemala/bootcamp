@@ -226,7 +226,13 @@ El manual cita la versión del producto en la portada y en cada aviso. Un agente
 
 Las reglas siguientes son la forma ejecutable de todo lo anterior: **un contrato** que un agente de IA puede leer y respetar para redactar manuales coherentes, sin alucinar elementos que no existen en la UI.
 
-Guárdalo como archivo aparte (por ejemplo `skills/redactar-manual-usuario.md`) o incluso en `CLAUDE.md` / `AGENTS.md` del repo del producto. Cualquier agente con acceso a ese archivo puede invocarlo.
+:::tip Archivo copiable
+La plantilla completa de `redactar-manual-usuario.skill.md` vive como archivo real en [`examples-md/agents/skills/general/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/agents/skills/general). Esa versión incluye además dos secciones extra que no caben aquí: **ordenar por workflow real** (primero tareas frecuentes, después maestros) y **variante multi-tenant** con segmentación sistema × rol para apps con menús distintos según el perfil del usuario.
+
+Copia el archivo a tu repo (`.claude/skills/redactar-manual-usuario.skill.md` o equivalente según tu agente) y cualquier agente con acceso al repositorio podrá invocarlo.
+:::
+
+El bloque siguiente es una versión reducida del contrato, útil para entender la forma sin salir de esta lección:
 
 ```markdown
 # Skill: redactar manual de usuario

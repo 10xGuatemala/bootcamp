@@ -1,0 +1,268 @@
+<!-- Destino sugerido: .claude/skills/redactar-manual-usuario.skill.md -->
+
+---
+name: redactar-manual-usuario
+description: Genera o actualiza secciones de un manual de usuario final a partir de una captura de pantalla, un flujo descrito en prosa o una entrada del CHANGELOG que describa un cambio visible. Ordena por workflow real (no por menú) y, en apps multi-tenant, separa un manual por sistema × rol.
+---
+
+# Skill: redactar-manual-usuario
+
+El manual de usuario final muere el día que alguien escribe "haz clic en el botón Enviar" cuando el botón real dice "Guardar" — o peor, el día que se estructura por pantallas en vez de por tareas. Los lectores no entran al manual por curiosidad: entran porque algo dejó de funcionar o porque es su primera vez haciendo algo crítico. Si la sección se llama "La pantalla de Facturas" en vez de "Cómo emitir una factura", el lector ya perdió diez minutos antes de encontrar la respuesta. Este skill existe para producir procedimientos orientados a tareas, fieles a la UI real, con ordenamiento por workflow operativo y con sección explícita de recuperación de errores.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Se libera una versión y hay que documentar un flujo nuevo o modificado.
+- Se migra documentación antigua (orientada a pantallas o técnica) al formato orientado a tareas.
+- Un usuario final o el equipo de soporte pide una guía paso a paso de una función existente.
+- Se inicia un manual nuevo para un sistema × rol en una aplicación multi-tenant.
+
+**No me uses para:**
+- Documentación técnica (API, arquitectura, guías para desarrolladores). La audiencia y el vocabulario son distintos.
+- Release notes — para eso, usa `release-notes`.
+- Modificar un manual aprobado sin actualizar su versión y su entrada en el CHANGELOG del producto.
+
+## Entradas
+
+Una de estas tres, **obligatoriamente**:
+
+1. Captura o descripción literal del flujo en la UI (textos de botones, campos, mensajes de error, mensajes de confirmación).
+2. Entrada del CHANGELOG que describe un cambio visible al usuario final.
+3. Prompt del usuario con el nombre de la tarea a documentar **más** acceso a la UI o al diseño aprobado.
+
+Además, siempre:
+
+4. **Sistema y rol** del lector objetivo si la app es multi-tenant.
+5. **Permisos y precondiciones** del rol — qué puede ver, qué puede escribir, qué le bloquea el sistema.
+
+Si falta información de la UI real, debo pedirla antes de redactar. **Nunca inventar elementos** — ni botones, ni campos, ni validaciones, ni rutas de imagen.
+
+## Reglas obligatorias
+
+- **Audiencia: usuario final, no desarrolladores.** El lector no sabe qué es un endpoint ni le importa.
+- **Lenguaje claro, segunda persona** ("Haces clic en…", "Seleccionas…"). Sin jerga técnica interna.
+- **Fidelidad absoluta a la UI.** Si la captura no muestra un botón, ese botón no existe para el manual. Si el mensaje de error dice "Valor inválido", el manual cita "Valor inválido" literal — no "Error de validación".
+- **Tono corporativo y profesional, sin condescender.** Prohibidas las palabras "simplemente", "solo", "fácilmente", "básicamente". Quitan autoridad al manual y sugieren que el lector debería haberlo resuelto sin ayuda.
+- **Mensajes del sistema citados literales** y resaltados (comillas o bloque inline), exactamente como aparecen en la UI.
+- **Orden por workflow operativo, no por el menú lateral.** Primero lo que el usuario hace con frecuencia alta; al final lo que toca una vez al año.
+- **En apps multi-tenant: un manual = un sistema × un rol.** Nunca mezclar con bloques condicionales "si eres X, ignora esto".
+
+## Estructura obligatoria por procedimiento
+
+Cada tarea del manual sigue este orden, sin excepciones:
+
+```markdown
+## Cómo {tarea concreta, orientada a resultado}
+
+### Antes de empezar, necesitas:
+- {Permiso, acceso o dato previo}.
+- {Otra precondición, o "Ninguna" si no hay}.
+
+### Pasos
+1. {Verbo imperativo + referencia literal a la UI}.
+2. {Siguiente paso}.
+3. ...
+
+### Resultado esperado
+{Qué ve el usuario al completar: mensaje literal, cambio de estado, redirección}.
+
+### Si algo sale mal
+- **{Mensaje literal de error}**: {causa probable y cómo resolver}.
+- **{Otro mensaje}**: ...
+```
+
+Las cinco subsecciones son obligatorias. Si una tarea no tiene precondiciones, escribe "Ninguna". Si nunca ha salido mal, deja un bullet genérico ("Si la página no carga, recarga el navegador") — pero no omitas la sección. Es la más consultada cuando el lector vuelve al manual.
+
+## Pasos para redactar un procedimiento
+
+### Paso 1: Parar y observar la UI antes de escribir una línea
+
+Navegar el flujo completo con un usuario que tenga el rol objetivo, tomar notas de los textos literales y las pantallas por las que pasa. Si no hay acceso a la UI, pedir capturas actualizadas.
+
+- Mal: redactar a partir del nombre de la función en el código (`CreateInvoiceAsync`) y traducir al español. El usuario no ve ese nombre.
+- Bien: anotar exactamente qué lee el usuario: "Factura → Nueva", botón "Guardar y emitir", mensaje de confirmación "Factura 0001 emitida correctamente".
+
+**Valor para el agente:** el manual es un contrato con la UI, no con el backend. Si el rol objetivo no tiene permiso para ver un botón, ese botón no existe en su manual aunque el endpoint esté expuesto.
+
+### Paso 2: Priorizar las fuentes en el orden correcto
+
+El orden de consulta no es negociable:
+
+1. **La UI real** — primero. Navega el flujo, toma notas.
+2. **Las reglas de negocio visibles** — qué bloquea el sistema, qué validaciones aparecen.
+3. **Mensajes del sistema** — errores, advertencias, confirmaciones. Literales, no parafraseados.
+4. **Código** — solo como último recurso, para confirmar el comportamiento de un caso borde cuando UI y reglas no resuelven la duda.
+
+- Mal: arrancar abriendo el controlador para ver qué hace el endpoint. El manual termina reflejando capacidades del backend que el rol objetivo no puede usar.
+- Bien: entrar a la app con una cuenta del rol objetivo, recorrer el flujo, y solo ir al código si aparece una pregunta específica ("¿por qué a veces el botón está deshabilitado?").
+
+**Valor para el agente:** el backend suele ser más permisivo que la UI. Documentar desde el código genera manuales aspiracionales que mienten sobre lo que el usuario realmente puede hacer.
+
+### Paso 3: Titular la tarea por resultado, no por pantalla
+
+El H2 del procedimiento es "Cómo {tarea concreta}". Nunca "La pantalla de X" ni "Módulo de X".
+
+- Mal: `## La pantalla de Facturas`. El lector busca una tarea, no un tour.
+- Bien: `## Cómo emitir una factura a un cliente existente`.
+- Bien: `## Cómo anular una factura ya emitida`.
+
+Si una pantalla soporta tres tareas, son tres procedimientos separados con tres H2 distintos, no un solo procedimiento que cubra todo.
+
+**Valor para el agente:** el título por tarea facilita que un buscador interno (Ctrl+F, search del sitio) devuelva el resultado correcto. "Emitir factura" es lo que el usuario escribe; "Pantalla de facturas" no.
+
+### Paso 4: Redactar los pasos con verbos imperativos y referencias literales
+
+Cada paso empieza con un verbo en imperativo y menciona **texto exacto** de la UI.
+
+- Mal: *"Procederás a crear una nueva factura utilizando el formulario correspondiente."* Voz pasiva, sin referencia concreta a la UI, "correspondiente" es un comodín.
+- Bien:
+  1. Haz clic en **Facturas** en el menú lateral.
+  2. Haz clic en el botón **Nueva factura**.
+  3. Selecciona el cliente en el campo **Cliente**.
+  4. Haz clic en **Guardar y emitir**.
+
+Los textos de la UI van en **negrita** para que el lector los ubique visualmente.
+
+**Valor para el agente:** referencias literales son verificables. Si el botón cambia de nombre, el manual falla el QA automatizado que compara los textos del manual contra los textos de la UI. Referencias abstractas ("el botón correspondiente") no son auditables.
+
+### Paso 5: Documentar el resultado esperado con el mensaje literal del sistema
+
+"Resultado esperado" no es una celebración — es la señal que le dice al usuario que terminó bien.
+
+- Mal: *"Se guardará la factura y ya estará lista."* Vago. El usuario no sabe qué buscar en pantalla.
+- Bien: *"Ves el mensaje **Factura 0001 emitida correctamente** y la factura aparece en la lista con estado **Emitida**."*
+
+Si el resultado incluye una redirección, indícalo: "La app te lleva a la vista de detalle de la factura creada".
+
+**Valor para el agente:** el resultado esperado es el criterio de éxito verificable. Los tests E2E pueden validar exactamente ese mensaje literal. Si el manual no lo cita, no hay contrato.
+
+### Paso 6: Registrar los errores con su mensaje literal y causa probable
+
+"Si algo sale mal" lista los mensajes de error **tal como aparecen** y, para cada uno, qué los causa y cómo resolverlos.
+
+- Mal: *"Si hay un error, revisa tus datos."* No ayuda — el usuario ya sabe que hay un error.
+- Bien:
+  - **"Cliente inactivo"**: el cliente está marcado como inactivo. Ve a **Clientes → Reactivar** o selecciona otro cliente.
+  - **"NIT inválido"**: el NIT ingresado no pasa la validación de la SAT. Verifica el NIT y corrige el formato (sin guiones, sin espacios).
+
+Cubrir al menos los errores que el equipo de soporte ve con más frecuencia — no una lista exhaustiva teórica.
+
+**Valor para el agente:** es la sección que más se consulta en producción. Un manual sin "Si algo sale mal" sirve para onboarding; uno con ella sirve para soporte continuo.
+
+### Paso 7: Ordenar los procedimientos por workflow operativo
+
+El manual no sigue el orden del menú lateral — sigue **el orden en que el usuario hace las cosas**.
+
+- Primero: tareas del ciclo de alta frecuencia (diario, semanal o mensual).
+- Después: tareas de configuración, catálogos y mantenimiento (ocasionales).
+- Al final: operaciones administrativas excepcionales.
+
+Ejemplo: en un sistema contable, documenta primero "cerrar el mes" (todos los meses) y después "configurar tipos de cambio" (una vez al año). El menú puede tener "Configuración" arriba; el manual no.
+
+Si el producto tiene un ciclo operativo cíclico, el manual arranca con ese ciclo completo antes de pasar a maestros/catálogos.
+
+**Valor para el agente:** el orden por workflow hace que el lector encuentre en las primeras secciones lo que va a necesitar hoy, no lo que configuró una vez y olvidó.
+
+## Variante: app multi-tenant con segmentación sistema × rol
+
+Úsala cuando el producto expone **menús distintos según el perfil del usuario** (ej. un ERP con módulo comercial, módulo de operaciones y portal de clientes externos; cada uno con varios roles).
+
+**Regla: un manual = un sistema × un rol. No mezclar.**
+
+- `sistema-A/rol-1/` — un manual completo.
+- `sistema-A/rol-2/` — otro manual, aunque compartan 70% del contenido.
+- `sistema-B/rol-1/` — otro manual.
+
+Parece duplicación, pero evita manuales con "si eres X, ignora esto" esparcido por todas partes — que el usuario real no lee.
+
+### Estructura de carpetas por sistema × rol
+
+```
+manuales/
+├── {sistema-A}/
+│   ├── {rol-1}/
+│   │   ├── README.md                 # Índice: flujo operativo + maestros
+│   │   ├── 01-{tarea-ciclo-1}.md     # 01-09: flujo operativo
+│   │   ├── 02-{tarea-ciclo-2}.md
+│   │   ├── 10-{maestro-1}.md         # 10+: maestros/catálogos
+│   │   └── 11-{maestro-2}.md
+│   └── {rol-2}/
+│       └── ...
+└── {sistema-B}/
+    └── ...
+```
+
+### Reglas de exclusión explícita
+
+Antes de redactar, listar **qué NO va** en este manual:
+
+- Pantallas a las que el rol **no puede acceder**.
+- Módulos que pertenecen a **otro sistema**.
+- Acciones de escritura si el rol es de solo lectura.
+- Opciones de administración global si el rol es operativo.
+
+Si una opción aparece en el menú pero condicionada por permiso o sistema, verificar en el código de visibilidad (`*ngIf`, guards, `[Authorize(Roles = ...)]`) antes de documentarla. Si no se puede verificar, preguntar.
+
+**Valor para el agente:** la lista de exclusión es tan importante como la lista de inclusión. Sin ella, el manual crece con procedimientos que el rol objetivo no puede ejecutar y se vuelve inútil.
+
+### README por carpeta sistema × rol
+
+El `README.md` dentro de cada carpeta `{sistema}/{rol}/`:
+
+- Describe el alcance del rol en una frase.
+- Lista los archivos agrupados por **flujo operativo** y **maestros/transversales**.
+- Usa enlaces relativos (`./01-tarea.md`) — no URLs absolutas.
+
+Antes de entregar, confirmar que todo archivo listado existe y no hay archivos huérfanos.
+
+## Formato de salida
+
+- Markdown con la estructura obligatoria por procedimiento.
+- Encabezado de sección: `## Cómo {tarea}` (H2 por procedimiento).
+- Textos literales de la UI en **negrita**; mensajes del sistema en comillas o bloque de código inline.
+- Sin capturas nuevas a menos que se me proporcionen — no inventar rutas de imagen.
+
+## Antes de entregar, verifico
+
+- [ ] Cada procedimiento tiene las 5 secciones (tarea, precondiciones, pasos, resultado, recuperación).
+- [ ] El título de cada procedimiento es una tarea (`Cómo {verbo}`), no el nombre de una pantalla.
+- [ ] Todos los botones, campos y mensajes mencionados existen en la captura o flujo provisto.
+- [ ] El lenguaje es comprensible para alguien sin formación técnica.
+- [ ] No usé "simplemente", "solo", "fácilmente", "básicamente".
+- [ ] Los mensajes del sistema están citados con su texto literal, no parafraseados.
+- [ ] Los procedimientos están ordenados por workflow operativo, no por el menú.
+- [ ] En manuales multi-tenant: un solo sistema × rol, con lista de exclusión explícita.
+- [ ] El `README.md` del rol lista todos los archivos y no hay huérfanos.
+
+## Errores comunes
+
+- **Estructurar el manual por pantallas** ("La pantalla de Facturas") en lugar de por tareas ("Cómo emitir una factura"). El lector busca tareas, no tours.
+- **Inventar botones o validaciones** que la UI no muestra. El manual pierde credibilidad al primer intento fallido del lector.
+- **Copiar el tono de la documentación técnica** al manual. El usuario final no quiere saber qué pasa "en el backend"; quiere saber qué hacer.
+- **Omitir la sección "Si algo sale mal".** Es la que más se consulta en producción. Un manual sin ella sirve para onboarding y nada más.
+- **Seguir el orden del menú lateral** cuando el workflow real del usuario es otro. Un operador entra a cerrar el mes, no a configurar catálogos.
+- **En apps multi-tenant, mezclar roles o sistemas** en un mismo manual con bloques condicionales. El usuario real se pierde. Un manual = un sistema × un rol.
+- **Usar el backend como fuente única** de lo documentable. Si la UI no lo muestra para ese rol, no existe para ese manual aunque el endpoint lo permita.
+- **Usar "simplemente" o "solo"** en pasos. "Simplemente haz clic en Guardar" insulta al lector que ya hizo clic y no le funcionó.
+
+## Glosario
+
+**Procedimiento** *(Procedure / how-to)* — sección del manual que documenta una tarea concreta con precondiciones, pasos, resultado esperado y recuperación. Encaja con el tipo *how-to guide* del marco [Diátaxis](https://diataxis.fr/).
+
+**Workflow operativo** *(Operational workflow)* — secuencia de tareas que el usuario ejecuta con frecuencia (diario, semanal, mensual). Dicta el orden del manual por encima del orden del menú.
+
+**Regla de exclusión** *(Exclusion rule)* — declaración explícita de qué procedimientos **no** van en un manual, típicamente por permiso, por rol o por sistema. Se documenta antes de empezar a redactar.
+
+**Mensaje literal** *(Literal message)* — cita exacta de un texto de la UI (botón, campo, error, confirmación). El manual nunca parafrasea la UI.
+
+**Manual por sistema × rol** *(Tenant-role manual)* — en apps multi-tenant, manual dedicado a un único cruce de sistema y rol. Evita bloques condicionales dentro del manual.
+
+**Microcopy** *(Microcopy)* — textos breves de la UI (botones, errores, confirmaciones) que el manual cita literal. Su calidad determina la calidad del manual.
+
+:::info Referencias primarias
+- [Diátaxis](https://diataxis.fr/) — marco que distingue tutorial, how-to, reference y explanation. Este skill genera artefactos del tipo *how-to*.
+- [Nielsen Norman Group — User Manuals](https://www.nngroup.com/articles/instruction-manuals/) — principios de usabilidad aplicados a manuales orientados a tarea.
+- [Plain Language Guidelines](https://www.plainlanguage.gov/guidelines/) — principios de redacción clara aplicables al tono corporativo sin condescender.
+- [5.3 Manuales de usuario final](../../../docs/documentacion-y-requerimientos/03-manuales-de-usuario-final.md) — módulo del bootcamp que describe el flujo completo de redacción; este skill es la forma operativa del módulo.
+- [Skill `release-notes`](./release-notes.skill.md.example) — genera las entradas del CHANGELOG público que este skill consume como entrada cuando se documenta una versión nueva.
+:::

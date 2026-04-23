@@ -12,18 +12,33 @@ examples-md/
 │   ├── CLAUDE.md.example
 │   ├── AGENTS.md.example
 │   └── skills/
-│       ├── code-review.skill.md.example
-│       └── release-notes.skill.md.example
+│       ├── general/                         # Skills agnósticas de stack
+│       │   ├── code-review.skill.md.example
+│       │   ├── release-notes.skill.md.example
+│       │   ├── redactar-manual-usuario.skill.md.example
+│       │   ├── revisar-hallazgo-sast.skill.md.example
+│       │   ├── entrevista-specs.skill.md.example
+│       │   └── scaffolding-desde-specs.skill.md.example
+│       └── net-core-web-api/                # Skills específicas del curso .NET
+│           ├── estructura-proyecto-net.skill.md.example
+│           ├── nuevo-endpoint-rest-net.skill.md.example
+│           ├── nueva-entidad-ef-core.skill.md.example
+│           ├── patrones-diseno-net.skill.md.example
+│           └── checklist-produccion-net.skill.md.example
 ├── design/              # Plantillas UX/UI
 │   ├── DESIGN.md.example
 │   ├── component-brief.md.example
 │   └── screen-spec.md.example
-└── project/             # Plantillas de gestión ágil
+└── project/             # Plantillas de gestión ágil + arranque + release
+    ├── specs.md.example                     # Contrato de arranque (Actividad 0)
+    ├── release-requirements.md.example      # Requerimientos por versión (release-centric)
     ├── product-backlog.md.example
     ├── sprint-plan.md.example
     ├── sprint-goal.md.example
     └── retrospective.md.example
 ```
+
+Las skills se organizan por dominio. Las de `general/` aplican a cualquier stack; las de `net-core-web-api/` son específicas del curso [1.2 Desarrollo de Web APIs en .NET Core](../docs/desarrollo-web-y-movil/net-core-web-api/index.md) y asumen .NET 8 + Entity Framework Core.
 
 ## Uso
 

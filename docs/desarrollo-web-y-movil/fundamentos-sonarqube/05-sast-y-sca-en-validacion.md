@@ -12,6 +12,10 @@ Validar una entrega no significa revisar solo si "funciona". También conviene r
 Este módulo complementa [Integración de SonarQube en el ciclo DevOps](./04-ciclo-devops.md).
 :::
 
+:::tip Archivo copiable
+La skill `revisar-hallazgo-sast` automatiza el triaje de un hallazgo individual (SonarQube, CodeQL, Snyk, Dependabot): decide si es bloqueante, mitigable o falso positivo y propone un plan concreto. Vive en [`examples-md/agents/skills/general/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/agents/skills/general). Cópiala a `.claude/skills/` cuando implementes SAST/SCA en tu pipeline.
+:::
+
 ## Dónde encajan en el ciclo
 
 ```mermaid

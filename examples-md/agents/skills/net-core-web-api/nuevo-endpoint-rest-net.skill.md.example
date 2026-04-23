@@ -1,0 +1,366 @@
+<!-- Destino sugerido: .claude/skills/nuevo-endpoint-rest-net.skill.md -->
+
+---
+name: nuevo-endpoint-rest-net
+description: Agrega un endpoint REST nuevo en una Web API de .NET 8 con arquitectura en capas (Controller → Service → DbContext), DTOs validados, autorización por roles y convenciones Swagger consistentes.
+---
+
+# Skill: nuevo-endpoint-rest-net
+
+Un controlador con cinco endpoints se escribe en una tarde. Un año después tiene cuatrocientas líneas, una mezcla de lógica HTTP y reglas de negocio, validaciones que se repiten por cuatro módulos y códigos de estado que nadie recuerda por qué se eligieron así. Este skill existe para que cada endpoint nuevo entre al proyecto con las decisiones ya tomadas: qué método HTTP, qué ruta, qué DTO, qué capa, qué autorización, qué código de respuesta para cada caso.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Se necesita exponer una operación nueva en una Web API .NET existente.
+- Se reescribe un endpoint y conviene re-documentar la capa completa de forma consistente.
+- Se audita un controlador existente contra convenciones REST y de la capa de servicio.
+
+**No me uses para:**
+- Definir el contrato de negocio — eso viene del requerimiento aprobado, no del skill.
+- Crear la entidad o la migración — usa `nueva-entidad-ef-core`.
+- Decidir patrones estructurales (Strategy, Factory, Builder, Template Method, Máquina de Estados) — esos aparecen cuando el servicio crece; usar `patrones-diseno-net`.
+- Establecer la estructura del proyecto (carpetas, namespaces, paquetes NuGet) — usar `estructura-proyecto-net`.
+
+## Entradas
+
+1. **Recurso afectado** (ej. `clientes`, `facturas`) y si el recurso ya existe o se crea con este endpoint.
+2. **Operación**: método HTTP + acción concreta (listar, obtener por id, crear, actualizar total, actualizar parcial, eliminar, u operación de dominio como `POST /api/facturas/{id}/anulacion`).
+3. **Reglas de negocio** que la capa de servicio debe aplicar, si las hay.
+4. **Requisitos de autorización** — roles que pueden ejecutarla, restricción por pertenencia (multi-empresa, multi-tenant), endpoints públicos.
+5. **Forma esperada de la respuesta** — qué campos del recurso se exponen al cliente.
+
+## Reglas REST que aplico siempre
+
+### URLs con sustantivos en plural, sin verbos
+
+- Mal: `GET /api/cliente/obtener`, `POST /api/crearCliente`.
+- Bien: `GET /api/clientes`, `POST /api/clientes`.
+
+El verbo HTTP ya expresa la acción. Si la operación no encaja con un verbo HTTP estándar, modélala como sub-recurso: `POST /api/facturas/{id}/anulacion` en vez de `POST /api/facturas/anular/{id}`.
+
+**Valor para el agente:** una URL que sigue la convención es predecible. Un agente puede generar cliente HTTP, documentación o pruebas sin consultarlo con un humano.
+
+### Rutas anidadas para pertenencia clara
+
+Cuando un recurso existe siempre dentro de otro, anida la ruta: `/api/empresas/{idEmpresa}/clientes/{idCliente}`. Cuando el recurso existe por sí solo y el otro es solo un filtro, usa query string: `/api/clientes?idEmpresa=12`.
+
+### Códigos de estado canónicos
+
+| Código | Cuándo usarlo | Caso límite típico |
+|---|---|---|
+| `200 OK` | GET exitoso, PUT/PATCH que devuelve el recurso actualizado | — |
+| `201 Created` | POST que crea un recurso | Incluir header `Location` con la URL del recurso nuevo |
+| `204 No Content` | DELETE exitoso; PUT/PATCH sin body de respuesta | No incluir body; si lo incluyes, usa `200` |
+| `400 Bad Request` | El DTO no pasa validaciones de forma (campo faltante, tipo incorrecto, formato inválido) | — |
+| `401 Unauthorized` | Falta token o el token es inválido | No confundir con `403`: aquí el servidor no sabe quién eres |
+| `403 Forbidden` | Autenticado pero sin permiso para esta operación | Para no filtrar existencia del recurso, devuelve `404` en vez de `403` cuando el usuario no debería saber que existe |
+| `404 Not Found` | El recurso no existe, o el usuario no tiene derecho a saber que existe | — |
+| `409 Conflict` | Estado actual del recurso impide la operación (ej. crear duplicado con clave única) | — |
+| `422 Unprocessable Entity` | DTO bien formado pero viola una regla de negocio | Úsalo cuando `400` suena a "error de forma" y el error real es semántico |
+
+**Regla rápida `400` vs `422`:** si un validador de tipos (`[Required]`, `[EmailAddress]`, `[Range]`) lo detecta, es `400`. Si solo la lógica de negocio lo detecta (ej. "el cliente ya está inactivo y no se puede facturar"), es `422`.
+
+## Decisión: ¿controlador → servicio → DbContext o controlador → DbContext?
+
+Antes de decidir, ubícate en el diagrama de [flujo de ejecución](./estructura-proyecto-net.skill.md.example#flujo-de-ejecución) del skill `estructura-proyecto-net`: el flujo principal pasa por el servicio; el atajo va directo del controlador al `DbContext`.
+
+El módulo [1.2.1 Arquitectura de Backend API Rest en .NET Core](../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md) acepta los dos flujos. Aplica el simplificado solo si todas estas condiciones se cumplen:
+
+- No hay reglas de negocio — solo persistencia directa.
+- El endpoint es único para ese recurso (no forma parte de un conjunto de operaciones relacionadas).
+- No hay transformación entre el DTO y la entidad más allá de mapeo uno a uno.
+
+| Flujo | Cuándo | Ejemplo |
+|---|---|---|
+| `Controller → Service → DbContext` | Hay lógica de negocio, múltiples operaciones del mismo recurso, o validación cruzada | `POST /api/facturas` — valida cliente activo, calcula totales, aplica impuestos |
+| `Controller → DbContext` | Lectura simple de un catálogo, sin transformaciones ni reglas | `GET /api/paises` desde una tabla de referencia estática |
+
+**Valor para el agente:** la tabla es un criterio verificable. El agente no "decide" con intuición; observa si hay regla de negocio y aplica el flujo correspondiente.
+
+No crees capas de servicio "por si acaso". Un servicio con un solo método que solo reenvía al `DbContext` es ruido que el próximo desarrollador va a eliminar.
+
+## Naming y ubicación de archivos
+
+Los archivos que generes deben seguir el contrato del skill [`estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example). Tabla resumida de lo que aplica a un endpoint:
+
+| Archivo | Ubicación | Sufijo de clase | Ejemplo |
+|---|---|---|---|
+| Controlador | `Modules/{Dominio}/{SubDominio}/Controllers/` | `Controller` | `ClienteController` |
+| Servicio | `Modules/{Dominio}/{SubDominio}/Services/` | `Service` | `ClienteService` |
+| DTO de entrada | `Modules/{Dominio}/{SubDominio}/Dtos/` | `Request` | `CrearClienteRequest` |
+| DTO de salida | `Modules/{Dominio}/{SubDominio}/Dtos/` | `Response` | `ClienteResponse` |
+| DTO de filtro | `Modules/{Dominio}/{SubDominio}/Dtos/` | `FilterDto` | `ClienteFilterDto` |
+| Entidad EF | `Commons/Data/Models/` | `Model` | `ClienteModel` |
+| Validador FluentValidation | `Commons/Application/Validators/` o `Modules/{Dominio}/Validators/` | `Validator` | `ClienteValidator` |
+
+Reglas de naming críticas:
+
+- Clases, propiedades y métodos públicos: `PascalCase`.
+- Parámetros y variables locales: `camelCase`.
+- Campos privados de instancia: `_camelCase`.
+- Interfaces con prefijo `I` (`IClienteService`) y en su propio archivo.
+- Una clase por archivo; nombre del archivo = nombre de la clase.
+- Namespaces reflejan la estructura de carpetas sin excepción.
+- Nombres de dominio en español si el resto del dominio está en español (`ClienteService`, no `CustomerService`).
+
+Mal: generar `Dtos/ClienteDto.cs` con tres clases adentro (`ClienteRequest`, `ClienteResponse`, `ClienteFilterDto`).
+Bien: tres archivos separados, un sufijo cada uno.
+
+**Valor para el agente:** al seguir el sufijo y la carpeta, el endpoint creado es indistinguible de uno hecho por un humano que conoce las convenciones. Un review semántico puede concentrarse en la lógica, no en corregir ubicaciones.
+
+## Pasos
+
+### Paso 1: Definir DTO de request
+
+Cada endpoint que recibe datos tiene su propio DTO. No reutilices la entidad de EF Core como request — acopla la API al esquema de la base de datos y expone campos internos.
+
+- **Mal:**
+  ```csharp
+  [HttpPost]
+  public async Task<IActionResult> CrearCliente([FromBody] ClienteModel cliente)
+  {
+      _context.Clientes.Add(cliente);
+      await _context.SaveChangesAsync();
+      return Ok(cliente);
+  }
+  ```
+  Problemas: el cliente puede enviar `Id`, `FechaCreacion`, `IdEmpresa`; la entidad queda ligada al contrato público; cualquier campo nuevo en la tabla aparece automáticamente en la API.
+
+- **Bien:**
+  ```csharp
+  public class ClienteRequest
+  {
+      [Required, MaxLength(120)]
+      public string Nombre { get; set; } = string.Empty;
+
+      [Required, EmailAddress]
+      public string Correo { get; set; } = string.Empty;
+
+      [Phone]
+      public string? Telefono { get; set; }
+  }
+  ```
+
+**Valor para el agente:** los atributos de validación son contrato declarado. Un agente que lee `[Required, EmailAddress]` entiende sin ambigüedad qué acepta el endpoint y puede generar pruebas, clientes y documentación a partir de ahí.
+
+### Paso 2: Definir DTO de response
+
+Análogo al request: una clase dedicada con los campos que el cliente necesita, en el formato que necesita. Si el proyecto ya usa AutoMapper, configura el mapeo en el `Profile` correspondiente.
+
+- Mal: retornar `ClienteModel` crudo — expone `IdEmpresa`, timestamps internos, flags de auditoría.
+- Bien: `ClienteResponse` con `Id`, `Nombre`, `Correo`, `Telefono`, `FechaRegistro` (en el formato y zona horaria acordados con el cliente).
+
+**Valor para el agente:** el DTO de response es un contrato estable. Puede evolucionar independientemente de la entidad y el agente sabe exactamente qué debe documentar en Swagger.
+
+### Paso 3: Escribir el controlador delgado
+
+Un controlador recibe, delega al servicio, retorna. Ninguna regla de negocio vive aquí.
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class ClientesController : ControllerBase
+{
+    private readonly ClienteService _clienteService;
+
+    public ClientesController(ClienteService clienteService)
+    {
+        _clienteService = clienteService;
+    }
+
+    /// <summary>
+    /// Registrar un nuevo cliente.
+    /// </summary>
+    /// <param name="request">Datos del cliente a registrar.</param>
+    /// <returns>Cliente creado con su identificador asignado.</returns>
+    [HttpPost]
+    [Authorize(Roles = "Administrador,Ventas")]
+    [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ClienteResponse>> CrearCliente(
+        [FromBody] ClienteRequest request)
+    {
+        var cliente = await _clienteService.CrearAsync(request);
+        return CreatedAtAction(
+            nameof(ObtenerPorId),
+            new { id = cliente.Id },
+            cliente);
+    }
+}
+```
+
+Reglas del controlador:
+- `[Authorize]` a nivel de clase; `[AllowAnonymous]` solo en endpoints públicos explícitos.
+- `[Authorize(Roles = "...")]` por método cuando los permisos varían.
+- `[ProducesResponseType]` declara cada código posible — Swagger lo usa para generar documentación precisa.
+- Comentarios XML `///` para que Swagger tenga descripción del endpoint.
+
+**Valor para el agente:** un controlador delgado es legible. Un agente que debe agregar un endpoint nuevo al controlador copia el patrón existente sin tener que decidir dónde vive cada responsabilidad.
+
+### Paso 4: Escribir el servicio con DTOs en la frontera
+
+```csharp
+public class ClienteService
+{
+    private readonly ApplicationDbContext _context;
+    private readonly DateUtil _dateUtil;
+
+    public ClienteService(ApplicationDbContext context, DateUtil dateUtil)
+    {
+        _context = context;
+        _dateUtil = dateUtil;
+    }
+
+    public async Task<ClienteResponse> CrearAsync(ClienteRequest request)
+    {
+        var correoNormalizado = request.Correo.Trim().ToLowerInvariant();
+
+        var existe = await _context.Clientes
+            .AsNoTracking()
+            .AnyAsync(c => c.Correo == correoNormalizado);
+
+        if (existe)
+            throw new ReglaNegocioException(
+                "Ya existe un cliente con ese correo.");
+
+        var cliente = new ClienteModel
+        {
+            Nombre = request.Nombre.Trim(),
+            Correo = correoNormalizado,
+            Telefono = request.Telefono,
+            FechaRegistro = _dateUtil.AhoraLocal()
+        };
+
+        _context.Clientes.Add(cliente);
+        await _context.SaveChangesAsync();
+
+        return new ClienteResponse
+        {
+            Id = cliente.Id,
+            Nombre = cliente.Nombre,
+            Correo = cliente.Correo,
+            Telefono = cliente.Telefono,
+            FechaRegistro = cliente.FechaRegistro
+        };
+    }
+}
+```
+
+Reglas del servicio:
+- Recibe DTOs, retorna DTOs. Nunca expone `ClienteModel` al controlador.
+- Usa `AsNoTracking()` en consultas de solo lectura — EF no trackea cambios y la consulta es más rápida.
+- Prefiere `AnyAsync` antes que `FirstOrDefaultAsync` + null-check cuando solo necesitas saber si existe.
+- Usa el utilitario de fecha del proyecto (si existe) en vez de `DateTime.UtcNow` directo — evita inconsistencias de zona horaria.
+- Lanza excepciones de dominio específicas (`ReglaNegocioException`, `RecursoNoEncontradoException`) para que un middleware las traduzca al código HTTP correcto (`422`, `404`).
+
+**Valor para el agente:** el servicio concentra reglas en un lugar. Cuando cambia una regla, el agente modifica un archivo, no cinco controladores.
+
+### Paso 5: Registrar en la inyección de dependencias
+
+Un servicio con `DbContext` va siempre en `AddScoped` — se crea una instancia por solicitud HTTP, igual que el contexto.
+
+```csharp
+// Program.cs o ServiceCollectionExtensions.cs
+builder.Services.AddScoped<ClienteService>();
+```
+
+- Mal: `AddSingleton<ClienteService>()` — falla en producción porque `DbContext` es scoped y no puede vivir en un singleton.
+- Bien: `AddScoped<ClienteService>()`.
+
+Si usas interfaz (`IClienteService`), regístrala en lugar de la clase concreta:
+```csharp
+builder.Services.AddScoped<IClienteService, ClienteService>();
+```
+
+**Cuándo justificar interfaz:** cuando planeas sustituir la implementación (pruebas con mock, múltiples proveedores). Si el servicio es único y estable, no agregues interfaz — es ceremonia sin beneficio.
+
+### Paso 6: Verificar Swagger y traducción de errores
+
+Con `[ProducesResponseType]` declarado y `[ApiController]` activado, Swagger debe mostrar:
+- El DTO de request con sus validaciones.
+- El DTO de response con sus campos.
+- Todos los códigos de estado posibles, cada uno con su forma de cuerpo.
+
+El middleware del proyecto debe traducir excepciones de dominio a respuestas HTTP:
+- `ReglaNegocioException` → `422 Unprocessable Entity` con mensaje claro.
+- `RecursoNoEncontradoException` → `404 Not Found`.
+- Excepciones no controladas → `500 Internal Server Error` con mensaje genérico (nunca exponer el stack trace al cliente).
+
+**Valor para el agente:** cuando un agente abre Swagger y ve la documentación completa, sabe que el endpoint está listo. La ausencia de un código en Swagger es una señal de documentación incompleta.
+
+## Prompt de auditoría
+
+Para revisar un controlador existente contra estas reglas, copia este prompt en la sesión del agente:
+
+```
+Audita el controlador <NombreController> contra el skill `nuevo-endpoint-rest-net`. Reporta, por cada endpoint:
+
+1. ¿La URL usa sustantivo plural sin verbos?
+2. ¿El método HTTP corresponde a la operación (POST para crear, PUT/PATCH para modificar, DELETE para eliminar)?
+3. ¿Los códigos de estado declarados en `[ProducesResponseType]` cubren todos los casos posibles (éxito, 400, 401, 403, 404, 422)?
+4. ¿Se usa `[Authorize]` de forma consistente?
+5. ¿El controlador delega a un servicio o accede directo al `DbContext` — y es la decisión correcta según el flujo del recurso?
+6. ¿Los DTOs de request y response son dedicados o se reutiliza la entidad de EF?
+
+Salida: tabla por endpoint con columnas "Regla", "Estado", "Corrección sugerida".
+```
+
+## Antes de entregar, verifico
+
+- [ ] La URL usa sustantivo plural sin verbos.
+- [ ] El método HTTP corresponde a la operación.
+- [ ] Los códigos de estado posibles están en `[ProducesResponseType]` (o `[ApiConventionMethod]`).
+- [ ] El endpoint tiene `[Authorize]` apropiado (o `[AllowAnonymous]` justificado por negocio, no por descuido).
+- [ ] Los DTOs de request tienen `[Required]` y validadores consistentes; el DTO de response no expone campos internos.
+- [ ] El controlador no accede directamente al `DbContext` cuando hay lógica de negocio.
+- [ ] Las consultas de lectura usan `AsNoTracking()`.
+- [ ] El servicio está registrado con `AddScoped` (o `AddSingleton`/`AddTransient` justificado).
+- [ ] Swagger muestra el endpoint con request, response y códigos de estado documentados.
+- [ ] Si el proyecto usa múltiples `DbContext`, el servicio inyecta el contexto correcto.
+- [ ] Las excepciones de dominio se traducen a códigos HTTP esperados vía middleware.
+
+## Salidas
+
+- Controlador con el endpoint nuevo siguiendo el patrón del proyecto.
+- DTO de request y DTO de response bajo `Modules/<Modulo>/Dtos/` (o la estructura del proyecto).
+- Servicio con el método que implementa la regla de negocio (o la decisión explícita de ir directo al `DbContext`).
+- Registro en `ServiceCollectionExtensions.cs` o `Program.cs`.
+- Swagger actualizado con el endpoint documentado.
+
+## Errores comunes
+
+- Meter lógica de negocio en el controlador. Empieza con un `if` y termina con diez — el controlador ya no es delgado y el servicio está vacío.
+- Retornar el `Model` de EF al cliente. Expone campos internos y acopla la API al esquema de DB; cualquier migración rompe el contrato público.
+- Olvidar `AsNoTracking()` en listados grandes. EF mantiene el grafo de cambios aunque no se use — el endpoint se degrada bajo carga.
+- Usar `DateTime.UtcNow` directo cuando el proyecto tiene un utilitario con zona horaria configurada. Genera inconsistencias silenciosas entre endpoints.
+- Crear una clase de servicio con un único método de CRUD trivial — capa vacía que solo añade ruido.
+- Confundir `401` con `403`. `401` es "no sé quién eres"; `403` es "sé quién eres y no puedes". Mal usados, el cliente recibe un mensaje que no describe el problema real.
+- Confundir `400` con `422`. Reserva `400` para errores de forma (lo detectan validadores); usa `422` para errores semánticos (los detecta la lógica de negocio).
+- Registrar el servicio como `Singleton` cuando depende de `DbContext`. Falla en producción con un `InvalidOperationException` al resolver el scope.
+
+## Glosario
+
+**Controlador delgado** *(Thin controller)* — controlador que recibe, valida forma, delega al servicio y retorna. Sin lógica de negocio. Patrón recomendado en [ASP.NET Core · Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/).
+
+**DTO** *(Data Transfer Object)* — objeto plano para transportar datos entre capas sin exponer la entidad de persistencia. Ver [1.2.2 La Capa de Controlador](../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md).
+
+**Idempotencia** *(Idempotence)* — propiedad de una operación que produce el mismo resultado sin importar cuántas veces se ejecute. `GET`, `PUT` y `DELETE` son idempotentes; `POST` normalmente no. Definición en [RFC 9110 §9.2.2](https://www.rfc-editor.org/rfc/rfc9110.html#name-idempotent-methods).
+
+**`[ProducesResponseType]`** *(ProducesResponseType attribute)* — atributo que declara explícitamente los códigos de estado y tipos de respuesta para generación de Swagger precisa.
+
+**Richardson Maturity Model** *(Richardson Maturity Model)* — modelo de madurez de APIs REST en cuatro niveles (0 a 3) propuesto por Leonard Richardson; los endpoints que describe este skill apuntan a nivel 2 (verbos HTTP + códigos de estado).
+
+**Sub-recurso de acción** *(Action sub-resource)* — patrón para operaciones de dominio que no encajan con CRUD puro; se modelan como sub-recurso anidado (`POST /api/facturas/{id}/anulacion`) en vez de verbo en la URL.
+
+:::info Referencias primarias
+- [RFC 9110 · HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html) — especificación oficial de métodos HTTP, códigos de estado y semántica.
+- [Microsoft · REST API design best practices](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design) — guía aplicada a Azure y .NET.
+- [Martin Fowler · Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) — modelo clásico para evaluar madurez REST.
+- [ASP.NET Core · Web API controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/) — referencia oficial de controladores.
+- [1.2.2 La Capa de Controlador](../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md) y [1.2.3 La Capa de Servicios](../../../docs/desarrollo-web-y-movil/net-core-web-api/03-capa-servicios.md) — contexto del bootcamp del que este skill es la versión operativa.
+- [Skill `estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example) — define carpetas, namespaces y naming que este skill consume al crear archivos.
+- [Skill `patrones-diseno-net`](./patrones-diseno-net.skill.md.example) — cuándo aplicar Strategy, Factory, Builder, Template Method o StateMachine cuando el servicio crece.
+:::

@@ -226,6 +226,25 @@ app.Run();
 3. **Manejo de Excepciones**: Los servicios deben capturar las excepciones esperadas y lanzar excepciones específicas que sean manejadas adecuadamente en los controladores.
 4. **Validación de Datos**: Realiza validaciones tanto a nivel de controlador (para validar el formato de la solicitud) como en el servicio (para validar reglas de negocio).
 5. **Separación de Responsabilidades**: El servicio debe contener solo lógica de negocio. La lógica de validación del modelo debe hacerse en el controlador, y la lógica de acceso a datos debe ser responsabilidad de los repositorios.
+6. **Usar `AsNoTracking()` en consultas de solo lectura**: EF Core por default activa el *change tracker* para detectar modificaciones y persistirlas con `SaveChangesAsync`. En una consulta que solo lee datos (listados, reportes, verificaciones de existencia), ese tracking es overhead sin beneficio. `AsNoTracking()` desactiva el seguimiento y reduce memoria y tiempo de consulta. Aplícalo por default en lecturas; retíralo solo si vas a modificar la entidad devuelta.
+
+```csharp
+// Mal: lista de 10,000 empleados con change tracker activo — 10× memoria innecesaria
+var empleados = await _context.Empleados
+    .Where(e => e.Departamento == "Ventas")
+    .ToListAsync();
+
+// Bien: solo lectura, sin tracking
+var empleados = await _context.Empleados
+    .AsNoTracking()
+    .Where(e => e.Departamento == "Ventas")
+    .ToListAsync();
+
+// Bien: verificación de existencia — AnyAsync es más claro que FirstOrDefault + null-check
+var existe = await _context.Empleados
+    .AsNoTracking()
+    .AnyAsync(e => e.Correo == correoNormalizado);
+```
 
 ## Resumen
 
@@ -251,6 +270,8 @@ Con estas prácticas y conceptos, puedes estructurar la capa de servicios de una
 **`AddSingleton`** *(Singleton lifetime)* — instancia única compartida durante toda la vida de la aplicación.
 
 **Principio de inversión de dependencias** *(Dependency Inversion Principle)* — principio SOLID que favorece depender de abstracciones en lugar de implementaciones concretas.
+
+**`AsNoTracking()`** *(AsNoTracking)* — método de EF Core que desactiva el *change tracker* para una consulta; reduce memoria y tiempo cuando la entidad devuelta no se va a modificar. Aplicar por default en lecturas.
 
 :::info Referencias primarias
 - [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
@@ -291,6 +312,7 @@ Con estas prácticas y conceptos, puedes estructurar la capa de servicios de una
 - Mezclar validación HTTP con reglas de negocio en el servicio.
 - Registrar servicios como Singleton cuando dependen de `DbContext`.
 - Agregar interfaces innecesarias sin necesidad de sustitución.
+- Olvidar `AsNoTracking()` en listados grandes — EF mantiene el grafo de cambios sin necesidad y el endpoint se degrada bajo carga.
 
 **Referencias cruzadas:**
 - [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)

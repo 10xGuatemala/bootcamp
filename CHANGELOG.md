@@ -4,6 +4,25 @@ Cambios de contenido del bootcamp público. Solo se listan adiciones y modificac
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.5.0 — 2026-04-22
+
+### Added
+
+- **6.7 De specs a proyecto real** — nuevo módulo que cierra la ruta 6 (colaboración con agentes). Describe el flujo de arranque guiado (entrevista → contrato `specs.md` → scaffolding reproducible) con los cinco bloques ordenados (Objetivo → Stack → Estructura → Operación → Alcance) y la regla cardinal "una pregunta a la vez".
+- **Reorganización de skills copiables** en `examples-md/agents/skills/`, ahora por dominio:
+  - **`general/`** (agnósticas de stack): `code-review`, `release-notes`, `redactar-manual-usuario`, `revisar-hallazgo-sast`, `entrevista-specs`, `scaffolding-desde-specs`, `escribir-slash-command`.
+  - **`net-core-web-api/`** (curso 1.2): `estructura-proyecto-net`, `nuevo-endpoint-rest-net`, `nueva-entidad-ef-core`, `patrones-diseno-net`, `checklist-produccion-net`.
+- **Plantillas nuevas en `examples-md/project/`:** `specs.md.example` (contrato de arranque, Actividad 0) y `release-requirements.md.example` (requerimientos por versión, release-centric, con variante multi-repo para productos API + Web + BD).
+- **Tips copiables cruzados** en 6.3 Arquitectura orientada a skills, 1.2 index (net-core-web-api), 4.5 SAST/SCA en validación, 5.2 Versionado semántico en equipos y 5.3 Manuales de usuario final — enlazan a las skills y plantillas correspondientes del repo público.
+
+### Changed
+
+- **1.2.1 Arquitectura de backend** — nueva sección "Estructura de carpetas del proyecto" con árbol literal (`Auth/`, `Commons/` con sub-arquitectura, `Modules/{Dominio}/`, `Extensions/`, `Database/`), regla de los dos consumidores, tabla de sufijos por rol (15 filas) y patrón de bootstrap modular con extension methods. Glosario y `agent-block` sincronizados.
+- **1.2.2 Capa de Controlador** — regla rápida `400 Bad Request` vs `422 Unprocessable Entity`, tabla de sufijos DTO (`Request` / `Response` / `FilterDto`) y tabla de decisión `Controller → Service` vs `Controller → DbContext`. Glosario y `agent-block` sincronizados.
+- **1.2.3 Capa de Servicios** — nueva buena práctica: `AsNoTracking()` por default en consultas de solo lectura, con ejemplos Mal/Bien/`AnyAsync`. Glosario y errores comunes actualizados.
+- **1.2.4 Capa de Datos** — tabla de naming C#↔SQL (PK/FK/UNIQUE/índices), Data Annotations sobre Fluent API con tres razones explícitas, convención de zona horaria para `DateTime`, matriz tabla dedicada vs catálogo genérico y checklist de sincronía Model ↔ DDL. Glosario y `agent-block` sincronizados.
+- **1.2.5 Patrones de diseño en APIs REST** — nueva sección "Regla del tres" y reemplazo de la tabla existente por matriz dolor → patrón → ubicación con sufijos y carpetas (`Commons/Application/…`, `Modules/{Dominio}/StateMachine/`). Glosario y `agent-block` sincronizados.
+
 ## 3.4.0 — 2026-04-19
 
 ### Added

@@ -10,6 +10,17 @@ Los proyectos que colaboran bien con agentes tienden a compartir una forma: est�
 
 Esta lección trata de cómo diseñar software así, independientemente del lenguaje.
 
+:::tip Skills copiables del bootcamp
+En [`examples-md/agents/skills/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/agents/skills) viven plantillas listas para copiar a tu repo. Están organizadas por dominio:
+
+- **`general/`** (agnósticas de stack): [`code-review`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/code-review.skill.md.example), [`release-notes`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/release-notes.skill.md.example), [`redactar-manual-usuario`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/redactar-manual-usuario.skill.md.example), [`revisar-hallazgo-sast`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/revisar-hallazgo-sast.skill.md.example), [`entrevista-specs`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/entrevista-specs.skill.md.example), [`scaffolding-desde-specs`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/scaffolding-desde-specs.skill.md.example), [`escribir-slash-command`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/escribir-slash-command.skill.md.example).
+- **`net-core-web-api/`** (específicas del curso 1.2): `nuevo-endpoint-rest-net`, `nueva-entidad-ef-core`, `checklist-produccion-net`.
+
+Las dos skills de **arranque de proyecto** (`entrevista-specs` + `scaffolding-desde-specs`, combinadas con la plantilla [`specs.md.example`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/project/specs.md.example)) implementan el flujo "de specs a proyecto real": entrevista guiada → contrato aprobado → scaffolding reproducible.
+
+La skill [`escribir-slash-command`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/escribir-slash-command.skill.md.example) es **meta**: documenta el patrón para diseñar comandos complejos que leen código fuente y generan artefactos derivados (manuales, reportes, diagramas) con args explícitos, proceso numerado, reglas de exclusión y checklist de calidad.
+:::
+
 ## Orquestación vs. ejecución
 
 Divide el sistema en dos partes claras:

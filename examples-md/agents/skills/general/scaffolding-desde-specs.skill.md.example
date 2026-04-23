@@ -1,0 +1,192 @@
+<!-- Destino sugerido: .claude/skills/scaffolding-desde-specs.skill.md -->
+
+---
+name: scaffolding-desde-specs
+description: Lee un specs.md aprobado y ejecuta el scaffolding reproducible del proyecto (git init, package manager, dependencias con versiones fijadas, árbol de carpetas literal, scripts, commit inicial). Nada queda al criterio del agente — todo viene del contrato.
+---
+
+# Skill: scaffolding-desde-specs
+
+La diferencia entre un scaffolding que deja al equipo listo para trabajar y uno que requiere tres horas de limpieza es obedecer el contrato al pie de la letra. La tentación del agente es "mejorar": agregar ESLint "porque cualquier proyecto lo necesita", generar un componente de demo "para que arranque con algo", instalar una librería popular "que seguro van a querer". Cada una de esas adiciones no solicitadas termina en el diff del primer PR, el equipo discute por qué están ahí y el contrato deja de ser fuente de verdad. Este skill existe para ejecutar el scaffolding exactamente como lo dice `specs.md`, sin aportes propios.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Existe un `specs.md` **aprobado** en la raíz del proyecto (o pasado como entrada).
+- La carpeta de trabajo está vacía o contiene únicamente el `specs.md`.
+- El usuario confirmó explícitamente que se puede proceder.
+
+**No me uses para:**
+- Arrancar antes de tener specs aprobado — pedir al usuario que corra `entrevista-specs` primero.
+- Modificar un proyecto existente con código. El alcance es scaffolding inicial, no refactor.
+- Reemplazar un scaffolding existente — si la carpeta tiene código, detenerme y pedir instrucciones.
+
+## Entradas
+
+1. Ruta al `specs.md` aprobado.
+2. Carpeta de trabajo (por defecto, la actual).
+3. Confirmación explícita de que se puede proceder (ej. `"procede con el scaffolding"`).
+
+Si alguna entrada falta, detenerme antes de tocar el sistema de archivos.
+
+## Reglas obligatorias
+
+- **Leer el contrato primero, ejecutar después.** Parsear `specs.md` completo antes de lanzar el primer comando.
+- **Nada fuera del contrato.** No agregar dependencias, carpetas, scripts ni archivos que no estén en specs. Si detecto que falta algo obvio (ej. no hay `.gitignore` y el stack lo necesita), pregunto antes de crear — no asumo.
+- **Versiones exactas.** Si specs dice `react@18.3.1`, instalo `react@18.3.1`, no `react@latest` ni `react@^18.0.0`.
+- **Comandos reproducibles.** Mostrar qué comando voy a ejecutar antes de ejecutarlo, con la salida esperada. Si falla, detenerme y reportar — no reintentar ciegamente con otro gestor.
+- **Idempotencia por carpeta.** Si la carpeta ya tiene un `package.json`, `*.csproj` o `pyproject.toml`, detenerme y pedir instrucciones. No sobreescribir.
+- **No `git push` ni publicación remota.** El push lo decide el usuario. Mi trabajo termina con el commit local inicial.
+
+## Pasos
+
+### Paso 1: Validación previa del contrato
+
+Antes de tocar el sistema de archivos, leer `specs.md` completo y verificar:
+
+- Ninguna sección dice "por decidir" o "ver más tarde".
+- Stack, estructura, dependencias y scripts están cerrados con versiones fijadas.
+- Hay lista explícita de "Fuera de alcance".
+- El documento tiene versión (`v0.1.0`) y fecha.
+
+Si algo falta, detenerme y listar los gaps antes de tocar nada.
+
+- Mal: empezar con `git init` y "ver qué encuentro" en `specs.md` sobre la marcha.
+- Bien: recorrer todo el documento, confirmar que es implementable, y solo entonces empezar.
+
+**Valor para el agente:** validación previa evita scaffoldings parciales que quedan a medias. Un gap detectado al inicio se resuelve con una pregunta; el mismo gap detectado a mitad del scaffolding deja la carpeta en un estado indefinido.
+
+### Paso 2: Inicialización
+
+- `git init` si no existe repo.
+- `.gitignore` apropiado al stack (Node, .NET, Python, Go). Usar plantillas estándar, no inventar entradas.
+- `README.md` mínimo con el objetivo del proyecto tomado literalmente del Bloque A de `specs.md`.
+
+- Mal: generar un README con secciones "Getting Started", "Contributing", "License" cuando specs solo pide el objetivo.
+- Bien: README con una sola sección — el objetivo y los usuarios del proyecto.
+
+### Paso 3: Inicializar el manifest del package manager
+
+Inicializar el manifest según el stack:
+
+- **Node**: `pnpm init`, `npm init -y` o `yarn init -y` según specs.
+- **.NET**: `dotnet new {{template}}` con el template exacto del contrato.
+- **Python**: `pyproject.toml` con el gestor acordado (Poetry, uv, pip-tools).
+- **Go**: `go mod init {{module}}`.
+
+Ajustar los campos del manifest (`name`, `version`, `license`, `description`) con los valores del contrato. La `version` inicial es `0.1.0` salvo que specs indique otra.
+
+### Paso 4: Instalar dependencias con versiones exactas
+
+Instalar cada dependencia con su **versión exacta** del contrato:
+
+```bash
+# Mal
+pnpm add react react-dom
+
+# Bien
+pnpm add react@18.3.1 react-dom@18.3.1
+```
+
+Separar producción vs desarrollo según la tabla del contrato:
+
+- `pnpm add <dep>@<version>` para producción.
+- `pnpm add -D <dep>@<version>` para desarrollo.
+
+Reportar la versión efectivamente instalada al terminar — algunos gestores resuelven diferencias menores en transitivas. Si hay divergencia con lo acordado, reportar antes de continuar.
+
+- Mal: `pnpm add @types/react` "porque siempre se instala". Si no está en specs, no va.
+- Bien: instalar exactamente la lista del contrato. Si al implementar hace falta algo más, pedirlo al usuario y actualizar specs.
+
+**Valor para el agente:** la lista de dependencias del contrato es el baseline exacto del proyecto. Cualquier dependencia agregada después aparece en un commit separado con su razón de ser.
+
+### Paso 5: Crear el árbol de carpetas literal
+
+Crear exactamente la estructura del Bloque C de `specs.md`. Ni más, ni menos.
+
+- Cada carpeta vacía lleva un `.gitkeep` (o archivo índice mínimo si el stack lo requiere).
+- Los nombres de carpetas respetan la convención declarada (kebab-case, PascalCase, snake_case).
+- No generar archivos de ejemplo ni componentes de demo.
+
+- Mal: crear `src/components/ExampleComponent.tsx` "para que el árbol no se vea vacío". El equipo borra el archivo en el primer PR.
+- Bien: `src/components/.gitkeep` y nada más.
+
+### Paso 6: Registrar scripts
+
+Agregar los scripts del Bloque D de `specs.md` al manifest:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "vitest",
+    "lint": "eslint src",
+    "format": "prettier --write src"
+  }
+}
+```
+
+Validar que cada script es invocable — que el binario existe en `node_modules/.bin/` o equivalente —, aunque todavía no haga nada productivo por falta de código.
+
+### Paso 7: Commit inicial
+
+```bash
+git add .
+git commit -m "chore: initial scaffolding from specs.md v0.1.0"
+```
+
+Un único commit que representa el contrato materializado. Si specs tiene una convención de mensajes distinta, usarla.
+
+**No hacer push.** El push lo decide el usuario.
+
+### Paso 8: Reporte final
+
+Entregar un reporte estructurado:
+
+- **Árbol resultante** (`tree -L 2` o equivalente).
+- **Versiones instaladas** vs las acordadas, con diferencias destacadas.
+- **Comandos ejecutados** en orden.
+- **Próximo paso sugerido** (ej. "corre `pnpm dev` para verificar el server local").
+
+**Valor para el agente:** el reporte final deja evidencia auditable de que el scaffolding correspondió al contrato. Si hay desviaciones, están documentadas.
+
+## Antes de entregar, verifico
+
+- [ ] Todas las carpetas del árbol en specs §3 existen.
+- [ ] Todas las dependencias de specs §6 están instaladas con la versión exacta.
+- [ ] Todos los scripts de specs §5 están registrados y son invocables.
+- [ ] `git log` muestra exactamente un commit inicial.
+- [ ] No hay archivos o carpetas que no vengan de specs.
+- [ ] No ejecuté `git push` ni ninguna operación remota.
+- [ ] El reporte final lista las versiones efectivamente instaladas.
+
+## Errores comunes
+
+- **Instalar `latest` o rangos en vez de versión fijada.** Rompe la reproducibilidad que specs buscaba garantizar. Un proyecto que hoy arranca con `react@18.3.1` y mañana con `react@18.4.0` ya no es el mismo proyecto.
+- **Agregar "lo que cualquiera agregaría"** (ESLint, Prettier, `.nvmrc`, Husky) sin que esté en specs. Si el usuario lo quería, debió estar en la entrevista. Si lo quiere ahora, que lo agregue en un commit aparte con su razón.
+- **Crear archivos demo o boilerplate del framework** (componentes de ejemplo, rutas por defecto, páginas `index` con texto de Lorem Ipsum). El equipo los borra en el primer PR.
+- **Continuar cuando un paso falla.** Si `pnpm install` falla, detenerme y reportar. No intentar con otro gestor, no borrar `node_modules`, no reintentar con flags.
+- **Olvidar el commit inicial.** Sin commit, no hay punto de retorno si algo se tuerce en la primera hora de trabajo.
+- **Push no solicitado.** El usuario decide cuándo publicar. Mi trabajo termina en la carpeta local.
+- **Inicializar con el template equivocado.** `dotnet new webapi` vs `dotnet new web` vs `dotnet new classlib` — specs debe decir cuál, y el skill respeta la instrucción literal.
+- **Sobreescribir un scaffolding existente.** Si la carpeta tiene código, detenerme. Nunca suponer que el usuario "quiere empezar de cero".
+
+## Glosario
+
+**Scaffolding** *(Scaffolding)* — generación inicial de la estructura del proyecto (árbol de carpetas, manifest, dependencias, scripts, commit inicial) a partir de un contrato documentado.
+
+**Versión fijada** *(Pinned version)* — versión exacta de una dependencia (`18.3.1`), sin rango ni alias. Requisito para que el scaffolding sea reproducible.
+
+**Manifest** *(Package manifest)* — archivo de configuración del package manager (`package.json`, `*.csproj`, `pyproject.toml`, `go.mod`) que declara metadatos, dependencias y scripts.
+
+**Idempotencia** *(Idempotence)* — propiedad que garantiza que ejecutar la misma operación varias veces produce el mismo resultado. Aplicada aquí como detectar el estado actual antes de actuar.
+
+**Commit inicial** *(Initial commit)* — primer commit del repositorio, que representa el scaffolding materializado del contrato. Posterior a él, todos los cambios son diff contra ese baseline.
+
+:::info Referencias primarias
+- [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación del versionado exigido en las dependencias.
+- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/) — convención recomendada para el mensaje del commit inicial y posteriores.
+- [6.7 De specs a proyecto real](../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo entrevista → scaffolding; este skill es la segunda mitad operativa.
+- [Skill `entrevista-specs`](./entrevista-specs.skill.md.example) — genera el contrato que este skill consume.
+:::

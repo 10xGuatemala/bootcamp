@@ -10,6 +10,12 @@ El versionado no es un detalle cosmético. Es **una forma compartida de comunica
 
 Esta lección cubre las reglas prácticas, las decisiones grises (que son la mayoría) y el puente con el CHANGELOG.
 
+:::tip Plantilla copiable: requerimientos por versión
+Complementaria al CHANGELOG: la plantilla `release-requirements.md.example` vive en [`examples-md/project/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/project) y documenta **una versión concreta** con sus requerimientos, repos afectados, migraciones de BD y checklist de release.
+
+Es **release-centric**, no sprint-centric — sirve cuando el producto se versiona con SemVer y el release cruza múltiples repos (API + Web + docs + BD). Cópiala a `docs/requerimientos/vX.Y.Z.md` de tu proyecto.
+:::
+
 ## La regla, en una línea
 
 > `MAJOR.MINOR.PATCH` — subes MAJOR si rompes, MINOR si añades compatible, PATCH si corriges.

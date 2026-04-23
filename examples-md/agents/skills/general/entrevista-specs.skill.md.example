@@ -1,0 +1,170 @@
+<!-- Destino sugerido: .claude/skills/entrevista-specs.skill.md -->
+
+---
+name: entrevista-specs
+description: Conduce una entrevista de especificación para arrancar un proyecto nuevo. Pregunta una cosa a la vez, sin defaults ocultos, con cinco bloques ordenados (Objetivo → Stack → Estructura → Operación → Alcance) y termina generando un specs.md que sirve como contrato previo al scaffolding.
+---
+
+# Skill: entrevista-specs
+
+Un proyecto que arranca con "yo creo que usaremos React y Vite, luego vemos" suele terminar con tres semanas de refactor cuando alguien se da cuenta de que en realidad necesitaba SSR, o con un equipo que no puede revisar código ajeno porque cada quien eligió sus convenciones. La raíz del problema no es elegir mal — es no elegir explícitamente. Este skill existe para que la entrevista previa al scaffolding obligue a **cerrar decisiones antes de codificar**, dejando evidencia escrita que el usuario aprobó.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Se va a arrancar un proyecto desde una carpeta vacía y aún no hay `specs.md`.
+- Se quiere **rehacer** las specs de un proyecto existente antes de una refactorización mayor.
+- Un cliente pide "quiero una app que haga X" y el equipo necesita convertir esa intención en un contrato técnico.
+
+**No me uses para:**
+- Ejecutar el scaffolding — eso lo hace `scaffolding-desde-specs` una vez el contrato está aprobado.
+- Modificar un `specs.md` ya aprobado sin bumpear su versión — los cambios tardíos requieren revisión explícita.
+- Preguntas de consultoría abierta del tipo "¿qué tecnología me recomiendas?" — este skill asume que se va a construir algo, no evaluar opciones.
+
+## Entradas
+
+1. **Intención en una frase**: qué se quiere construir y para quién.
+2. **Restricciones duras conocidas**: stack obligatorio por política, fecha de entrega, presupuesto.
+3. **Conocimiento del usuario sobre el dominio** (novato / intermedio / experto) — ajusta la profundidad de las preguntas.
+
+Si falta la primera, no arrancar. Pedir el enunciado del proyecto antes de la primera pregunta.
+
+## Reglas obligatorias
+
+- **Una pregunta a la vez.** Nada de cuestionarios de veinte ítems. El usuario responde, confirmo, avanzo.
+- **Sin defaults ocultos.** Si propongo una opción "típica" (ej. "suele usarse Vitest"), la marco explícitamente como sugerencia y pido confirmación.
+- **Sin asumir.** Si la respuesta es ambigua, repregunto — no invento.
+- **Cada respuesta se convierte en una línea del contrato.** No hay respuestas "sueltas": si algo no va a `specs.md`, no debí preguntarlo.
+- **No generar `specs.md` hasta cerrar todas las secciones.** Si una queda abierta, dejarla marcada "por decidir" y **no** avanzar al scaffolding.
+- **El orden de los bloques no es negociable.** Cada bloque depende de los anteriores; saltar al stack sin cerrar el objetivo produce decisiones huérfanas.
+
+## Flujo de la entrevista
+
+Cinco bloques, en este orden. Cada uno solo arranca cuando el anterior queda cerrado.
+
+### Bloque A — Objetivo
+
+El bloque corto pero crítico. Sin objetivo claro, cualquier stack es defendible y ninguna decisión posterior puede evaluarse.
+
+1. ¿Cuál es el problema que resuelve este proyecto, en una frase?
+2. ¿Quién es el usuario final? ¿Uno solo o varios perfiles?
+
+- Mal: *"una app para gestión empresarial"*. Eso no acota nada — puede ser un ERP, un CRM, una herramienta interna de RR.HH.
+- Bien: *"una app web para que los vendedores registren visitas a clientes y el gerente de ventas revise semanalmente el avance del equipo"*. Dos perfiles, un contexto claro, un resultado observable.
+
+**Valor para el agente:** un objetivo concreto permite rechazar preguntas fuera de alcance ("¿agregamos integración con WhatsApp?") con evidencia escrita.
+
+### Bloque B — Stack (solo tras cerrar A)
+
+3. **Runtime y lenguaje objetivo**. Si hay restricción del equipo o cliente, aplicarla sin debatir.
+4. **Framework principal**. Depende del objetivo: ¿web, móvil, CLI, servicio, librería?
+5. **Persistencia**. DB relacional, documento, archivos, ninguna.
+6. **Autenticación** si aplica — qué tipo (sesión, JWT, OAuth), qué roles.
+7. **Package manager y versión** fijada.
+
+- Mal: *"un stack moderno"*. El adjetivo no es compromiso.
+- Bien: *"Node 20.11.1 + React 18.3.1 + Vite 5.2.0 + pnpm 9.1.0"*. Versiones exactas, instalables con el comando correspondiente.
+
+**Valor para el agente:** versiones fijadas hacen reproducible el scaffolding. Sin ellas, el proyecto arranca distinto cada mes.
+
+### Bloque C — Estructura y convenciones
+
+8. **Organización de carpetas**. Si el usuario conoce un patrón (Atomic Design, Clean Architecture, por feature, por capa), aplicarlo. Si no, proponer 2 opciones con tradeoff explícito y dejar que elija.
+9. **Naming de archivos** por tipo (componentes en `PascalCase.tsx`, servicios en `kebab-case.ts`, tests en `*.spec.ts`).
+10. **Tests**: framework, ubicación (`__tests__/` o junto al archivo), convención de nombres.
+11. **Lint y formatter**: herramienta y configuración mínima.
+
+Esta es la sección que los equipos saltan con más frecuencia y la que más duele después. Dos desarrolladores con convenciones distintas en el mismo repo generan revisión de PR interminable.
+
+- Mal: *"usa lo que se acostumbre"*. No hay "lo que se acostumbre" universal.
+- Bien: *"ESLint con la preset de Airbnb + Prettier con 2 espacios y `printWidth: 100`; tests con Vitest en `src/**/*.spec.ts`"*.
+
+**Valor para el agente:** convenciones explícitas permiten auto-corrección. Un agente que escribe un componente sabe dónde va y cómo se llama el archivo.
+
+### Bloque D — Operación
+
+12. **Scripts del `package.json` o `Makefile`**: `dev`, `build`, `test`, `lint`, `format` como mínimo. Cualquier otro relevante al proyecto.
+13. **CI/CD desde día uno**. Si sí, plataforma (GitHub Actions, GitLab CI, CircleCI) y qué corre el pipeline (lint, tests, build).
+14. **Licencia**. Propietaria, MIT, Apache-2.0 — saberlo antes de que el código salga del repo.
+
+- Mal: *"después vemos lo de CI"*. Si no se decide antes, nadie lo agrega después.
+- Bien: *"GitHub Actions corriendo lint + test en cada PR, build en main; pipeline vive en `.github/workflows/ci.yml`"*.
+
+### Bloque E — Alcance y cierre
+
+15. **Qué queda fuera del alcance v0**. Lista explícita para evitar scope creep. Mientras más corta y concreta, mejor.
+16. **Mostrar el `specs.md` generado**, pedir validación línea por línea.
+
+El paso 15 es la salvaguarda contra el "mientras estamos acá, ¿podemos agregar…?". Cualquier funcionalidad que no esté en alcance v0 no entra al scaffolding y se registra como backlog para v0.1 en adelante.
+
+**Valor para el agente:** la lista de "fuera de alcance" es un criterio verificable para rechazar peticiones durante la implementación. No es un "no" caprichoso — es un "no" acordado por escrito.
+
+## Formato del specs.md generado
+
+Al cerrar el último bloque, genera un `specs.md` siguiendo la plantilla del proyecto (`examples-md/project/specs.md.example`). El contrato incluye:
+
+- **Objetivo** del proyecto y usuarios.
+- **Stack** con versiones exactas.
+- **Árbol de carpetas literal** — el que se va a crear, no un placeholder.
+- **Convenciones** por tipo de archivo.
+- **Scripts** con su propósito.
+- **Dependencias iniciales** con versión.
+- **Decisiones cerradas** — una línea por cada respuesta de la entrevista.
+- **Fuera de alcance** — lista explícita.
+- **Historial** del contrato (`v0.1.0 - YYYY-MM-DD`).
+
+Ejemplo mínimo de la sección de decisiones:
+
+```markdown
+## Decisiones cerradas
+
+- Lenguaje: TypeScript 5.4.5.
+- Runtime: Node 20.11.1.
+- Framework: React 18.3.1 con Vite 5.2.0.
+- Package manager: pnpm 9.1.0.
+- Estructura: por feature (`src/features/<dominio>/`).
+- Tests: Vitest en `src/**/*.spec.ts`.
+- Lint: ESLint preset Airbnb + Prettier.
+- CI: GitHub Actions (lint + test por PR, build en `main`).
+- Licencia: propietaria.
+```
+
+Cada línea tiene un origen trazable en la entrevista. Nada "por decidir", nada implícito.
+
+## Antes de entregar el specs.md, verifico
+
+- [ ] Ninguna sección dice "por decidir" o "ver más tarde".
+- [ ] El árbol de carpetas es literal, sin placeholders abstractos ni `(...)`.
+- [ ] Todas las versiones de dependencias están fijadas — ningún `latest`, ningún rango `^`.
+- [ ] Hay lista explícita de "fuera de alcance", aunque sea corta.
+- [ ] El bloque de "Decisiones cerradas" tiene una línea por cada pregunta de la entrevista.
+- [ ] El usuario confirmó por escrito cada bloque antes de generar el documento final.
+- [ ] El contrato incluye un historial con versión inicial (`v0.1.0`) y fecha.
+
+## Errores comunes
+
+- **Preguntar todo de golpe.** El usuario no puede pensar veinte decisiones en paralelo; una a la vez.
+- **Asumir defaults** ("supongo que usarás Prettier"). Se cuelan decisiones que el usuario no tomó y después alguien las cambia sin aviso.
+- **Saltar al scaffolding antes de aprobación.** El documento tiene que quedar validado explícitamente. Si hay duda, volver a la pregunta.
+- **Preguntas que no alimentan el contrato.** Si una respuesta no acaba en `specs.md`, la pregunta sobraba.
+- **Llenar vacíos con opinión propia** cuando el usuario dice "tú decide". Ofrecer 2 alternativas con tradeoff, no imponer una.
+- **Cerrar el bloque sin versiones fijadas.** "Usamos la última de React" equivale a no decidir — en seis meses nadie sabrá qué versión era "la última".
+- **Olvidar el bloque de alcance fuera.** Sin él, el primer día de desarrollo llega una petición nueva y nadie tiene el documento para decir "eso es v0.1, no v0".
+
+## Glosario
+
+**Specs** *(Specification contract)* — documento que fija las decisiones del proyecto antes del primer commit. Equivale al contrato del tipo *tutorial* en el marco [Diátaxis](https://diataxis.fr/) pero aplicado al arranque.
+
+**Scope creep** *(Scope creep)* — crecimiento no controlado del alcance durante la implementación; la lista "Fuera de alcance v0" del specs es la defensa explícita.
+
+**Default oculto** *(Hidden default)* — decisión que el agente toma sin consultar, usualmente por analogía con proyectos previos; prohibido en esta entrevista.
+
+**Scaffolding** *(Scaffolding)* — generación inicial de la estructura del proyecto, ejecutada por el skill `scaffolding-desde-specs` una vez el contrato está aprobado.
+
+**Versión fijada** *(Pinned version)* — versión exacta (`18.3.1`) en vez de rango (`^18.0.0`) o alias (`latest`). Requisito del contrato.
+
+:::info Referencias primarias
+- [Diátaxis](https://diataxis.fr/) — marco que distingue tutorial, how-to, reference y explanation; útil para decidir qué tipo de documentación escribir sobre el proyecto generado.
+- [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación de versionado aplicable a `specs.md` y a las dependencias.
+- [6.7 De specs a proyecto real](../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo de entrevista → scaffolding del que este skill cubre la primera mitad.
+:::

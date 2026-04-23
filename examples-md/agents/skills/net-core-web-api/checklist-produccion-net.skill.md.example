@@ -1,0 +1,250 @@
+<!-- Destino sugerido: .claude/skills/checklist-produccion-net.skill.md -->
+
+---
+name: checklist-produccion-net
+description: Verifica si una Web API .NET está lista para cortar un release a producción. Audita versión alineada entre .csproj, CHANGELOG y endpoint /health; configuración de appsettings.Production; secretos fuera del repo; publish limpio; migraciones con rollback. Incluye variante multi-repo (BD + API + Web).
+---
+
+# Skill: checklist-produccion-net
+
+Un release fallido a las 2 a.m. de un sábado casi nunca es por el código nuevo. Es por un detalle de contorno: el `.csproj` quedó en `v3.3.9` mientras el CHANGELOG anunció `v3.4.0`, el `appsettings.Production.json` se publicó con una connection string de staging, el certificado JWT expiró esa misma semana, o la migración de BD subió antes que la API que la necesitaba. Este skill existe para que ese sábado no llegue — para recorrer los controles antes del tag, no después del incidente.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- El usuario pregunta "¿ya está listo para producción?" o "¿podemos cortar release?".
+- Se va a subir un tag SemVer y conviene auditar antes de empujarlo.
+- Se recibe una alerta en producción y hay que confirmar qué versión está realmente desplegada.
+- Se planifica un release que cruza varios repositorios (API + Web + BD) y hay que sincronizarlos.
+
+**No me uses para:**
+- Cortar el release — la decisión es humana, el skill solo reporta el estado.
+- Generar las notas del CHANGELOG — usa `release-notes`.
+- Definir el versionado correcto (PATCH vs MINOR vs MAJOR) — ver [5.2 Versionado semántico en equipos](../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md).
+
+## Entradas
+
+1. **Número de versión objetivo** (`X.Y.Z`).
+2. **Archivo `.csproj`** del proyecto.
+3. **CHANGELOG o archivo de notas** del release.
+4. **`appsettings.Production.json`** (o el mecanismo equivalente de config por entorno).
+5. **Endpoint `/health`** de la aplicación, si hay acceso a un entorno de prueba.
+6. **Si es multi-repo:** lista de repos que cambiaron en el release y archivo de requerimientos (`releases/vX.Y.Z.md` o equivalente).
+
+## Regla de oro
+
+> Si la versión del `.csproj`, del CHANGELOG y del endpoint `/health` **no son idénticas**, el release no está listo. Todo lo demás son mejoras; esto es requisito.
+
+Esta regla existe porque es la falla silenciosa más frecuente: el assembly desplegado no corresponde con la documentación pública. Cualquier incidente posterior empieza por preguntar "¿qué versión está corriendo?", y si las tres fuentes no coinciden, la investigación se bloquea ahí.
+
+## Pasos
+
+### Paso 1: Verificar versión alineada en tres lugares
+
+La versión tiene que coincidir en:
+
+- **`.csproj`** — `<Version>X.Y.Z</Version>` (define el assembly que se despliega).
+- **CHANGELOG** — entrada `[X.Y.Z] - YYYY-MM-DD` con los cambios listados.
+- **Endpoint `/health`** — tras el build, debe devolver `X.Y.Z` en el campo `version` (si el proyecto lo expone).
+
+```bash
+# Versión declarada en el proyecto
+grep -E '<Version>' *.csproj
+
+# Entrada del CHANGELOG para la versión objetivo
+grep -A3 "## \[3.4.0\]" CHANGELOG.md
+
+# Versión reportada por el binary desplegado
+curl -s https://{host}/api/health | jq .version
+```
+
+- Mal: CHANGELOG con `## [3.4.0] - 2026-04-15` pero `.csproj` todavía en `<Version>3.3.9</Version>`. El tag se sube, el assembly desplegado sigue en la versión anterior. Soporte no puede reproducir bugs porque "la versión de producción no es la misma que documentamos".
+- Bien: las tres fuentes devuelven `3.4.0`, sin excepciones.
+
+**Valor para el agente:** el chequeo es verificable con tres comandos sin intuición. Un agente reporta el estado exacto en segundos.
+
+### Paso 2: Auditar `appsettings.Production.json`
+
+La configuración de producción es el segundo lugar donde los errores entran silenciosos. Los puntos a verificar:
+
+- [ ] **Connection strings** apuntan a la DB de producción, no a local ni staging.
+- [ ] **Logging**: nivel `Information` o `Warning`, no `Debug` ni `Trace`.
+- [ ] **URLs externas** (frontend, SMTP, servicios de pago, integraciones) son las de producción.
+- [ ] **CORS** permite solo los dominios reales del frontend. Nunca `*` en producción.
+- [ ] **JWT**: `Issuer`, `Audience` y tiempos de expiración corresponden al ambiente productivo.
+- [ ] **Rate limiting**: valores ajustados al tráfico real, no a los de desarrollo.
+- [ ] **Swagger** deshabilitado o restringido por auth. La documentación abierta de la API es superficie innecesaria.
+
+- Mal: `"AllowedOrigins": ["*"]` en producción porque "en desarrollo funcionaba así". Cualquier sitio puede hacer request al backend autenticado del usuario.
+- Bien: lista explícita de dominios del frontend de producción.
+
+**Valor para el agente:** esta lista es una estructura JSON verificable. El agente lee el archivo, compara contra los criterios y reporta cada uno como pasa/falla.
+
+### Paso 3: Confirmar secretos fuera del repo
+
+Un secreto commiteado es un secreto comprometido — aunque se borre del `HEAD`, queda en el historial. Los secretos deben venir de:
+
+- Variables de entorno del servidor.
+- Gestor de secretos (Azure Key Vault, AWS Secrets Manager, HashiCorp Vault).
+- Archivo `appsettings.Production.json` **fuera del repo**, con permisos restringidos en el servidor.
+
+```bash
+# Scan histórico por palabras clave sensibles
+git log -p -- appsettings.Production.json | grep -iE "(password|secret|key|token)" | head
+
+# Patrón común de secretos accidentales
+git log --all -p -S "password=" | head
+```
+
+Si el scan devuelve algo, **rotar el secreto** — no basta con borrarlo del commit actual.
+
+- Mal: `"JwtSecret": "super-secret-production-key-12345"` en el `appsettings.Production.json` commiteado.
+- Bien: `"JwtSecret": "${JWT_SECRET}"` resuelto en runtime desde variable de entorno.
+
+### Paso 4: Verificar build de publish limpio
+
+Un `dotnet build -c Release` verde no equivale a "listo para producción". Lo que confirma que el deploy es reproducible es el `publish` completo:
+
+```bash
+dotnet publish ./MiProyecto.csproj \
+    -c Release \
+    -r linux-x64 \
+    --self-contained false \
+    -o ./publish
+
+# El output no debe incluir archivos de desarrollo
+ls ./publish | grep -E "(Development|\.pdb$)"
+```
+
+- [ ] `dotnet publish -c Release` termina sin errores ni warnings nuevos.
+- [ ] El assembly en `./publish/` reporta la versión correcta al ejecutarse.
+- [ ] **No se publica `appsettings.Development.json`** en la carpeta de despliegue.
+- [ ] Los archivos `.pdb` (symbols de debug) se publican solo si hay razón clara para ello — expandir stack traces con nombres de variables locales en producción puede leakear información.
+
+**Valor para el agente:** los comandos son reproducibles. El agente puede correr el publish en un runner, contar advertencias nuevas y reportar diferencias con el build anterior.
+
+### Paso 5: Revisar migraciones de base de datos
+
+Una migración silenciosa es la causa más común de rollback imposible. Los controles:
+
+- [ ] Las migraciones pendientes están listadas en el CHANGELOG o en el documento de release.
+- [ ] Los scripts DDL/DML están versionados en el repo (`Database/migrations/vX.Y.Z/`).
+- [ ] Hay **plan de rollback explícito** para cambios destructivos (`DROP COLUMN`, rename, truncate).
+- [ ] Los scripts son **idempotentes** cuando es posible (`IF NOT EXISTS`, `IF EXISTS`).
+- [ ] Los scripts fueron **probados contra una copia del dump de producción**, no solo contra datos sintéticos.
+- [ ] **Backup verificado** tomado antes del primer script destructivo.
+
+- Mal: script `015-eliminar-columna-email-viejo.sql` ejecutado en producción sin backup reciente. Si algo sale mal, no hay rollback posible.
+- Bien: script acompañado por un `015-eliminar-columna-email-viejo-rollback.sql` que restaura el estado previo, y un backup tomado y verificado en la ventana de mantenimiento.
+
+### Paso 6: Confirmar endpoints y observabilidad
+
+Los controles mínimos sobre la superficie pública de la API:
+
+- [ ] `/health` responde `200 OK` y devuelve la versión esperada.
+- [ ] `/swagger` deshabilitado en producción, o restringido por autenticación.
+- [ ] Los endpoints con `[AllowAnonymous]` están **justificados** — un scan del código no debería traer sorpresas.
+- [ ] Logging estructurado (Serilog o equivalente) escribe a donde el equipo de operaciones puede leerlo.
+- [ ] Métricas clave instrumentadas (request rate, error rate, latencia p50/p95/p99).
+- [ ] Alertas configuradas sobre el health endpoint — si cae, alguien se entera antes que los usuarios.
+
+**Valor para el agente:** cada punto produce una observación binaria. El agente entrega una tabla sin interpretación subjetiva.
+
+## Variante: release multi-repo (API + Web + BD)
+
+Muchos productos reales **no viven en un solo repo**. Un backend .NET + un frontend separado + un repo de docs + un paquete de migraciones SQL es un caso común. La versión del producto cruza varios repositorios y hay que mantener coherencia entre todos.
+
+### Qué cambia respecto al caso single-repo
+
+- **Sincronización de versiones**: `X.Y.Z` debe coincidir en todos los repos que cambiaron en el release.
+  - `.csproj` (API) ↔ `package.json` (Web) ↔ tag SemVer en cada repo ↔ documento de requerimientos.
+  - Si solo cambió un repo, solo ese bumpea y tagea — pero el documento de release lo declara explícitamente.
+- **Orden de despliegue**: casi siempre **BD → API → Web**.
+  1. Primero las migraciones SQL — la API necesita el esquema nuevo para arrancar.
+  2. Luego la API — el frontend la consume.
+  3. Al final el frontend — solo lee y muestra.
+  - Si el orden correcto es distinto por una razón específica (feature flag, compatibilidad hacia atrás), documentarlo en las notas del release.
+- **Rollback coordinado**: si algo falla, se revierte en **orden inverso** (Web → API → BD). Un rollback de BD sin backup previo no es reversible.
+
+### Checklist adicional para multi-repo
+
+- [ ] Archivo de requerimientos (`releases/vX.Y.Z.md` o equivalente) marca todos los items como completos, con los repos involucrados por requerimiento.
+- [ ] Todos los repos que cambiaron tienen commit en `main` y build verde.
+- [ ] Migraciones SQL en directorio versionado (`Database/migrations/vX.Y.Z/`) con prefijo numérico, scripts idempotentes y script de rollback para cambios destructivos.
+- [ ] Backup de la BD de producción tomado y verificado antes del primer script.
+- [ ] Scripts probados contra una copia del dump de producción.
+- [ ] `CHANGELOG.md` sincronizado en cada repo que cambió.
+- [ ] Tag SemVer creado y pusheado en cada repo que cambió — no solo en uno.
+- [ ] Health check de la API pasa tras el despliegue (`/health` devuelve la versión correcta).
+- [ ] Frontend cargado y su versión visible (footer, `about`) coincide con `package.json`.
+- [ ] Estado del documento de requerimientos actualizado a `Publicado - YYYY-MM-DD`.
+
+### Hotfix urgente
+
+Para parches que no pueden esperar al release regular:
+
+1. Branch `hotfix/vX.Y.Z` desde `main` en el o los repos afectados.
+2. Fix + entrada de CHANGELOG + bump de versión.
+3. Crear archivo `releases/vX.Y.Z.md` con un único requerimiento que describa el parche y su justificación.
+4. Correr el checklist completo — una línea mal desplegada tumba producción igual que mil.
+5. Merge a `main` en todos los repos afectados.
+6. Si el release regular que venía detrás se basaba en `dev`, hacer merge de `main` a `dev` para no perder el fix.
+
+## Formato de salida
+
+```markdown
+## Checklist de producción — v3.4.0
+
+### Bloqueantes
+- [ ] `.csproj` aún reporta `<Version>3.3.9</Version>` — bump pendiente.
+- [ ] `Database/migrations/v3.4.0/015-alter-clientes.sql` no tiene script de rollback.
+
+### Advertencias
+- [ ] Swagger expuesto en producción sin auth. No bloquea, pero se recomienda cerrar en próximo release.
+
+### Verificado OK
+- [x] CHANGELOG tiene entrada `[3.4.0] - 2026-04-22` con cambios listados.
+- [x] `appsettings.Production.json` sin secretos, usa `${JWT_SECRET}`.
+- [x] CORS limitado a `app.ejemplo.com`.
+- [x] Publish limpio sin warnings nuevos.
+
+### Decisión
+**No listo** — 2 bloqueantes. Corregir y re-auditar.
+```
+
+## Errores comunes
+
+- **Bump olvidado en `.csproj`.** El CHANGELOG anuncia `v3.4.0` pero el assembly sigue en `v3.3.9`. El `/health` delata el descuido; si no se revisó antes, aparece en soporte.
+- **Secretos "temporales"** que terminaron en el historial. Una vez commiteado, rotar el secreto — borrar el commit no lo rescata del git log.
+- **`appsettings.Development.json` en publish.** Se copia por accidente y sobreescribe la config de producción en deploy. Algunos entornos cargan `Development.json` si existe, ignorando `Production.json`.
+- **Swagger abierto en producción.** Documenta tu API completa a cualquiera que la escanee. Superficie innecesaria.
+- **CORS con `*`.** "En desarrollo funcionaba" no es justificación. En producción, lista blanca de dominios.
+- **Migración destructiva sin rollback.** `DROP COLUMN` en producción sin backup coordinado con operaciones. Si algo sale mal, el rollback no existe.
+- **Confundir `Release` con "listo para producción".** `dotnet build -c Release` optimiza el assembly; no verifica nada del resto del checklist.
+- **Desincronización silenciosa en multi-repo.** Un repo bumpea a `v3.4.0`, otro se queda en `v3.3.9`. El health check no lo delata si cada servicio reporta su propia versión.
+- **Deploy parcial.** Se sube API nueva contra BD vieja. El primer request rompe en producción porque la tabla nueva no existe.
+- **Tag en un solo repo de un release multi-repo.** El release queda a medias, sin referencia clara en los otros repos. Seis meses después nadie sabe qué versión del frontend corresponde con qué versión del backend.
+
+## Glosario
+
+**Release** *(Release)* — acto de publicar una versión versionada del software, con tag SemVer, entrada de CHANGELOG y despliegue a producción.
+
+**Bump de versión** *(Version bump)* — incremento del número de versión siguiendo SemVer: PATCH para bugfixes, MINOR para features compatibles, MAJOR para breaking changes.
+
+**CHANGELOG** *(Changelog)* — archivo que documenta los cambios de cada versión; el estándar es [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+**Endpoint `/health`** *(Health endpoint)* — ruta que reporta el estado del servicio, típicamente incluyendo la versión del assembly desplegado.
+
+**Script idempotente** *(Idempotent script)* — script cuya ejecución repetida produce el mismo resultado; usa cláusulas como `IF NOT EXISTS` y `IF EXISTS`.
+
+**Hotfix** *(Hotfix)* — parche urgente publicado fuera del ciclo regular, sobre la rama de producción, para resolver un incidente crítico.
+
+**Multi-repo** *(Multi-repo release)* — release que cruza varios repositorios; requiere sincronización explícita de versiones y orden de despliegue.
+
+:::info Referencias primarias
+- [Keep a Changelog · 1.1.0](https://keepachangelog.com/es-ES/1.1.0/) — formato estándar de CHANGELOG.
+- [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación oficial de SemVer.
+- [The Twelve-Factor App](https://12factor.net/) — referencia sobre configuración por entorno, secretos y builds reproducibles.
+- [5.1 De la idea al release](../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — ciclo completo del que este skill cubre el cierre.
+- [5.2 Versionado semántico en equipos](../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md) — decisión del número de versión.
+:::

@@ -63,6 +63,49 @@ public class Empleado
 
 :::
 
+### Convenciones de naming entre C# y SQL
+
+Un proyecto coherente mantiene la misma convención en todos los lados donde se nombra una entidad. La tabla siguiente fija la correspondencia entre el código C# (PascalCase) y el esquema SQL (snake_case), y los nombres esperados para restricciones e índices.
+
+| Elemento | Convención | Ejemplo |
+|---|---|---|
+| Clase Model | `PascalCase` con sufijo `Model` | `ClienteModel` |
+| Propiedad C# | `PascalCase` | `NombreComun` |
+| Tabla SQL | `snake_case` plural vía `[Table(...)]` | `clientes` |
+| Columna SQL | `snake_case` vía `[Column(...)]` | `nombre_comun` |
+| Clave primaria | `id_<entidad>` | `id_cliente` en tabla `clientes` |
+| Clave foránea | `id_<entidad_referida>` | `id_empresa` en tabla `clientes` |
+| Índice | `ix_<tabla>_<campos>` | `ix_clientes_empresa_nombre` |
+| Restricción UNIQUE | `uq_<tabla>_<campo>` | `uq_clientes_correo` |
+| Restricción FK | `fk_<tabla_origen>_<tabla_destino>` | `fk_clientes_empresa` |
+
+Con esta tabla, cualquier lector (o agente) puede inferir el nombre correcto de un artefacto SQL sin consultar. Si ve `nombre_comun` en el DDL, sabe que la propiedad en C# es `NombreComun`. Si va a crear un índice sobre dos columnas, conoce el prefijo `ix_` y el orden tabla→campos.
+
+### Data Annotations sobre Fluent API
+
+Entity Framework Core ofrece dos formas de mapear una clase a la base de datos: atributos en la propia clase (Data Annotations) o configuración programática en `OnModelCreating` (Fluent API). La preferencia por default es **Data Annotations**, por tres razones concretas:
+
+1. **La documentación vive junto al campo.** Al leer la clase se ve tamaño, nullability y nombre de columna sin saltar a otro archivo.
+2. **El diff es local.** Un cambio en un campo toca una línea; con Fluent API toca un archivo compartido que también configura otras entidades.
+3. **El agente lo procesa mejor.** Leer anotaciones es lectura estructural; inferirlas desde una cadena de llamadas fluidas en `OnModelCreating` requiere ejecutar mentalmente el builder.
+
+Fluent API se reserva para lo que los atributos no cubren:
+
+- Índices compuestos, filtrados o con nombre específico.
+- Relaciones many-to-many con tabla intermedia explícita con campos adicionales.
+- Configuración dependiente del proveedor (p. ej. `HasAnnotation("MySql:Charset", "utf8mb4")`).
+
+Un proyecto sano termina con Data Annotations cubriendo ~90% del mapeo y `OnModelCreating` usado solo para el resto.
+
+### Convención de zona horaria para `DateTime`
+
+Un proyecto sin decisión explícita sobre zonas horarias acaba con endpoints que guardan UTC, otros que guardan hora local y un reporte que mezcla ambos — y el bug "la fecha cambió un día" aparece después del primer cierre de mes. Antes de escribir la primera entidad con `DateTime`, el proyecto debe elegir una convención y documentarla:
+
+- **UTC para persistencia, conversión en presentación.** Todos los `DateTime` se guardan en UTC; la capa de presentación (o el cliente) convierte al huso del usuario. Más seguro para sistemas multi-huso.
+- **Hora local fija (p. ej. America/Guatemala) con utilitario centralizado.** Los `DateTime` se guardan en la zona del negocio; existe un `DateUtil.AhoraLocal()` o equivalente que todos los servicios usan. Apto para negocios monohuso.
+
+La decisión va en `specs.md` o `CLAUDE.md` del repo. Una vez tomada, no se usa `DateTime.UtcNow` ni `DateTime.Now` directamente en servicios — se invoca siempre el utilitario del proyecto.
+
 ### Mapeo de Entidad con Clave Compuesta
 
 En muchos casos es común tener entidades que requieren múltiples llaves para asegurar la unicidad de los registros. El siguiente ejemplo muestra cómo crear una entidad llamada `EmpleadoContrato`, que tiene una clave primaria compuesta por varias propiedades:
@@ -242,6 +285,37 @@ var empleados = context.Empleados
 | **Mantenimiento**             | Cambios en la estructura afectan SQL. | Cambios se reflejan automáticamente. |
 | **Flexibilidad**              | Muy alta.                      | Limitada para consultas muy complejas. |
 
+## Tabla dedicada vs catálogo genérico
+
+Muchos proyectos terminan con una decena de tablas casi idénticas: `tipos_documento`, `tipos_pago`, `tipos_cliente`, `tipos_contrato` — todas con `codigo`, `nombre`, `orden`. Antes de crear una tabla nueva para un catálogo, pregúntate si cabe en un **catálogo genérico** compartido (una tabla `catalogos` + una `catalogo_items` con un discriminador `tipo_catalogo`).
+
+| Pregunta | Decisión |
+|---|---|
+| ¿Los campos se reducen a `codigo`, `nombre`, `orden`? | Catálogo genérico |
+| ¿Hay campos específicos de negocio (p. ej. `porcentaje_impuesto`, `dias_validez`)? | Tabla dedicada |
+| ¿Otra entidad lo referencia por FK directa? | Tabla dedicada (FK a catálogo genérico es frágil) |
+| ¿Los valores cambian rara vez y son conocidos al arranque? | Catálogo genérico |
+| ¿Hay lógica de negocio que depende del código (p. ej. "solo el rol ADMIN puede X")? | Tabla dedicada, con código estable como constante |
+
+Regla práctica: tabla dedicada cuando haya comportamiento propio o FKs; catálogo genérico cuando sea solo una lista de valores de referencia que varios módulos consumen.
+
+## Checklist de sincronía Model ↔ DDL
+
+Agregar una tabla parece trivial hasta que dos meses después alguien cambia un `MaxLength` en la clase Model y olvida el `VARCHAR(n)` en el script SQL. El bug se manifiesta en producción cuando un usuario escribe una descripción larga: el formulario la acepta, EF Core también, y la base de datos la trunca sin avisar. La causa raíz es **la desincronía silenciosa entre código y esquema**.
+
+Antes de dar por cerrada una entidad, verifica punto por punto que Model, DDL y DbContext digan lo mismo:
+
+- [ ] Cada `[MaxLength(n)]` del Model tiene su `VARCHAR(n)` correspondiente en el DDL.
+- [ ] Cada `[Required]` del Model tiene `NOT NULL` en la columna SQL.
+- [ ] Cada `[Column(TypeName = "decimal(p,s)")]` tiene `DECIMAL(p,s)` con la misma precisión.
+- [ ] Cada `[Column("nombre_snake")]` coincide con el nombre real de la columna.
+- [ ] Toda FK declara `ON DELETE` y `ON UPDATE` explícitos (no depender del default del proveedor — cambia entre MySQL InnoDB y PostgreSQL).
+- [ ] Cada FK tiene un índice; la mayoría de los motores no lo crea automáticamente.
+- [ ] El `DbSet<>` está registrado en el `DbContext` correcto (relevante cuando hay varios contextos, p. ej. Auth vs negocio).
+- [ ] Las propiedades de navegación están declaradas (`= null!` o nullable explícito para permitir `.Include(...)`).
+
+Cualquier divergencia entre el Model y el DDL es un bug latente. Un diff entre el archivo `.cs` y el `.sql` revela desincronías al instante.
+
 ## Librerías Populares para Bases de Datos
 
 Dependiendo del proveedor de la base de datos que se esté utilizando, se pueden emplear diferentes librerías para conectarse y gestionar las operaciones de acceso a datos. A continuación se presentan las librerías más populares para algunos de los sistemas de gestión de bases de datos más comunes:
@@ -289,6 +363,14 @@ Con estos conceptos, puedes estructurar una capa de datos robusta que facilite l
 
 **Consulta parametrizada** *(Parameterized query)* — consulta cuyos valores se pasan como parámetros para evitar inyección SQL.
 
+**Data Annotations** *(Data Annotations)* — atributos en la clase Model (`[Table]`, `[Column]`, `[Required]`, `[MaxLength]`) que declaran el mapeo a la base de datos directamente en la clase.
+
+**Fluent API** *(Fluent API)* — configuración del modelo dentro de `OnModelCreating` mediante el `ModelBuilder`; alternativa a Data Annotations para casos que los atributos no cubren.
+
+**Catálogo genérico** *(Generic lookup table)* — tabla única (`catalogos` + `catalogo_items`) que aloja varios catálogos simples con un discriminador; evita proliferación de tablas con la misma forma.
+
+**Propiedad de navegación** *(Navigation property)* — propiedad en el Model que representa la relación con otra entidad (`public EmpresaModel Empresa { get; set; }`) y permite consultas con `.Include(...)`.
+
 :::info Referencias primarias
 - [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
 - [Entity Framework Core docs](https://learn.microsoft.com/en-us/ef/core/) — guía oficial de EF Core.
@@ -310,13 +392,18 @@ Con estos conceptos, puedes estructurar una capa de datos robusta que facilite l
 - Vistas o consultas agregadas que deban exponerse.
 
 **Pasos:**
-1. Crear entidades con atributos de mapeo (`[Key]`, `[Required]`, `[MaxLength]`, `[Column]`, `[Table]`).
-2. Definir claves compuestas con `[PrimaryKey(...)]` cuando aplique.
-3. Implementar el `DbContext` con los `DbSet` correspondientes y registrarlo en `Program.cs`.
-4. Mapear vistas a DTOs con `[Keyless]` para consultas agregadas.
-5. Escribir consultas LINQ preferentemente y parametrizar cualquier consulta SQL directa.
-6. Configurar la cadena de conexión por variables de entorno en producción.
-7. Seleccionar el provider adecuado (`Pomelo.EntityFrameworkCore.MySql`, `Npgsql`, `Oracle.EntityFrameworkCore`).
+1. Crear entidades con atributos de mapeo (`[Key]`, `[Required]`, `[MaxLength]`, `[Column]`, `[Table]`) — Data Annotations como default.
+2. Aplicar naming: PascalCase en C#, snake_case en SQL; `id_<entidad>` para PK, `id_<referida>` para FK, `ix_`/`uq_`/`fk_` para índices y restricciones.
+3. Definir claves compuestas con `[PrimaryKey(...)]` cuando aplique.
+4. Usar Fluent API solo para índices compuestos, relaciones many-to-many con tabla intermedia y configuración por proveedor.
+5. Decidir convención de zona horaria (UTC vs hora local) y documentarla; no usar `DateTime.UtcNow`/`Now` directo.
+6. Al modelar un catálogo, decidir entre tabla dedicada y catálogo genérico con la matriz de criterios.
+7. Implementar el `DbContext` con los `DbSet` correspondientes y registrarlo en `Program.cs`.
+8. Mapear vistas a DTOs con `[Keyless]` para consultas agregadas.
+9. Escribir consultas LINQ preferentemente y parametrizar cualquier consulta SQL directa.
+10. Verificar sincronía Model ↔ DDL ↔ DbContext antes de dar por cerrada la entidad.
+11. Configurar la cadena de conexión por variables de entorno en producción.
+12. Seleccionar el provider adecuado (`Pomelo.EntityFrameworkCore.MySql`, `Npgsql`, `Oracle.EntityFrameworkCore`).
 
 **Salidas:**
 - Entidades y `DbContext` listos para operaciones CRUD.
@@ -328,6 +415,12 @@ Con estos conceptos, puedes estructurar una capa de datos robusta que facilite l
 - Exponer entidades `DbContext` como DTOs de la API.
 - Almacenar la cadena de conexión con credenciales en `appsettings.json` de producción.
 - Olvidar `[Keyless]` en vistas, causando errores de modelado.
+- Desincronía silenciosa Model ↔ DDL: `[MaxLength]` y `VARCHAR(n)` con tamaños distintos.
+- FK sin `ON DELETE` explícito — comportamiento varía entre proveedores.
+- FK sin índice — las consultas por pertenencia se degradan silenciosamente al crecer la tabla.
+- `DateTime` sin convención de zona horaria documentada.
+- Crear tabla nueva para un catálogo trivial cuando cabía en el catálogo genérico.
+- Configurar mapeo disperso entre Data Annotations y `OnModelCreating` — el siguiente cambio olvida actualizar uno de los dos.
 
 **Referencias cruzadas:**
 - [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)

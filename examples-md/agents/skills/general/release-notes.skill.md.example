@@ -1,0 +1,254 @@
+<!-- Destino sugerido: .claude/skills/release-notes.skill.md -->
+
+---
+name: release-notes
+description: Genera notas de release a partir de commits Conventional Commits entre dos tags. Clasifica en secciones Keep a Changelog (Added / Changed / Fixed / Removed / Deprecated / Security), filtra ruido (bumps, merges, commits internos de CI) y preserva el idioma del repo. La salida se pega en CHANGELOG.md y en la GitHub Release.
+---
+
+# Skill: release-notes
+
+La mayoría de los CHANGELOG que se publican son basura no porque el equipo sea descuidado, sino porque el commit log incluye cuarenta entradas de las cuales la mitad son `chore: bump version`, merges automáticos de ramas y correcciones de tipos en tests. Copiar el `git log` sin filtrar produce release notes que el lector no termina de leer, y publicar sin filtrar entrena al equipo a ignorarlas. El otro extremo — escribir las notas a mano desde cero — consume una hora por release y se convierte en el primer paso que se salta bajo presión. Este skill existe para producir notas en el formato Keep a Changelog, en el idioma del repo, con los commits clasificados automáticamente y el ruido filtrado, pero con un humano revisando antes de publicar.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Se va a publicar una versión nueva y se necesitan notas para `CHANGELOG.md`, GitHub/GitLab Release o newsletter.
+- Se quiere documentar los cambios de una rama de release antes del merge a `main`.
+- Se genera un reporte de cambios para stakeholders no técnicos (con prosa, no con commits).
+- Se consolida un changelog largo que mezcla múltiples releases internos en una versión pública.
+
+**No me uses para:**
+- Decidir el número de versión (`major` / `minor` / `patch`) — eso lo decide quien conoce el alcance de breaking changes, no la lista de commits.
+- Publicar la release (tag, push, deploy). Mi trabajo termina con el Markdown redactado.
+- Generar notas de un CHANGELOG.public.md que solo lleva cambios de cursos o dominio — las reglas de qué va y qué no son del proyecto, no mías. Pedirlas explícitas si el repo las tiene.
+- Notas de una release que aún no tiene tag objetivo definido. Sin rango `vPREV..vNEW` no hay alcance verificable.
+
+## Entradas
+
+1. **Tag anterior** (`vPREV`, ej. `v3.3.0`) y **tag objetivo** (`vNEW`, ej. `v3.4.0`). Ambos obligatorios.
+2. **Rama** desde la cual generar (por defecto `main`).
+3. **Idioma del repo** — si los commits son en español, las notas también; si los commits mezclan, elegir el idioma del `CHANGELOG.md` existente y alinear.
+4. **Reglas de exclusión del proyecto** si existen (ej. "el CHANGELOG público solo incluye cambios visibles al usuario final").
+5. **Formato de destino** — `CHANGELOG.md`, GitHub Release, Markdown plano, o combinación.
+
+Si el tag objetivo aún no existe, pedir confirmación de cuál será antes de redactar — o trabajar con `HEAD` como referencia explícita.
+
+## Reglas obligatorias
+
+- **Formato Keep a Changelog**, sin inventar secciones nuevas. Las categorías son: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. Nada de "Misc", "Others", "Notas técnicas".
+- **Idioma preservado del repo.** Si el repo escribe en español, las notas van en español. No traducir.
+- **Filtro de ruido explícito.** Descartar `chore: bump version`, `Merge branch 'main' into feature/...`, commits de CI que no cambian producto, y revertidos que se anulan dentro del mismo rango.
+- **El mensaje del commit es un indicio, no la verdad.** Cuando el mensaje no coincide con el alcance real, abrir el diff o el PR vinculado antes de redactar la línea.
+- **Citar PRs e issues cuando estén disponibles** (`(#123)` → enlace a `/pulls/123` o al tracker). Mejora trazabilidad sin inflar la nota.
+- **Un item = una frase en imperativo pasado + referencia.** Nada de párrafos.
+- **Revisión humana obligatoria antes de publicar.** La clasificación automática falla cuando alguien usa `feat:` para algo que es `fix:`. El skill entrega el borrador; quien publica confirma.
+- **No versionar ni taggear.** Ese paso lo decide el responsable de release con su propio criterio.
+
+## Pasos
+
+### Paso 1: Obtener la lista de commits del rango
+
+Ejecutar:
+
+```bash
+git log vPREV..vNEW --pretty=format:'%h %s (%an)'
+# Si hay PRs: añadir %b para ver el cuerpo con referencias a tickets.
+```
+
+Si el rango incluye un merge commit con squash, ese único commit representa muchos cambios. Revisar el PR vinculado para detalles si el mensaje no alcanza.
+
+- Mal: usar `git log --all` — incluye commits que aún no llegaron a la rama de release.
+- Bien: `git log vPREV..vNEW` con la rama de release como `vNEW`, acotando exactamente el alcance.
+
+**Valor para el agente:** el rango explícito es el contrato. Todo commit fuera del rango no va; todo commit dentro del rango se considera para la nota.
+
+### Paso 2: Filtrar ruido antes de clasificar
+
+Descartar sin excepción:
+
+- `chore: bump version` y equivalentes (`chore: release vX.Y.Z`).
+- Merges de ramas (`Merge branch 'main' into ...`).
+- Commits de CI puros (`ci: update workflow`) si no cambian comportamiento del producto.
+- Commits revertidos dentro del mismo rango (si `feat: X` y `revert: feat: X` conviven, ambos salen).
+- Commits de formato (`style: apply prettier`) a menos que el repo los considere parte del changelog.
+
+Reglas del proyecto pueden ampliar este filtro (ej. el CHANGELOG público del bootcamp 10X excluye cambios de pipeline, CSS y branding — solo cambios de cursos).
+
+- Mal: incluir `chore: bump version to 3.4.0` en la nota de `v3.4.0`. Es circular.
+- Bien: filtrarlo y mantener la nota enfocada en lo que cambió para el lector.
+
+**Valor para el agente:** el ruido diluye la señal. Una nota con veinticinco items de los cuales diez son `chore: bump` pierde al lector en los primeros cinco.
+
+### Paso 3: Clasificar cada commit en una sección Keep a Changelog
+
+Tabla de equivalencias por defecto (puede sobreescribirse si el proyecto tiene convenciones distintas):
+
+| Tipo Conventional Commits | Sección Keep a Changelog |
+|---|---|
+| `feat:` | **Added** (capacidad nueva) o **Changed** (reemplazo de comportamiento) |
+| `fix:` | **Fixed** |
+| `perf:` | **Changed** (con nota explícita de performance) |
+| `refactor:` | Usualmente **sin entrada**; solo si es observable al usuario → **Changed** |
+| `docs:` | **Changed** si afecta documentación pública; sin entrada si es interna |
+| `BREAKING CHANGE:` (footer o `!`) | **Changed** con el símbolo ⚠ al inicio |
+| Vulnerabilidad corregida (CVE / SAST) | **Security** |
+| Funcionalidad marcada para eliminación futura | **Deprecated** |
+| Funcionalidad retirada | **Removed** |
+
+Cuando el tipo no alcanza para decidir (ej. un `feat:` que agrega un flag para desactivar un comportamiento existente), abrir el diff para entender alcance real.
+
+- Mal: poner todo `feat:` bajo `Added` sin pensar. Un `feat: reemplazar sistema de caché de Redis a Memcached` es `Changed`, no `Added` — es un reemplazo.
+- Bien: distinguir capacidad genuinamente nueva (Added) de cambio a capacidad existente (Changed).
+
+**Valor para el agente:** la clasificación correcta le dice al lector **qué tipo de decisión debe tomar** al actualizar. `Added` se puede ignorar; `Changed` exige revisar si algo rompió.
+
+### Paso 4: Redactar una línea por cambio — imperativo pasado + referencia
+
+Cada item sigue el patrón: `{Verbo en imperativo pasado o presente conceptual} {qué cambió} ({ref al PR/issue})`.
+
+- Mal: *"Se realizó la adición de un módulo sobre accesibilidad."* Voz pasiva, verboso.
+- Mal: *"feat: accesibilidad."* Es el commit, no una nota de release — el lector no sabe qué agregaste.
+- Bien: *"Agrega módulo 3.1.13 sobre accesibilidad básica con ejemplos WCAG 2.2 (#142)."*
+
+Si el cambio tiene un impacto importante al lector, añadir una línea de contexto después del item:
+
+```markdown
+- ⚠ Reemplaza el endpoint `GET /api/users/list` por `GET /api/users` con paginación estándar (#189).
+  Los clientes deben migrar antes de v4.0; el endpoint viejo responde con `Deprecation` header hasta ese release.
+```
+
+**Valor para el agente:** la línea corta es el índice; la línea de contexto es la respuesta al "y ahora qué hago". Ambas cuentan.
+
+### Paso 5: Agrupar breaking changes con alerta visual
+
+Todo cambio con `BREAKING CHANGE:` en el footer o `feat!:` / `fix!:` en el título entra con el símbolo ⚠ al inicio del bullet y va en `Changed` (o `Removed` si algo fue retirado).
+
+Además, agregar una sección `### Breaking changes` resumida al tope del release si hay dos o más, con la acción requerida por el lector:
+
+```markdown
+### Breaking changes
+
+- ⚠ `GET /api/users/list` eliminado — migrar a `GET /api/users`.
+- ⚠ Variable de entorno `DB_URL` renombrada a `DATABASE_URL`.
+```
+
+**Valor para el agente:** los breaking changes son los que rompen lectores. Enterrarlos bajo `Changed` sin marca visual los hace invisibles hasta que alguien rompe producción.
+
+### Paso 6: Citar PRs e issues cuando el commit los incluya
+
+Si el mensaje del commit o el squash merge incluye `(#123)`, mantener la referencia con enlace al tracker:
+
+- GitHub/GitLab: `(#123)` → enlace a `.../pull/123` o `.../issues/123`.
+- Jira/Linear/otros: si el proyecto usa claves (`BOOT-42`), mantenerlas en el item si el repo las linkea automáticamente; si no, expandir a URL completa cuando sea claro.
+
+No inventar números. Si un commit no trae referencia, la nota no la fabrica.
+
+**Valor para el agente:** los links al tracker son la trazabilidad de la nota. Un lector que quiere más contexto lo encuentra en un clic, no en una búsqueda por palabras clave.
+
+### Paso 7: Ensamblar el bloque final
+
+Plantilla:
+
+```markdown
+## [3.4.0] - 2026-04-22
+
+### Breaking changes
+- ⚠ {cambio que rompe + acción requerida} (#NNN).
+
+### Added
+- {capacidad nueva + referencia} (#NNN).
+
+### Changed
+- {cambio a capacidad existente} (#NNN).
+
+### Deprecated
+- {funcionalidad marcada para retiro} (#NNN).
+
+### Removed
+- {funcionalidad retirada} (#NNN).
+
+### Fixed
+- {bug corregido} (#NNN).
+
+### Security
+- {vulnerabilidad corregida, con CVE si aplica} (#NNN).
+```
+
+Sección vacía → se omite. No hay `### Added\n- Ninguno.`. Si el release es solo `Fixed`, la nota tiene una sola sección y ya.
+
+Al final del bloque, dejar el link de comparación con el release previo:
+
+```markdown
+[3.4.0]: https://github.com/org/repo/compare/v3.3.0...v3.4.0
+```
+
+## Formato de salida
+
+```markdown
+## [3.4.0] - 2026-04-22
+
+### Breaking changes
+- ⚠ Reemplaza `GET /api/users/list` por `GET /api/users` con paginación estándar — migrar antes de v4.0 (#189).
+
+### Added
+- Agrega módulo 3.1.13 sobre accesibilidad básica con ejemplos WCAG 2.2 (#142).
+- Publica colección `examples-md/` con artefactos Markdown para agentes (#151).
+
+### Changed
+- Renumera "Convenciones de UI" de 3.1.12 a 3.1.14 para insertar los módulos nuevos (#145).
+
+### Fixed
+- Corrige enlaces rotos en índices parent de la ruta `diseno-ux-ui` (#156).
+- Repara el build de Docusaurus ante referencias a `./folder/` sin `index.md` (#162).
+
+### Security
+- Actualiza `docusaurus@3.10.2` que corrige CVE-2024-xxxxx en parser Markdown.
+
+[3.4.0]: https://github.com/10xGuatemala/bootcamp/compare/v3.3.0...v3.4.0
+```
+
+## Antes de entregar, verifico
+
+- [ ] El rango `vPREV..vNEW` está fijado y todos los commits citados caen dentro.
+- [ ] No hay `chore: bump`, merges automáticos ni commits de CI puros en la nota.
+- [ ] Cada item tiene un verbo accionable y, si aplica, la referencia `(#NNN)`.
+- [ ] Los breaking changes están marcados con ⚠ y agrupados en sección dedicada si son dos o más.
+- [ ] Las secciones vacías están omitidas, no listadas con "Ninguno".
+- [ ] El idioma coincide con el `CHANGELOG.md` existente del repo.
+- [ ] Las reglas de exclusión del proyecto están respetadas (ej. CHANGELOG.public.md solo con cambios de cursos).
+- [ ] El link de comparación al tope o al pie está presente.
+- [ ] No taggeé, no empujé, no publiqué. El skill entrega el Markdown, no ejecuta.
+
+## Errores comunes
+
+- **Confundir el mensaje del commit con el contenido real del cambio.** El mensaje es un indicio. Si el diff contradice el mensaje, manda el diff — abrir el PR cuando dude.
+- **Publicar la nota sin revisión humana.** La clasificación automática falla cuando alguien usa `feat:` para algo que es realmente `fix:`, o al revés. Alguien con contexto debe validar antes del release.
+- **Incluir `chore: bump version` en la propia nota.** Es circular. Filtrar.
+- **Inventar secciones** ("Misc", "Others", "Notas varias"). Keep a Changelog tiene seis secciones por diseño — si algo no entra, o no va o entra en la que aplica.
+- **Traducir los commits** cuando el repo es en otro idioma. Respetar el idioma del `CHANGELOG.md` existente.
+- **Enterrar breaking changes** bajo `Changed` sin marca visual. El lector los descubre cuando algo rompe — tarde.
+- **Inflar la nota con items triviales** (`refactor: rename variable`). Si el lector no necesita saberlo, fuera.
+- **Citar PRs con números inventados o suposiciones** ("creo que era el #123"). Si el commit no trae el número, la nota tampoco lo inventa.
+
+## Glosario
+
+**Keep a Changelog** *(Keep a Changelog)* — convención de formato para CHANGELOG.md que define seis secciones estándar (Added, Changed, Deprecated, Removed, Fixed, Security). Ver [keepachangelog.com](https://keepachangelog.com/es-ES/1.1.0/).
+
+**Conventional Commits** *(Conventional Commits)* — convención de mensajes de commit (`feat:`, `fix:`, `chore:`, etc.) que permite clasificar automáticamente los cambios. Fuente de los tipos que este skill traduce a secciones Keep a Changelog.
+
+**Breaking change** *(Breaking change)* — cambio que rompe el contrato con lectores/clientes (API removida, variable renombrada, comportamiento alterado). Exige bump de versión `major` según [SemVer](https://semver.org/lang/es/).
+
+**Release** *(Release)* — conjunto de cambios publicados bajo una versión específica. Equivale a un tag SemVer en el repo y, usualmente, a una entrada en el CHANGELOG.
+
+**Tag** *(Tag)* — referencia inmutable a un commit que marca una versión. En este skill, `vPREV` y `vNEW` delimitan el rango de commits a incluir en la nota.
+
+**Squash merge** *(Squash merge)* — estrategia de merge que combina todos los commits de un PR en uno solo. Requiere revisar el cuerpo del commit o el PR vinculado para ver el detalle de cambios.
+
+:::info Referencias primarias
+- [Keep a Changelog 1.1.0](https://keepachangelog.com/es-ES/1.1.0/) — formato canónico del changelog; la plantilla y las seis secciones vienen de acá.
+- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/) — convención de mensajes de commit que alimenta la clasificación automática.
+- [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — criterio para decidir `major` / `minor` / `patch` según el tipo de cambios que la nota documenta.
+- [5.1 De la idea al release](../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — módulo del bootcamp que enmarca cuándo cortar release y qué documentar.
+- [5.2 Multi-repo y deploy coordinado](../../../docs/documentacion-y-requerimientos/02-multi-repo-y-deploy-coordinado.md) — consideraciones adicionales cuando una release abarca varios repos con orden de deploy.
+- [Skill `checklist-produccion-net`](../net-core-web-api/checklist-produccion-net.skill.md.example) — verifica la alineación entre versión y `/health` antes de publicar; consume las notas generadas por este skill.
+:::

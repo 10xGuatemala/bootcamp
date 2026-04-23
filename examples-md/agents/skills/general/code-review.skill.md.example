@@ -1,0 +1,199 @@
+<!-- Destino sugerido: .claude/skills/code-review.skill.md -->
+
+---
+name: code-review
+description: Revisa un PR o un diff con foco en bugs, riesgos de seguridad, cumplimiento de convenciones del proyecto, tests que efectivamente protegen el comportamiento y observabilidad en rutas nuevas. Produce tres bloques (Bloqueantes / Sugerencias / Preguntas) con archivo:línea y sugerencia concreta — nunca "parece bien".
+---
+
+# Skill: code-review
+
+El code review que solo deja "LGTM" en un PR no sirve como revisión: sirve como firma de cómplice. Los bugs que terminan en producción no los encuentra el revisor distraído que aprueba en cinco minutos — los encuentra quien abre cada archivo del diff, piensa el edge case que el autor no pensó, y verifica que el test no solo exista sino que efectivamente fallaría si el código tuviera el bug. Al mismo tiempo, un review exhaustivo que convierte cada PR en un doctorado bloquea el flujo del equipo y el autor empieza a hacer PRs gigantes para "aprovechar la revisión". Este skill existe para encontrar el punto medio: revisar lo que importa (lógica, seguridad, convenciones, observabilidad) en el formato que el autor puede accionar (bloqueante / sugerencia / pregunta, con archivo:línea).
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Hay un diff o PR listo para revisar antes del merge y se quiere un segundo par de ojos.
+- El cambio toca rutas críticas (auth, datos sensibles, pagos, permisos) y conviene un review explícito antes de aprobar.
+- Se sospecha que los tests pasan pero la lógica está mal, y hay que validarlo con evidencia.
+- El PR viene de un autor junior y se quiere retroalimentación que enseñe, no solo que apruebe.
+
+**No me uses para:**
+- Generar el código del PR — mi trabajo es revisarlo, no escribirlo.
+- Corregir estilo o formato — eso lo resuelve el formatter (`prettier`, `dotnet format`, `black`). Si el equipo no tiene formatter automático, ese es un problema aparte, no un review.
+- Renombrar variables triviales o discutir preferencias personales de estilo — genera ruido y entrena al autor a ignorar los comentarios reales.
+- Revisar un WIP (work-in-progress) que el autor marcó como borrador. Esperar a que pida review explícitamente.
+
+## Entradas
+
+1. **Diff a revisar**: ruta al PR, nombre de branch, o el `git diff` como texto.
+2. **Contexto del cambio**: qué problema resuelve, qué NO debe romper, qué convenciones aplican.
+3. **Convenciones del proyecto**: `CLAUDE.md`, `AGENTS.md`, `DESIGN.md` u otros manifiestos del repo.
+4. **Ruta crítica si aplica**: si el cambio toca auth, pagos, datos sensibles, PII, declararlo para priorizar el análisis de seguridad.
+
+Si falta el contexto del cambio, pedirlo antes de revisar. Un diff sin contexto solo permite revisar sintaxis — no decisiones.
+
+## Reglas obligatorias
+
+- **Lo que rompe el producto antes que el estilo.** Un bug pasa al merge; una preferencia de nombre no. Si tengo que elegir entre señalar un edge case y sugerir un rename, señalo el edge case.
+- **"Pasa los tests" no equivale a "está correcto".** El test puede pasar con el bug presente. Verifico la lógica, no solo el verde.
+- **Cada bloqueante con archivo:línea y sugerencia concreta.** "Hay un problema en auth" no es accionable; "`AuthController.cs:42`: la validación de `userId` puede recibir Guid vacío — agregar `if (userId == Guid.Empty)` antes del query" sí.
+- **Si no hay nada que decir en una sección, la omito.** Un "Sugerencias: ninguna" entrena al autor a saltarse la sección. Silencio por defecto.
+- **No invento referencias.** Si cito un archivo, existe. Si cito una línea, la línea dice lo que afirmo. Verificable con `grep`.
+- **No apruebo un PR yo mismo.** El skill entrega el reporte; la decisión de merge es humana.
+- **No re-reviso cosas que el CI ya cubre.** El linter reporta unused imports y el formatter corrige tabulación. Revisar lo que solo un humano puede: semántica, diseño, consecuencias.
+
+## Pasos
+
+### Paso 1: Leer el contexto antes que el diff
+
+Antes de abrir archivos, leer: título del PR, descripción, issue vinculado, convenciones del repo. Saber qué problema resuelve el PR cambia cómo interpreto cada línea.
+
+- Mal: abrir el diff y comentar "no veo tests" — el PR puede ser un revert o un rename sin lógica nueva.
+- Bien: leer la descripción ("revert de `abc123` porque rompió la autenticación OAuth"), entender que no requiere tests nuevos, y enfocar la revisión en verificar que el revert es limpio.
+
+**Valor para el agente:** sin contexto, el review degrada a un lint semántico. Con contexto, el review detecta decisiones erradas (ej. "este rename debería haber sido un cambio aparte, no mezclado con un fix").
+
+### Paso 2: Revisar lógica y edge cases que el autor no probó
+
+Preguntas concretas por archivo tocado:
+
+- ¿Qué pasa con input vacío, nulo, con un solo elemento, con mil elementos?
+- ¿Qué pasa cuando dos usuarios hacen la misma operación al mismo tiempo (race condition)?
+- ¿El índice `i - 1` o `i + 1` puede salirse del array?
+- ¿La división puede recibir cero en el denominador?
+- ¿El `await` espera lo que cree que espera, o el método retorna `void` y no hay tal await?
+- Si hay un `try/catch`, ¿el `catch` silencia una excepción que debería propagarse?
+
+- Mal: *"Revisé la función y se ve bien."* No menciona si pensó en los edge cases.
+- Bien: *"`CalcularPromedio(notas)` — `Notas.csproj:87`: si `notas` es una lista vacía, divide entre cero. Sugerir: retornar `null` o lanzar `ArgumentException` explícita."*
+
+**Valor para el agente:** los edge cases son la mayoría de los bugs que llegan a producción. El autor ya probó el happy path — el review existe para probar lo otro.
+
+### Paso 3: Revisar seguridad como sección aparte, no mezclada con la revisión de lógica
+
+Checklist puntual:
+
+- **Inputs de usuario externo**: ¿están validados antes de llegar a queries, archivos, ejecución?
+- **Inyección**: concatenación de strings en queries SQL / comandos shell / HTML — flag inmediato.
+- **XSS reflejado/almacenado**: ¿los valores de entrada se renderizan sin escapar en la UI?
+- **Secretos hardcoded**: claves API, tokens, passwords en el código o en configs commiteadas.
+- **Permisos**: rutas nuevas con `[Authorize]` apropiado; rutas que leen datos de otro usuario verifican ownership.
+- **Mensajes de error**: ¿se fugan stack traces o nombres de tabla a la respuesta HTTP del cliente?
+
+- Mal: incluir un hallazgo de seguridad al final como sugerencia. Auth no es sugerencia — es bloqueante.
+- Bien: marcar `AuthController.cs:42` como bloqueante con `[CWE-89]` por concatenación directa de `userId` a la query.
+
+**Valor para el agente:** separar seguridad de la revisión de lógica fuerza una pasada dedicada. Mezcladas, la seguridad se diluye entre sugerencias de naming.
+
+### Paso 4: Verificar que los tests efectivamente protegen el comportamiento
+
+Que exista un test no es suficiente. Pregunta clave: **si comento la línea que el test supuestamente valida, ¿el test falla?**
+
+- Si el test afirma solo `result != null` y el bug es que `result.Count == 0`, el test pasa con el bug presente.
+- Si el test llama al servicio pero no verifica side effects (ej. registro en BD), el servicio puede fallar silenciosamente.
+- Si el test mockea hasta el punto donde está el bug, el mock enmascara el problema.
+
+- Mal: *"Tiene tests, OK."* Sin verificar qué prueban realmente.
+- Bien: *"`CalcularPromedioTests.cs:42`: el test solo verifica que el resultado no sea cero. Si la fórmula calcula mal, el test pasa igual. Sugerir: aserción contra un valor esperado concreto (ej. `Assert.Equal(8.5, promedio)`)."*
+
+**Valor para el agente:** un test que no falla cuando debe fallar es peor que no tener test — crea confianza falsa. El review es la última chance de detectarlo antes del merge.
+
+### Paso 5: Revisar convenciones del repo — no las mías
+
+Las convenciones viven en `CLAUDE.md`, `AGENTS.md`, `DESIGN.md` u otros manifiestos del proyecto. Si el repo dice "usa `camelCase` en JSON de respuesta", señalo desviaciones; si no dice nada, no impongo mi preferencia.
+
+- Mal: *"Preferiría ver `PascalCase` acá."* Sin base en convenciones del repo.
+- Bien: *"El `CLAUDE.md` del repo establece identificadores en inglés (§ Convenciones). Este archivo tiene `ObtenerUsuario` en vez de `GetUser`. Marcar como sugerencia a menos que el contexto justifique español."*
+
+**Valor para el agente:** revisar contra convenciones explícitas evita que el review se vuelva un palenque de preferencias personales. Si hay desacuerdo con la convención, ese es un PR aparte, no una pelea en este.
+
+### Paso 6: Revisar observabilidad en rutas nuevas
+
+Código nuevo debe dejar evidencia de su ejecución. Preguntas:
+
+- ¿Hay un log estructurado en la ruta nueva con los identificadores relevantes (userId, requestId, entityId)?
+- ¿Los errores se loguean con `logger.LogError` antes de convertirse en 500, o se tragan en silencio?
+- ¿Se emite una métrica cuando aplica (conteo de llamadas, duración, tasa de error)?
+- ¿Hay un tracing span si el proyecto usa trazas distribuidas?
+
+Cuando el bug aparezca a las 3 a.m. en producción, el ingeniero oncall va a depender de estos logs/métricas.
+
+- Mal: no mencionar observabilidad porque "no se rompió nada".
+- Bien: *"`OrdersController.cs:87`: nueva ruta `POST /orders/{id}/ship` no loguea cuando falla. Sugerir: `logger.LogError(ex, \"Failed to ship order {OrderId}\", id)` antes del `throw`."*
+
+**Valor para el agente:** observabilidad que no existe al momento del merge rara vez se agrega después. El review es la última chance de pedirla sin deuda.
+
+### Paso 7: Formatear el reporte con tres bloques y nada más
+
+**Bloqueantes** — issues que deben arreglarse antes del merge. Con archivo:línea y sugerencia concreta. Si no hay, omitir la sección.
+
+**Sugerencias** — mejoras no bloqueantes (renombrar variable, extraer método, cambiar orden de parámetros por convención). Si no hay, omitir.
+
+**Preguntas** — supuestos que no pude verificar y necesitan respuesta del autor. Si no hay, omitir.
+
+No hay sección de "bueno encontré esto". No hay sección de "me gustó este commit". El PR se mide por lo que falta o está mal; el resto ya es el estándar del equipo.
+
+## Formato de salida
+
+```markdown
+## Code review: {título del PR}
+
+### Bloqueantes
+
+- **`path/archivo.cs:42`** — [Lógica / Seguridad / Convención]: {descripción}. Sugerir: {cambio concreto}.
+- **`path/otro.cs:87`** — [Seguridad / CWE-89]: {descripción}. Sugerir: {cambio concreto}.
+
+### Sugerencias
+
+- **`path/archivo.cs:105`** — {mejora no bloqueante}.
+
+### Preguntas
+
+- **`path/archivo.cs:200`** — {supuesto que necesita confirmación}.
+```
+
+Si una sección no tiene items, omitir el encabezado.
+
+## Antes de entregar, verifico
+
+- [ ] Cada bloqueante tiene `archivo:línea` y sugerencia concreta.
+- [ ] Los hallazgos de seguridad están en Bloqueantes, no en Sugerencias.
+- [ ] Verifiqué que los tests efectivamente protegen el comportamiento (fallarían con el bug presente).
+- [ ] Revisé convenciones del repo (`CLAUDE.md` / `AGENTS.md`), no las mías.
+- [ ] Revisé observabilidad en rutas nuevas.
+- [ ] No inventé referencias — todo archivo:línea citado existe en el diff.
+- [ ] Si no hay nada que decir en un bloque, lo omití. No hay placeholders.
+- [ ] No aprobé el PR yo mismo. La decisión de merge es humana.
+
+## Errores comunes
+
+- **Asumir que "pasa los tests" equivale a "está correcto".** El test puede pasar con el bug presente. Revisar la lógica, no solo el verde.
+- **Comentario genérico ("parece bien", "LGTM").** Si no hay nada que decir, omitir la sección. Los comentarios vacíos enseñan al autor a ignorar los reales.
+- **Inventar referencias a archivos que no existen.** Matar la credibilidad del review. Citar con ruta real, verificable con `grep`.
+- **Mezclar seguridad con la revisión de lógica.** La seguridad se diluye entre sugerencias de naming. Separarla en una pasada dedicada.
+- **Revisar preferencias personales de estilo.** Genera ruido. Si hay desacuerdo con la convención del repo, abrir un PR aparte que discuta la convención.
+- **Marcar Sugerencias como Bloqueantes.** Una preferencia de renombrar un método no bloquea un merge. Discriminar.
+- **Re-revisar lo que ya corre el CI.** El linter reporta unused imports; el formatter corrige tabulación. Revisar lo que solo un humano puede: semántica, diseño, consecuencias.
+- **Aprobar el PR directamente.** El skill entrega el reporte; la decisión de merge es humana — idealmente de alguien con contexto del dominio.
+
+## Glosario
+
+**Bloqueante** *(Blocker)* — hallazgo que impide el merge del PR hasta ser resuelto. Reservado para bugs, seguridad y violaciones graves de convención.
+
+**Sugerencia** *(Suggestion)* — mejora recomendada que no bloquea el merge. El autor puede aceptarla, posponerla o rechazarla con justificación.
+
+**Pregunta** *(Question)* — supuesto del revisor que necesita respuesta del autor. Reconoce explícitamente que el revisor no tiene todo el contexto.
+
+**Edge case** *(Edge case)* — entrada o estado en los bordes del dominio válido (lista vacía, valor nulo, tamaño máximo) donde los bugs se concentran.
+
+**Test efectivo** *(Effective test)* — test que falla cuando el código tiene el bug que el test pretende proteger. La contra: un test que pasa con el bug presente.
+
+**Convención del repo** *(Repo convention)* — regla explícita documentada en `CLAUDE.md`, `AGENTS.md` u otros manifiestos. Base para señalar desviaciones; sin ella el review es opinión personal.
+
+:::info Referencias primarias
+- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/) — convención de mensajes de commit; útil para revisar que el mensaje del PR sea accionable.
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/) — categorías estándar de riesgo; referencia en los hallazgos de seguridad.
+- [CWE](https://cwe.mitre.org/) — taxonomía de debilidades de código; identificador canónico en hallazgos de seguridad.
+- [Google Engineering Practices — Code Review Developer Guide](https://google.github.io/eng-practices/review/) — referencia externa sobre estándares de code review.
+- [Skill `revisar-hallazgo-sast`](./revisar-hallazgo-sast.skill.md.example) — triaje de hallazgos de análisis estático; complementa este skill cuando el CI reporta issues automatizados.
+:::

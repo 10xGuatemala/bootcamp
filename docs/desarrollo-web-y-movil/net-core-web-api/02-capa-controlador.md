@@ -203,6 +203,46 @@ public class EmpleadoRequest
 
 Estas validaciones aseguran que los datos enviados por el cliente cumplan con ciertos requisitos antes de ser procesados por la aplicación.
 
+### Regla rápida: `400 Bad Request` vs `422 Unprocessable Entity`
+
+Dos códigos de error que se confunden con frecuencia en controladores REST:
+
+- **`400 Bad Request`** — el DTO no pasa una validación de forma (campo faltante, tipo incorrecto, formato inválido). Lo detecta un validador declarativo (`[Required]`, `[EmailAddress]`, `[Range]`). Con `[ApiController]`, ASP.NET Core lo retorna automáticamente sin código adicional.
+- **`422 Unprocessable Entity`** — el DTO está bien formado pero viola una regla de negocio (p. ej. "el cliente ya está inactivo y no puede facturar", "no hay stock disponible"). Solo la lógica de la capa de servicio puede detectarlo.
+
+Regla rápida: **si un atributo de validación lo atrapa, es `400`. Si solo la lógica de negocio lo atrapa, es `422`.** Aplicar esta distinción consistentemente permite al cliente distinguir "arregla el formulario" de "el estado del sistema no permite esta operación".
+
+### Sufijos y ubicación de DTOs
+
+Los DTOs no son una clase "genérica" — cada uno cumple un rol específico y su nombre lo declara. La convención por proyecto:
+
+| Rol | Sufijo | Ejemplo | Uso |
+|---|---|---|---|
+| Entrada del endpoint | `Request` | `CrearEmpleadoRequest` | `[FromBody]` en POST/PUT/PATCH |
+| Salida del endpoint | `Response` | `EmpleadoResponse` | Tipo de retorno del controlador |
+| Filtro de búsqueda | `FilterDto` | `EmpleadoFilterDto` | `[FromQuery]` en GET con filtros |
+| DTO de referencia (genérico) | `Dto` | `PaisDto` | Cuando no es ni request ni response |
+
+Ubicación: `Modules/{Dominio}/{SubDominio}/Dtos/`, un archivo por clase. Los atributos de validación viven en los DTOs `Request`, nunca en los `Response`.
+
+- Mal: `EmpleadoDto.cs` con tres clases adentro (`EmpleadoRequest`, `EmpleadoResponse`, `EmpleadoFilterDto`).
+- Bien: tres archivos separados, un sufijo cada uno; el lector sabe de qué rol se trata por el nombre.
+
+### Cuándo delegar en un servicio y cuándo ir directo al `DbContext`
+
+El controlador puede seguir dos flujos: delegar al servicio (flujo principal) o acceder directamente al `DbContext` (atajo). La decisión no es estilística — es un criterio verificable.
+
+| Flujo | Cuándo aplicarlo | Ejemplo |
+|---|---|---|
+| `Controller → Service → DbContext` | Hay lógica de negocio, múltiples operaciones del mismo recurso, validación cruzada o cálculos | `POST /api/facturas` — valida cliente activo, calcula totales, aplica impuestos |
+| `Controller → DbContext` | Lectura simple sin transformaciones ni reglas, mapeo DTO↔entidad uno a uno | `GET /api/paises` — tabla de referencia estática |
+
+El atajo `Controller → DbContext` solo aplica si **las tres condiciones** se cumplen: sin reglas de negocio, endpoint único para ese recurso, sin transformaciones. En caso de duda, usa el flujo principal con servicio — es más fácil agregar lógica a un servicio existente que extraer un servicio cuando el controlador ya tiene veinte líneas de lógica.
+
+- Mal: crear un `PaisService.ObtenerTodosAsync()` que solo reenvía al `DbContext` sin lógica. Capa vacía que el próximo desarrollador va a eliminar.
+- Mal: meter un cálculo de impuestos dentro del controlador "porque es rápido". Crece con el tiempo y el controlador deja de ser delgado.
+- Bien: `GET /api/paises` accede al `DbContext`; `POST /api/facturas` delega en `FacturaService`.
+
 ### Importancia de la Documentación
 
 La documentación adecuada de los controladores y sus métodos es crucial para que otros desarrolladores puedan entender y usar tu API.
@@ -255,6 +295,12 @@ Con estos conceptos, los desarrolladores junior pueden estructurar controladores
 
 **Swagger / OpenAPI** *(Swagger · OpenAPI)* — especificación y herramientas para documentar APIs REST de forma interactiva.
 
+**`400 Bad Request`** *(Bad Request)* — código HTTP para errores de forma en el DTO (campo faltante, tipo incorrecto, formato inválido); detectable por validadores declarativos.
+
+**`422 Unprocessable Entity`** *(Unprocessable Entity)* — código HTTP para errores de negocio en un DTO bien formado (regla del dominio violada); detectable solo por la capa de servicio.
+
+**Controlador delgado** *(Thin controller)* — controlador que recibe, valida forma, delega al servicio y retorna; sin lógica de negocio.
+
 :::info Referencias primarias
 - [Microsoft · .NET docs](https://learn.microsoft.com/en-us/dotnet/) — referencia del ecosistema .NET.
 - [ASP.NET Core · Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/) — guía oficial de controladores Web API.
@@ -279,9 +325,12 @@ Con estos conceptos, los desarrolladores junior pueden estructurar controladores
 1. Definir la ruta base con `[Route("api/[controller]")]` y habilitar `[ApiController]`.
 2. Inyectar los servicios necesarios por constructor.
 3. Aplicar `[Authorize]` a nivel de clase o método según el nivel de protección.
-4. Validar entradas con DTOs anotados (`[Required]`, `[EmailAddress]`, `[Range]`, etc.).
-5. Devolver resultados usando `Ok`, `NotFound`, `CreatedAtAction` y otros helpers de `ControllerBase`.
-6. Documentar cada endpoint con comentarios XML y exponerlo vía Swagger/OpenAPI.
+4. Validar entradas con DTOs anotados (`[Required]`, `[EmailAddress]`, `[Range]`, etc.) — errores de forma retornan `400`.
+5. Delegar al servicio cuando hay lógica de negocio; ir directo al `DbContext` solo para lecturas triviales sin reglas.
+6. Aplicar sufijos `Request`/`Response`/`FilterDto` a los DTOs, un archivo por clase.
+7. Usar `422` para errores de regla de negocio; `400` para errores de forma.
+8. Devolver resultados usando `Ok`, `NotFound`, `CreatedAtAction` y otros helpers de `ControllerBase`.
+9. Documentar cada endpoint con comentarios XML y exponerlo vía Swagger/OpenAPI.
 
 **Salidas:**
 - Controladores delgados, centrados en HTTP y validación.
@@ -293,6 +342,9 @@ Con estos conceptos, los desarrolladores junior pueden estructurar controladores
 - Olvidar `[Authorize]` en endpoints que manipulan datos sensibles.
 - Recibir modelos de dominio directamente en lugar de DTOs.
 - No documentar los métodos y romper la generación de Swagger.
+- Confundir `400` con `422` (errores de forma vs errores de negocio).
+- Crear un servicio trivial que solo reenvía al `DbContext` para una lectura sin reglas.
+- Archivo `XxxDto.cs` con tres clases adentro en vez de archivos separados con sufijos claros.
 
 **Referencias cruzadas:**
 - [1.2.1 Arquitectura de Backend API Rest en .NET Core](./01-arquitectura-de-backend.md)

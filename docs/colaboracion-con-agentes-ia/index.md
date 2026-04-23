@@ -51,9 +51,10 @@ flowchart TB
     M4[04 · Seguridad al ejecutar herramientas externas]
     M5[05 · Diseño de prompts y verificación]
     M6[06 · Seguridad de chatbots con IA]
-    M1 --> M2 --> M3 --> M4 --> M5 --> M6
+    M7[07 · De specs a proyecto real]
+    M1 --> M2 --> M3 --> M4 --> M5 --> M6 --> M7
     classDef step fill:#0d4d92,color:#fff,stroke:#0b417b,stroke-width:1px,rx:8,ry:8,font-size:15px,padding:10px
-    class M1,M2,M3,M4,M5,M6 step
+    class M1,M2,M3,M4,M5,M6,M7 step
 ```
 
 **Alternativa en lista** (accesible y útil si el diagrama no carga):
@@ -64,6 +65,7 @@ flowchart TB
 4. [**6.4 Seguridad al ejecutar herramientas externas**](./04-seguridad-en-herramientas-externas.md) — validación, ReDoS, timeouts.
 5. [**6.5 Diseño de prompts y verificación**](./05-diseno-de-prompts-y-verificacion.md) — instrucciones claras y verificables.
 6. [**6.6 Seguridad de chatbots con IA**](./06-seguridad-de-chatbots.md) — prompt injection, exposición de datos.
+7. [**6.7 De specs a proyecto real**](./07-de-specs-a-proyecto-real.md) — arranque guiado: entrevista, contrato `specs.md`, scaffolding reproducible.
 
 ## Cómo aprovechar este contenido
 
@@ -85,5 +87,6 @@ flowchart TB
 - [6.4 Seguridad al ejecutar herramientas externas](./04-seguridad-en-herramientas-externas.md)
 - [6.5 Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
 - [6.6 Seguridad de chatbots con IA](./06-seguridad-de-chatbots.md)
+- [6.7 De specs a proyecto real](./07-de-specs-a-proyecto-real.md)
 
 </div>
