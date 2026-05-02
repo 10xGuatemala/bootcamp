@@ -248,7 +248,7 @@ Al final del bloque, dejar el link de comparación con el release previo:
 - [Keep a Changelog 1.1.0](https://keepachangelog.com/es-ES/1.1.0/) — formato canónico del changelog; la plantilla y las seis secciones vienen de acá.
 - [Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/) — convención de mensajes de commit que alimenta la clasificación automática.
 - [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — criterio para decidir `major` / `minor` / `patch` según el tipo de cambios que la nota documenta.
-- [5.1 De la idea al release](../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — módulo del bootcamp que enmarca cuándo cortar release y qué documentar.
-- [5.2 Multi-repo y deploy coordinado](../../../docs/documentacion-y-requerimientos/02-multi-repo-y-deploy-coordinado.md) — consideraciones adicionales cuando una release abarca varios repos con orden de deploy.
-- [Skill `checklist-produccion-net`](../net-core-web-api/checklist-produccion-net.skill.md.example) — verifica la alineación entre versión y `/health` antes de publicar; consume las notas generadas por este skill.
+- [5.1 De la idea al release](../../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — módulo del bootcamp que enmarca cuándo cortar release y qué documentar.
+- [5.2 Versionado semántico en equipos](../../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md) — consideraciones adicionales cuando una release abarca varios repos con orden de deploy.
+- [Skill `checklist-produccion-net`](../net-core-web-api/checklist-produccion-net.skill.md) — verifica la alineación entre versión y `/health` antes de publicar; consume las notas generadas por este skill.
 :::

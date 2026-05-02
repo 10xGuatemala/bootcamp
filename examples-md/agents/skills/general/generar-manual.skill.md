@@ -1,11 +1,11 @@
-<!-- Destino sugerido: .claude/skills/redactar-manual-usuario.skill.md -->
+<!-- Destino sugerido: .claude/skills/generar-manual.skill.md -->
 
 ---
-name: redactar-manual-usuario
+name: generar-manual
 description: Genera o actualiza secciones de un manual de usuario final a partir de la UI real navegada con el rol objetivo (o capturas literales cuando no hay acceso vivo). Un requerimiento entregado en un release, una nota del release o un ticket de soporte solo sirven como disparadores de qué revisar — nunca como fuente del contenido. Ordena por workflow real (no por menú) y, en apps multi-tenant, separa un manual por sistema × rol.
 ---
 
-# Skill: redactar-manual-usuario
+# Skill: generar-manual
 
 El manual de usuario final muere el día que alguien escribe "haz clic en el botón Enviar" cuando el botón real dice "Guardar" — o peor, el día que se estructura por pantallas en vez de por tareas. Los lectores no entran al manual por curiosidad: entran porque algo dejó de funcionar o porque es su primera vez haciendo algo crítico. Si la sección se llama "La pantalla de Facturas" en vez de "Cómo emitir una factura", el lector ya perdió diez minutos antes de encontrar la respuesta. Este skill existe para producir procedimientos orientados a tareas, fieles a la UI real, con ordenamiento por workflow operativo y con sección explícita de recuperación de errores.
 
@@ -42,6 +42,7 @@ Contexto (siempre):
 
 7. **Sistema y rol** del lector objetivo si la app es multi-tenant.
 8. **Permisos y precondiciones** del rol — qué puede ver, qué puede escribir, qué le bloquea el sistema.
+9. **Destino del manual** — sitio web para humanos, chatbot/RAG, soporte interno, API/CLI o curado manual. Este dato decide si se declara contrato de imágenes.
 
 Si llega un disparador sin acceso a la UI ni capturas, debo pedir la UI antes de redactar. **Nunca inventar elementos** — ni botones, ni campos, ni validaciones, ni rutas de imagen — y nunca redactar pasos a partir del requerimiento o de la nota del release: esos artefactos dicen qué cambió; la UI muestra cómo se usa.
 
@@ -228,7 +229,8 @@ Antes de entregar, confirmar que todo archivo listado existe y no hay archivos h
 - Markdown con la estructura obligatoria por procedimiento.
 - Encabezado de sección: `## Cómo {tarea}` (H2 por procedimiento).
 - Textos literales de la UI en **negrita**; mensajes del sistema en comillas o bloque de código inline.
-- Sin capturas nuevas a menos que se me proporcionen — no inventar rutas de imagen.
+- Si el destino necesita imágenes, declarar un contrato de capturas: `Ilustración N: descripción` como mínimo, o `![alt](path)` cuando el path convencional ya esté claro.
+- Sin capturas nuevas cuando el destino sea chatbot/RAG, API/CLI o Markdown puro — ahí el texto literal pesa más que una imagen.
 
 ## Antes de entregar, verifico
 
@@ -241,6 +243,8 @@ Antes de entregar, confirmar que todo archivo listado existe y no hay archivos h
 - [ ] Los procedimientos están ordenados por workflow operativo, no por el menú.
 - [ ] En manuales multi-tenant: un solo sistema × rol, con lista de exclusión explícita.
 - [ ] El `README.md` del rol lista todos los archivos y no hay huérfanos.
+- [ ] Si el destino requiere imágenes, el manual declara slots `Ilustración N:` o referencias `![alt](path)` para que `generar-capturas-manual` pueda resolverlas.
+- [ ] Si el destino no requiere imágenes, no dejé slots ni rutas de captura vacías.
 
 ## Errores comunes
 
@@ -271,6 +275,6 @@ Antes de entregar, confirmar que todo archivo listado existe y no hay archivos h
 - [Diátaxis](https://diataxis.fr/) — marco que distingue tutorial, how-to, reference y explanation. Este skill genera artefactos del tipo *how-to*.
 - [Nielsen Norman Group — User Manuals](https://www.nngroup.com/articles/instruction-manuals/) — principios de usabilidad aplicados a manuales orientados a tarea.
 - [Plain Language Guidelines](https://www.plainlanguage.gov/guidelines/) — principios de redacción clara aplicables al tono corporativo sin condescender.
-- [5.3 Manuales de usuario final](../../../docs/documentacion-y-requerimientos/03-manuales-de-usuario-final.md) — módulo del bootcamp que describe el flujo completo de redacción; este skill es la forma operativa del módulo.
-- [Skill `release-notes`](./release-notes.skill.md.example) — ayuda a redactar notas de release; este skill puede usarlas como señal de qué revisar, pero redacta el manual desde la UI real.
+- [5.3 Manuales de usuario final](../../../../docs/documentacion-y-requerimientos/03-manuales-de-usuario-final.md) — módulo del bootcamp que describe el flujo completo de redacción; este skill es la forma operativa del módulo.
+- [Skill `release-notes`](./release-notes.skill.md) — ayuda a redactar notas de release; este skill puede usarlas como señal de qué revisar, pero redacta el manual desde la UI real.
 :::

@@ -239,5 +239,5 @@ Si la fuente primaria y la confirmadora divergen, el comando se **detiene y pide
 - [Claude Code · Slash commands](https://docs.claude.com/en/docs/agents-and-tools/claude-code/slash-commands) — referencia oficial de slash commands.
 - [Agent Skills overview](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) — referencia oficial de skills.
 - [Anthropic · Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — patrones arquitectónicos aplicables (orchestrator-workers, routing).
-- [6.3 Arquitectura orientada a skills](../../../docs/colaboracion-con-agentes-ia/03-arquitectura-orientada-a-skills.md) — módulo del bootcamp sobre diseño de skills reutilizables.
+- [6.3 Arquitectura orientada a skills](../../../../docs/colaboracion-con-agentes-ia/03-arquitectura-orientada-a-skills.md) — módulo del bootcamp sobre diseño de skills reutilizables.
 :::

@@ -115,9 +115,9 @@ Ese `specs.md` retroactivo es la base para normalizar el proyecto y para que fut
 :::tip Archivos copiables
 El flujo completo vive como artefactos listos para usar en [`examples-md/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md):
 
-- Plantilla del contrato: [`project/specs.md.example`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/project/specs.md.example).
-- Skill que conduce los pasos 1–3: [`agents/skills/general/entrevista-specs.skill.md.example`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/entrevista-specs.skill.md.example).
-- Skill que ejecuta el paso 4: [`agents/skills/general/scaffolding-desde-specs.skill.md.example`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/scaffolding-desde-specs.skill.md.example).
+- Plantilla del contrato: [`project/specs.md`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/project/specs.md).
+- Skill que conduce los pasos 1–3: [`agents/skills/general/entrevista-specs.skill.md`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/entrevista-specs.skill.md).
+- Skill que ejecuta el paso 4: [`agents/skills/general/scaffolding-desde-specs.skill.md`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/scaffolding-desde-specs.skill.md).
 
 Copia los tres archivos a tu repo (`.claude/skills/` y la raíz para `specs.md`) y el flujo queda disponible para cualquier miembro del equipo.
 :::

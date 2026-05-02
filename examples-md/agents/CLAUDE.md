@@ -44,5 +44,5 @@ dotnet run --project src/Api
 
 ## Referencias cruzadas
 
-- [DESIGN.md](./DESIGN.md) — tokens de diseño y estándares de UI.
+- [DESIGN.md](../design/DESIGN.md) — tokens de diseño y estándares de UI.
 - [AGENTS.md](./AGENTS.md) — convenciones multi-agente.

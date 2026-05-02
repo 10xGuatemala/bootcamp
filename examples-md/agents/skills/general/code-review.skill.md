@@ -195,5 +195,5 @@ Si una sección no tiene items, omitir el encabezado.
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/) — categorías estándar de riesgo; referencia en los hallazgos de seguridad.
 - [CWE](https://cwe.mitre.org/) — taxonomía de debilidades de código; identificador canónico en hallazgos de seguridad.
 - [Google Engineering Practices — Code Review Developer Guide](https://google.github.io/eng-practices/review/) — referencia externa sobre estándares de code review.
-- [Skill `revisar-hallazgo-sast`](./revisar-hallazgo-sast.skill.md.example) — triaje de hallazgos de análisis estático; complementa este skill cuando el CI reporta issues automatizados.
+- [Skill `revisar-hallazgo-sast`](./revisar-hallazgo-sast.skill.md) — triaje de hallazgos de análisis estático; complementa este skill cuando el CI reporta issues automatizados.
 :::

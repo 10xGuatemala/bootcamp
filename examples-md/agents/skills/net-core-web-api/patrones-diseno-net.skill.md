@@ -28,7 +28,7 @@ Un patrón de diseño introducido el día uno — cuando hay un solo filtro, una
 
 1. **Problema observado**: descripción concreta del dolor (ej. "ClienteService, ProductoService y ProveedorService tienen el mismo `ApplyFilters` con 15 líneas cada uno").
 2. **Servicios/entidades afectados**: lista explícita, no "varios".
-3. **Estructura del proyecto**: debe seguir el contrato de [`estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example) — `Commons/Application/`, `Modules/{Dominio}/`, etc.
+3. **Estructura del proyecto**: debe seguir el contrato de [`estructura-proyecto-net`](./estructura-proyecto-net.skill.md) — `Commons/Application/`, `Modules/{Dominio}/`, etc.
 4. **Métricas de duplicación si existen**: líneas duplicadas, cantidad de servicios afectados, frecuencia con que se agrega un caso nuevo.
 
 Sin problema observado, no aplico ningún patrón. "Por si acaso crecemos" no es entrada válida.
@@ -344,7 +344,7 @@ Cada strategy, factory, builder, máquina de estados debe tener tests unitarios 
 - [Refactoring Guru — Design Patterns](https://refactoring.guru/design-patterns) — referencia pedagógica de los 23 patrones GoF con ejemplos en C#.
 - [Microsoft — Design Patterns in C#](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles) — principios arquitectónicos que enmarcan cuándo aplicar patrones.
 - [Martin Fowler — Is Design Dead?](https://martinfowler.com/articles/designDead.html) — ensayo canónico sobre cuándo introducir abstracciones (refactoring en lugar de diseño upfront).
-- [1.2.5 Patrones de diseño en APIs REST](../../../docs/desarrollo-web-y-movil/net-core-web-api/05-patrones-de-diseno-en-apis-rest.md) — módulo del bootcamp que cubre los cinco patrones que este skill materializa.
-- [Skill `estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example) — define las carpetas donde este skill coloca los patrones.
-- [Skill `nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md.example) — base desde la cual un endpoint puede crecer al punto de necesitar un patrón.
+- [1.2.5 Patrones de diseño en APIs REST](../../../../docs/desarrollo-web-y-movil/net-core-web-api/05-patrones-de-diseno-en-apis-rest.md) — módulo del bootcamp que cubre los cinco patrones que este skill materializa.
+- [Skill `estructura-proyecto-net`](./estructura-proyecto-net.skill.md) — define las carpetas donde este skill coloca los patrones.
+- [Skill `nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md) — base desde la cual un endpoint puede crecer al punto de necesitar un patrón.
 :::

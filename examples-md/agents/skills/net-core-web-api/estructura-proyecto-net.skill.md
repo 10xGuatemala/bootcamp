@@ -63,13 +63,13 @@ flowchart LR
     Program -. Se registra como servicio en .-> DataContext
 ```
 
-Diagrama canónico del módulo [1.2.1 Arquitectura de backend](../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md). Lectura en prosa:
+Diagrama canónico del módulo [1.2.1 Arquitectura de backend](../../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md). Lectura en prosa:
 
 1. **Vista → Controlador** (flecha llena): el cliente (SPA, app móvil, otro servicio) envía un request HTTP con cuerpo JSON. El controlador deserializa al DTO de request.
-2. **Controlador → Servicio** (flecha llena, flujo principal): el controlador delega al servicio cuando hay lógica de negocio (validaciones cruzadas, cálculos, efectos secundarios, múltiples operaciones). Implementado en [`nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md.example) §Decisión.
+2. **Controlador → Servicio** (flecha llena, flujo principal): el controlador delega al servicio cuando hay lógica de negocio (validaciones cruzadas, cálculos, efectos secundarios, múltiples operaciones). Implementado en [`nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md) §Decisión.
 3. **Servicio ↔ DataContext** (flecha doble): el servicio usa el `DbContext` (EF Core) para leer/escribir datos, aplicando reglas antes y después.
 4. **DataContext → Clase Model** (flecha llena): EF Core materializa filas de la tabla como instancias de la clase `XxxModel`.
-5. **Clase Model ↔ Tabla** (flecha doble): las operaciones de EF Core (`SaveChanges`, queries LINQ) se traducen a SQL y ejecutan contra la tabla. El mapeo lo define [`nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md.example).
+5. **Clase Model ↔ Tabla** (flecha doble): las operaciones de EF Core (`SaveChanges`, queries LINQ) se traducen a SQL y ejecutan contra la tabla. El mapeo lo define [`nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md).
 6. **Controlador → DataContext directo** (flecha punteada, flujo alternativo): atajo permitido **solo** cuando no hay reglas de negocio, la operación es única y el mapeo DTO ↔ entidad es uno a uno. Típicamente lectura de catálogos estáticos (`GET /api/paises`). Si duda, usa el flujo principal.
 7. **Configuración en Program.cs** (flechas punteadas hacia arriba): tanto el `Servicio` como el `DataContext` se registran en el contenedor DI durante el bootstrap. Los métodos de extensión en `Extensions/` encapsulan los `services.AddScoped<>()` y `services.AddDbContext<>()`.
 
@@ -252,7 +252,7 @@ Cada carpeta vacía lleva `.gitkeep` hasta que tenga archivos reales.
 - **Enums** en `PascalCase`, valores también en `PascalCase`: `enum Estado { Activo, Inactivo, Eliminado }`.
 - **Nombres en español para entidades de dominio** (cuando el dominio es español): `ClienteModel`, `OrdenCompraService`. No traducir "Cliente" a "Customer" si el resto del dominio es español — genera fricción.
 - **Nombres en inglés para infraestructura técnica**: `ServiceCollectionExtensions`, `DateUtil`, `FilterContext`. Convención de la comunidad .NET.
-- **Tablas y columnas SQL en `snake_case`** (mapeadas con `[Table("clientes")]` y `[Column("nombre_comun")]`), detalle cubierto en [`nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md.example).
+- **Tablas y columnas SQL en `snake_case`** (mapeadas con `[Table("clientes")]` y `[Column("nombre_comun")]`), detalle cubierto en [`nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md).
 
 - Mal: `IClienteService` en `Modules/Clientes/Services/ClienteService.cs`. La interfaz va en su propio archivo `IClienteService.cs`.
 - Bien: `IClienteService.cs` + `ClienteService.cs`, ambos en la misma carpeta, mismo namespace.
@@ -400,8 +400,8 @@ Al cerrar el scaffolding, agregar (o crear) `CLAUDE.md` con:
 - [Microsoft — C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions) — convenciones oficiales de naming y estilo en C#.
 - [Microsoft — .NET Naming Guidelines](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-guidelines) — reglas de naming para tipos, miembros y namespaces.
 - [Microsoft — Organizing code with projects](https://learn.microsoft.com/en-us/dotnet/core/tutorials/cli-templates-create-project-solution) — decisiones de proyecto único vs solución multi-proyecto.
-- [1.2.1 Arquitectura de backend](../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md) — módulo del bootcamp que fundamenta las decisiones de capas.
-- [Skill `nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md.example) — cómo agregar un endpoint una vez la estructura existe.
-- [Skill `nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md.example) — cómo agregar una entidad respetando `Commons/Data/Models/`.
-- [Skill `patrones-diseno-net`](./patrones-diseno-net.skill.md.example) — cuándo introducir Strategy, Factory, Builder, Template Method o StateMachine dentro de esta estructura.
+- [1.2.1 Arquitectura de backend](../../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md) — módulo del bootcamp que fundamenta las decisiones de capas.
+- [Skill `nuevo-endpoint-rest-net`](./nuevo-endpoint-rest-net.skill.md) — cómo agregar un endpoint una vez la estructura existe.
+- [Skill `nueva-entidad-ef-core`](./nueva-entidad-ef-core.skill.md) — cómo agregar una entidad respetando `Commons/Data/Models/`.
+- [Skill `patrones-diseno-net`](./patrones-diseno-net.skill.md) — cuándo introducir Strategy, Factory, Builder, Template Method o StateMachine dentro de esta estructura.
 :::

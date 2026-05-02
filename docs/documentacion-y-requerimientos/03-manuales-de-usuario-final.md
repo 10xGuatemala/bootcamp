@@ -307,9 +307,9 @@ El módulo [5.5](./05-generar-manuales-con-agentes.md) toma esta relación y la 
 Las reglas siguientes son la forma ejecutable de todo lo anterior: **un contrato** que un agente de IA puede leer y respetar para redactar manuales coherentes, sin alucinar elementos que no existen en la UI.
 
 :::tip Archivo copiable
-La plantilla completa de `redactar-manual-usuario.skill.md` vive como archivo real en [`examples-md/agents/skills/general/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/agents/skills/general). Esa versión incluye además dos secciones extra que no caben aquí: **ordenar por workflow real** (primero tareas frecuentes, después maestros) y **variante multi-tenant** con segmentación sistema × rol para apps con menús distintos según el perfil del usuario.
+La plantilla completa de `generar-manual.skill.md` vive como archivo real en [`examples-md/agents/skills/general/`](https://github.com/10xGuatemala/bootcamp/tree/main/examples-md/agents/skills/general). Esa versión incluye además dos secciones extra que no caben aquí: **ordenar por workflow real** (primero tareas frecuentes, después maestros) y **variante multi-tenant** con segmentación sistema × rol para apps con menús distintos según el perfil del usuario.
 
-Copia el archivo a tu repo (`.claude/skills/redactar-manual-usuario.skill.md` o equivalente según tu agente) y cualquier agente con acceso al repositorio podrá invocarlo.
+Copia el archivo a tu repo (`.claude/skills/generar-manual.skill.md` o equivalente según tu agente) y cualquier agente con acceso al repositorio podrá invocarlo.
 :::
 
 El bloque siguiente es una versión reducida del contrato, útil para entender la forma sin salir de esta lección:
@@ -383,7 +383,7 @@ redactar — nunca inventar pasos a partir del requerimiento o de la nota del re
 
 Una vez registrada la skill, invocarla es tan simple como:
 
-> "Usando la skill **redactar-manual-usuario**, documenta el procedimiento 'Cómo aprobar una solicitud de vacaciones' a partir de esta captura."
+> "Usando la skill **generar-manual**, documenta el procedimiento 'Cómo aprobar una solicitud de vacaciones' a partir de esta captura."
 
 El agente genera la sección siguiendo las reglas sin que el equipo tenga que repetirlas cada vez.
 

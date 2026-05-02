@@ -6,7 +6,7 @@ sidebar_label: 5.5 Generación de manuales con agentes
 
 # Generación de manuales con agentes
 
-El módulo [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md) dejó la skill `redactar-manual-usuario`. Esa skill redacta procedimientos desde la UI real o desde capturas literales cuando no hay acceso vivo. Pero un manual real puede cubrir varios flujos, roles y destinos: lectura humana, soporte interno, chatbot, RAG o capacitación.
+El módulo [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md) dejó la skill `generar-manual`. Esa skill redacta procedimientos desde la UI real o desde capturas literales cuando no hay acceso vivo. Pero un manual real puede cubrir varios flujos, roles y destinos: lectura humana, soporte interno, chatbot, RAG o capacitación.
 
 Sin orquestación, eso se convierte en prompts sueltos, secciones con estilos distintos y pasos que no siempre corresponden al release entregado. Este módulo introduce un patrón de orquestación que genera el manual Markdown primero, agrega capturas solo cuando el destino las necesita y valida la consistencia al final.
 
@@ -16,19 +16,19 @@ Un orquestador es un agente cuyo trabajo es **invocar otros agentes en orden y v
 
 En el patrón que veremos, el orquestador `generar-manual-completo` coordina dos skills especializadas:
 
-- `generar-manual` — navega la UI real con el rol objetivo (o usa capturas literales) y redacta el `.md` siguiendo las reglas de [5.3](./03-manuales-de-usuario-final.md). El código sirve como apoyo para permisos, rutas y validaciones, no como fuente principal.
-- `generar-capturas` — fase opcional. Lee el `.md` recién escrito, mapea cada `![alt](.../NN.png)` a un componente real y produce las imágenes con un test E2E (Playwright, Cypress o el que use el equipo).
+- `generar-manual` — navega la UI real con el rol objetivo (o usa capturas literales) y redacta el `.md` siguiendo las reglas de [5.3](./03-manuales-de-usuario-final.md). Si el destino necesita imágenes, deja un contrato de imágenes verificable: referencias `![alt](.../NN.png)` o slots `Ilustración N:`. El código sirve como apoyo para permisos, rutas y validaciones, no como fuente principal.
+- `generar-capturas-manual` — fase opcional. Lee el contrato de imágenes del `.md`, mapea cada captura a un componente real, produce las imágenes con un test E2E (Playwright, Cypress o el que use el equipo) y actualiza solo las referencias de imagen del manual cuando faltan rutas o `alt` text.
 
 Después, el orquestador valida el resultado. En modo **Solo Markdown**, revisa estructura, fuente y fidelidad a la UI. En modo **Completo**, además confirma que cada imagen referenciada existe y que las capturas corresponden al manual.
 
-El siguiente diagrama muestra el patrón completo como una cadena de trabajo. Primero se redacta el manual base; si el destino necesita imágenes, la skill de capturas genera los archivos y actualiza el manual con esas referencias. Al final, el orquestador valida el resultado.
+El siguiente diagrama muestra el patrón completo como una cadena de trabajo. Primero se redacta el manual base; si el destino necesita imágenes, la skill de capturas genera los archivos y normaliza las referencias del manual. Al final, el orquestador valida el resultado.
 
 ```mermaid
 flowchart LR
     O["1. generar-manual-completo<br/>orquestador"]
     M["2. generar-manual<br/>redacta manual base"]
     D{"¿necesita<br/>capturas?"}
-    C["3. generar-capturas<br/>crea .png + spec E2E"]
+    C["3. generar-capturas-manual<br/>crea .png + spec E2E"]
     U["4. actualizar manual<br/>rutas + alt text"]
     F["5. validar y reportar<br/>verde / amarillo / rojo"]
 
@@ -60,7 +60,7 @@ Lectura del diagrama:
 1. `generar-manual-completo` recibe el módulo/flujo y controla el proceso.
 2. `generar-manual` redacta el manual base desde la UI real.
 3. El manual base vuelve al orquestador como resultado de la skill.
-4. La decisión `¿necesita capturas?` no es un paso de trabajo: solo marca la rama. Si la respuesta es sí, el orquestador invoca `generar-capturas` usando el contrato de imágenes del manual base; después el manual se actualiza con rutas y `alt` text.
+4. La decisión `¿necesita capturas?` no es un paso de trabajo: solo marca la rama. Si la respuesta es sí, el orquestador invoca `generar-capturas-manual` usando el contrato de imágenes del manual base; después la fase de capturas normaliza rutas y `alt` text sin reescribir la prosa del manual.
 5. Si la respuesta es no, el orquestador salta directo a validación. En ambos casos, valida el resultado final y entrega el reporte verde / amarillo / rojo.
 
 El reporte usa tres niveles:
@@ -83,8 +83,8 @@ Cada skill tiene un alcance acotado:
 
 | Skill | Lee | Produce | Responsabilidad principal |
 |-------|-----|---------|---------------------------|
-| `generar-manual` | UI real con el rol objetivo + plantilla del manual | `manuales/<modulo>/<NN-flujo>.md` | Redactar procedimientos fieles a la UI, con citas literales de botones y mensajes |
-| `generar-capturas` *(opcional)* | El `.md` recién escrito | Spec E2E + `.png` en el path declarado | Mapear cada `![alt]` a un selector estable y producir imágenes cuando el destino las requiere |
+| `generar-manual` | UI real con el rol objetivo + plantilla del manual | `manuales/<modulo>/<NN-flujo>.md` | Redactar procedimientos fieles a la UI, con citas literales de botones y mensajes; declarar contrato de imágenes si aplica |
+| `generar-capturas-manual` *(opcional)* | Contrato de imágenes del `.md` recién escrito | Spec E2E + `.png` + referencias de imagen normalizadas | Mapear cada captura declarada a un selector estable y producir imágenes cuando el destino las requiere |
 | `generar-manual-completo` | Manual y, si existen, capturas | Reporte verde / amarillo / rojo | Validar el manual; validar imágenes solo en modo completo |
 
 ## Variantes según el destino del manual
@@ -93,15 +93,15 @@ No todos los proyectos necesitan capturas reales. Antes de adoptar el patrón co
 
 | Destino del manual | Capturas | Stack mínimo | Skills usadas |
 |--------------------|----------|--------------|---------------|
-| Lectura humana en sitio web | E2E reales en `.png` | Playwright / Cypress + dev server + credenciales | `redactar` + `capturar` + `orquestador` |
-| Chatbot / RAG / soporte automatizado | Sin imágenes — descripción literal del UI | Solo Markdown | `redactar` + `orquestador` en modo Solo Markdown |
-| Producto sin UI (CLI, API, librería) | Sin capturas — comandos y respuestas literales | Solo Markdown + bloques de código | `redactar` adaptada + `orquestador` en modo Solo Markdown |
-| Equipo sin infra E2E todavía | Capturas curadas a mano | Editor de imágenes + carpeta versionada | `redactar` + flujo manual de capturas |
-| Migración progresiva | Empieza sin imágenes; agrégalas cuando exista E2E | Markdown ahora, Playwright después | `redactar` ahora; agregar `capturar` + `orquestador` después |
+| Lectura humana en sitio web | E2E reales en `.png` | Playwright / Cypress + dev server + credenciales | `generar-manual` + `generar-capturas-manual` + `generar-manual-completo` |
+| Chatbot / RAG / soporte automatizado | Sin imágenes — descripción literal del UI | Solo Markdown | `generar-manual` + `generar-manual-completo` en modo Solo Markdown |
+| Producto sin UI (CLI, API, librería) | Sin capturas — comandos y respuestas literales | Solo Markdown + bloques de código | `generar-manual` adaptada + `generar-manual-completo` en modo Solo Markdown |
+| Equipo sin infra E2E todavía | Capturas curadas a mano | Editor de imágenes + carpeta versionada | `generar-manual` + revisión humana de imágenes |
+| Migración progresiva | Empieza sin imágenes; agrégalas cuando exista E2E | Markdown ahora, Playwright después | `generar-manual` ahora; agregar `generar-capturas-manual` + `generar-manual-completo` después |
 
-Las variantes sin capturas no son "manuales incompletos". Para un chatbot, una imagen es ruido; lo único útil es el texto literal del botón, el mensaje de error y el orden de los pasos. Un manual `.md` puro, redactado con la skill `redactar-manual-usuario` aplicando fielmente los textos del UI, alimenta perfectamente un sistema de RAG sin necesidad de generar un solo `.png`.
+Las variantes sin capturas no son "manuales incompletos". Para un chatbot, una imagen es ruido; lo único útil es el texto literal del botón, el mensaje de error y el orden de los pasos. Un manual `.md` puro, redactado con la skill `generar-manual` aplicando fielmente los textos del UI, alimenta perfectamente un sistema de RAG sin necesidad de generar un solo `.png`.
 
-El orquestador `generar-manual-completo` se adapta: cuando el manual no declara referencias `![alt](.../NN.png)`, la fase 2 se salta automáticamente y la fase 3 valida solo las reglas del Markdown. La sección de [comportamiento ante errores](#errores-comunes) detalla ese caso.
+El orquestador `generar-manual-completo` se adapta: cuando el destino no necesita imágenes y el manual no declara contrato de capturas, la fase 2 se salta automáticamente y la fase 3 valida solo las reglas del Markdown. Si el destino es lectura humana y el manual no declara referencias ni slots `Ilustración N:`, el reporte marca amarillo para revisión humana. La sección de [comportamiento ante errores](#errores-comunes) detalla ese caso.
 
 **Regla práctica:** decide el destino del manual **antes** de elegir variante. Si el destino cambia (ej. "lo escribimos para humanos pero ahora lo va a leer un bot"), no agregues capturas; revisa primero si las que tienes aportan o si están obsoletas.
 
@@ -142,7 +142,7 @@ Entradas solo para la variante con capturas:
 La tentación es escribir una sola skill "manual-end-to-end". El problema es que mezcla dos lecturas (código fuente + manual ya redactado) y dos escrituras (markdown + spec de Playwright) en un solo contexto.
 
 - Mal: *una skill `documentar-modulo` que observa la UI, redacta el manual y al final escribe el spec con las capturas en el mismo prompt*. La ventana de contexto se llena de información que no aplica a todas las fases.
-- Bien: *`generar-manual` observa la UI y produce `.md`; `generar-capturas` solo lee ese `.md` y produce `.spec.ts` + `.png` cuando el destino lo requiere*. Cada skill carga únicamente las fuentes que necesita.
+- Bien: *`generar-manual` observa la UI y produce `.md`; `generar-capturas-manual` solo lee el contrato de imágenes de ese `.md`, produce `.spec.ts` + `.png` y normaliza referencias cuando el destino lo requiere*. Cada skill carga únicamente las fuentes que necesita.
 
 **Valor para el agente:** contextos limpios reducen alucinaciones. La skill de capturas no necesita saber qué validaciones tiene el backend — solo necesita saber qué pantallas referenciar y qué selectores usar.
 
@@ -150,8 +150,8 @@ La tentación es escribir una sola skill "manual-end-to-end". El problema es que
 
 El orquestador no asume que la fase anterior funcionó. Verifica con un check observable antes de pasar a la siguiente.
 
-- Mal: *`generar-manual-completo` llama a `generar-manual` y, sin verificar nada, llama a `generar-capturas`*. Si `generar-manual` falló a la mitad, el spec se escribe contra un manual incompleto y produce capturas que no corresponden.
-- Bien: *después de fase 1, el orquestador comprueba que `manuales/<modulo>/<NN-flujo>.md` existe y contiene procedimientos válidos. Si el manual declara referencias `![alt](.../NN.png)` y el destino requiere imágenes, ese conteo se vuelve el objetivo de capturas para fase 2. Si no, fase 2 se salta*.
+- Mal: *`generar-manual-completo` llama a `generar-manual` y, sin verificar nada, llama a `generar-capturas-manual`*. Si `generar-manual` falló a la mitad, el spec se escribe contra un manual incompleto y produce capturas que no corresponden.
+- Bien: *después de fase 1, el orquestador comprueba que `manuales/<modulo>/<NN-flujo>.md` existe y contiene procedimientos válidos. Si el manual declara referencias `![alt](.../NN.png)` o slots `Ilustración N:` y el destino requiere imágenes, ese conteo se vuelve el objetivo de capturas para fase 2. Si no hay contrato de imágenes y el destino tampoco las necesita, fase 2 se salta*.
 
 **Valor para el agente:** dependencias declaradas hacen reproducible la cadena. Si el orquestador se interrumpe en fase 2, otro agente puede retomar desde ahí leyendo el conteo en el manual.
 
@@ -201,7 +201,7 @@ La fase 2 (capturas), cuando aplica, depende de infraestructura externa: el dev 
   - *Fase 1 falla*: abortar (sin manual no hay nada que validar).
   - *Fase 2 no aplica*: saltar capturas y ejecutar fase 3 solo sobre el Markdown.
   - *Fase 2 falla por entorno (credenciales, dev server caído)*: saltar capturas, ejecutar fase 3 sobre el manual existente y reportar que las imágenes no se generaron por causa de entorno.
-  - *Fase 2 falla por código (selector roto)*: reportar el spec exacto y la línea, sugerir reabrir `/generar-capturas` después de arreglar.
+  - *Fase 2 falla por código (selector roto)*: reportar el spec exacto y la línea, sugerir reabrir `/generar-capturas-manual` después de arreglar.
 
 **Valor para el agente:** un orquestador robusto distingue las clases de fallo. Confundir "no hay credenciales" con "el spec está mal escrito" hace que el equipo arregle lo que no estaba roto.
 
@@ -213,9 +213,10 @@ Después de ejecutar `/generar-manual-completo <modulo> <NN-flujo>`:
 |-----------|--------------|---------------|----------|
 | Manual de usuario | `manuales/<modulo>/<NN-flujo>.md` | `generar-manual` | Todas las variantes |
 | Índice del módulo | `manuales/<modulo>/README.md` | `generar-manual` | Todas las variantes |
-| Capturas de pantalla | `imagenes/<modulo>/<NN-flujo>/*.png` | `generar-capturas` | Solo variante con E2E |
-| Spec ejecutable | `e2e-docs/specs/<NN-flujo>.spec.ts` | `generar-capturas` | Solo variante con E2E |
-| Script reutilizable | `package.json` → `docs:screenshots:<flujo>` | `generar-capturas` | Solo variante con E2E |
+| Referencias de imagen normalizadas | `manuales/<modulo>/<NN-flujo>.md` | `generar-capturas-manual` | Solo variante con E2E |
+| Capturas de pantalla | `imagenes/<modulo>/<NN-flujo>/*.png` | `generar-capturas-manual` | Solo variante con E2E |
+| Spec ejecutable | `e2e-docs/specs/<NN-flujo>.spec.ts` | `generar-capturas-manual` | Solo variante con E2E |
+| Script reutilizable | `package.json` → `docs:screenshots:<flujo>` | `generar-capturas-manual` | Solo variante con E2E |
 | Reporte de validación | Salida en consola | `generar-manual-completo` | Todas las variantes |
 
 En las variantes sin capturas (chatbot, sin UI, equipo sin infra E2E), las tres filas marcadas como "Solo variante con E2E" no se producen y el reporte de fase 3 valida únicamente reglas del Markdown. El reporte en consola es la única salida que no se versiona — vive el tiempo de la sesión y se reproduce volviendo a invocar el orquestador.
@@ -237,7 +238,7 @@ Bloque copiable que un agente puede usar para auditar un orquestador de manuales
 ```text
 Audita este orquestador (`generar-manual-completo`) y responde:
 
-1. ¿Las skills `generar-manual` y `generar-capturas` están desacopladas?
+1. ¿Las skills `generar-manual` y `generar-capturas-manual` están desacopladas?
    ¿La de capturas funciona contra cualquier .md que cumpla la convención
    de path o asume detalles internos del que produce `generar-manual`?
 
@@ -258,7 +259,7 @@ considerar el orquestador production-ready.
 ```
 
 :::tip Empieza por el orquestador, no por las skills
-La trampa común es escribir primero `generar-manual`, después `generar-capturas`, y descubrir al final que el orquestador no puede componerlas porque cada una asume cosas distintas sobre los paths o los argumentos. Diseña el contrato del orquestador (`/comando <modulo> <NN-flujo>`, fases, validaciones cruzadas) **antes** de escribir cada skill. Las skills se diseñan para encajar en ese contrato, no al revés.
+La trampa común es escribir primero `generar-manual`, después `generar-capturas-manual`, y descubrir al final que el orquestador no puede componerlas porque cada una asume cosas distintas sobre los paths o los argumentos. Diseña el contrato del orquestador (`/comando <modulo> <NN-flujo>`, fases, validaciones cruzadas) **antes** de escribir cada skill. Las skills se diseñan para encajar en ese contrato, no al revés.
 :::
 
 ## Puente al siguiente módulo
@@ -282,7 +283,7 @@ El siguiente paso natural está fuera de esta categoría: integrar el orquestado
 - Acceso E2E a credenciales del rol objetivo vía `.env` solo cuando el destino requiere capturas.
 
 **Pasos:**
-1. Separar lectura de redacción en skills distintas (`generar-manual` observa la UI, `generar-capturas` lee el manual).
+1. Separar lectura de redacción en skills distintas (`generar-manual` observa la UI, `generar-capturas-manual` lee solo el contrato de imágenes del manual).
 2. Encadenar con dependencia explícita: verificar artefactos observables antes de pasar de fase.
 3. Validar consistencia en una fase 3 dedicada (cruzar manual + imágenes), no dentro de cada skill.
 4. Reportar verde / amarillo / rojo con archivo y causa por cada error.
@@ -303,9 +304,9 @@ El siguiente paso natural está fuera de esta categoría: integrar el orquestado
 **Referencias cruzadas:**
 - [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md)
 - [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
-- [Skill `redactar-manual-usuario`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/redactar-manual-usuario.skill.md.example)
-- [Skill `generar-capturas-manual`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/generar-capturas-manual.skill.md.example)
-- [Skill `orquestador-manual-completo`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/orquestador-manual-completo.skill.md.example)
+- [Skill `generar-manual`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/generar-manual.skill.md)
+- [Skill `generar-capturas-manual`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/generar-capturas-manual.skill.md)
+- [Skill `generar-manual-completo`](https://github.com/10xGuatemala/bootcamp/blob/main/examples-md/agents/skills/general/generar-manual-completo.skill.md)
 
 </div>
 

@@ -187,6 +187,6 @@ Entregar un reporte estructurado:
 :::info Referencias primarias
 - [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación del versionado exigido en las dependencias.
 - [Conventional Commits 1.0.0](https://www.conventionalcommits.org/es/v1.0.0/) — convención recomendada para el mensaje del commit inicial y posteriores.
-- [6.7 De specs a proyecto real](../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo entrevista → scaffolding; este skill es la segunda mitad operativa.
-- [Skill `entrevista-specs`](./entrevista-specs.skill.md.example) — genera el contrato que este skill consume.
+- [6.7 De specs a proyecto real](../../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo entrevista → scaffolding; este skill es la segunda mitad operativa.
+- [Skill `entrevista-specs`](./entrevista-specs.skill.md) — genera el contrato que este skill consume.
 :::

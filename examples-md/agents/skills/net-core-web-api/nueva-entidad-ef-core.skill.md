@@ -32,7 +32,7 @@ Agregar una tabla parece trivial hasta que dos meses después alguien cambia un 
 
 ## Regla clave: Data Annotations sobre Fluent API
 
-El módulo [1.2.4 La Capa de Datos](../../../docs/desarrollo-web-y-movil/net-core-web-api/04-capa-datos.md) muestra las dos opciones: atributos en la clase (Data Annotations) o configuración en `OnModelCreating` (Fluent API). La preferencia es **Data Annotations**, por tres razones concretas:
+El módulo [1.2.4 La Capa de Datos](../../../../docs/desarrollo-web-y-movil/net-core-web-api/04-capa-datos.md) muestra las dos opciones: atributos en la clase (Data Annotations) o configuración en `OnModelCreating` (Fluent API). La preferencia es **Data Annotations**, por tres razones concretas:
 
 1. **La documentación vive junto al campo.** Cuando un desarrollador lee la clase, ve el tamaño, nullability y nombre de columna sin saltar a otro archivo.
 2. **El diff es local.** Un cambio en un campo toca una línea en la clase; en Fluent API, toca un archivo compartido que también configura otras entidades.
@@ -318,5 +318,5 @@ Salida: tabla con columnas "Regla", "Estado", "Diferencia", "Corrección sugerid
 - [EF Core · Relationships](https://learn.microsoft.com/en-us/ef/core/modeling/relationships) — modelado de FKs y cardinalidad.
 - [EF Core · Indexes](https://learn.microsoft.com/en-us/ef/core/modeling/indexes) — atributos `[Index]` y configuración avanzada.
 - [Martin Fowler · Database Refactoring](https://martinfowler.com/books/refactoringDatabases.html) — referencia clásica sobre evolución de esquemas.
-- [1.2.4 La Capa de Datos](../../../docs/desarrollo-web-y-movil/net-core-web-api/04-capa-datos.md) — módulo del bootcamp del que este skill es la versión operativa.
+- [1.2.4 La Capa de Datos](../../../../docs/desarrollo-web-y-movil/net-core-web-api/04-capa-datos.md) — módulo del bootcamp del que este skill es la versión operativa.
 :::

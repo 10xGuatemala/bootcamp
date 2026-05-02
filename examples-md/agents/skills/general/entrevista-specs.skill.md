@@ -101,7 +101,7 @@ El paso 15 es la salvaguarda contra el "mientras estamos acá, ¿podemos agregar
 
 ## Formato del specs.md generado
 
-Al cerrar el último bloque, genera un `specs.md` siguiendo la plantilla del proyecto (`examples-md/project/specs.md.example`). El contrato incluye:
+Al cerrar el último bloque, genera un `specs.md` siguiendo la plantilla del proyecto (`examples-md/project/specs.md`). El contrato incluye:
 
 - **Objetivo** del proyecto y usuarios.
 - **Stack** con versiones exactas.
@@ -166,5 +166,5 @@ Cada línea tiene un origen trazable en la entrevista. Nada "por decidir", nada 
 :::info Referencias primarias
 - [Diátaxis](https://diataxis.fr/) — marco que distingue tutorial, how-to, reference y explanation; útil para decidir qué tipo de documentación escribir sobre el proyecto generado.
 - [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación de versionado aplicable a `specs.md` y a las dependencias.
-- [6.7 De specs a proyecto real](../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo de entrevista → scaffolding del que este skill cubre la primera mitad.
+- [6.7 De specs a proyecto real](../../../../docs/colaboracion-con-agentes-ia/07-de-specs-a-proyecto-real.md) — módulo del bootcamp que describe el flujo completo de entrevista → scaffolding del que este skill cubre la primera mitad.
 :::

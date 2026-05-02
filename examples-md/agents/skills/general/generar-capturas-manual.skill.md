@@ -2,14 +2,14 @@
 
 ---
 name: generar-capturas-manual
-description: Skill OPCIONAL del patrón de generación de manuales. Genera el spec E2E (Playwright por defecto) que produce las capturas de pantalla referenciadas por un manual de usuario, las guarda en el path declarado por el manual y deja la suite ejecutable como un script reutilizable. Solo aplica cuando el manual va a leerse en un sitio web por humanos — saltar para manuales destinados a chatbots/RAG, productos sin UI o equipos sin infra E2E.
+description: Skill OPCIONAL del patrón de generación de manuales. Genera el spec E2E (Playwright por defecto) que produce las capturas declaradas por un manual de usuario, las guarda en el path declarado o convencional, normaliza las referencias de imagen del manual y deja la suite ejecutable como un script reutilizable. Solo aplica cuando el manual va a leerse en un sitio web por humanos — saltar para manuales destinados a chatbots/RAG, productos sin UI o equipos sin infra E2E.
 ---
 
 # Skill: generar-capturas-manual
 
 Las capturas de pantalla son la parte del manual que envejece más rápido y la primera que el lector humano usa para decidir si confiar en el documento. Si el manual dice "haz clic en **Emitir**" y la captura muestra un botón **Guardar**, el lector cierra el manual y abre soporte. Generar capturas a mano además multiplica el costo: 12 pantallas × 5 min × cada release = horas perdidas en algo que un agente puede automatizar.
 
-Este skill produce el código de un test E2E que recorre la app real, navega a cada pantalla referenciada por el manual y deja los `.png` en el directorio que el manual ya declara. El spec queda en el repo como ciudadano de primera clase: corre como cualquier otro test, falla si la UI cambia, y vive junto al código que captura.
+Este skill produce el código de un test E2E que recorre la app real, navega a cada pantalla declarada por el manual y deja los `.png` en el directorio acordado. Si el manual solo tenía slots `Ilustración N:`, actualiza esa zona con referencias Markdown (`![alt](path)`) y `alt` text verificable. El spec queda en el repo como ciudadano de primera clase: corre como cualquier otro test, falla si la UI cambia, y vive junto al código que captura.
 
 ## Soy opcional — primero decide si te necesito
 
@@ -23,7 +23,7 @@ Antes de invocarme, confirma que el manual realmente necesita capturas. No todos
 | Equipo sin infra E2E todavía | **Aún no** | Saltar; agregar capturas curadas a mano o esperar a tener Playwright/Cypress |
 | Manual de migración entre versiones | Solo de pantallas que cambiaron | Invocarme con la lista filtrada |
 
-Si el manual no tiene referencias `![alt](.../NN.png)`, ni siquiera me invoques: el orquestador `generar-manual-completo` salta automáticamente la fase 2 cuando el `.md` no las declara.
+Si el manual no tiene referencias `![alt](.../NN.png)` ni slots `Ilustración N:`, ni siquiera me invoques: el orquestador `generar-manual-completo` salta automáticamente la fase 2 cuando el `.md` no declara contrato de imágenes.
 
 ## Cuándo invocarme
 
@@ -37,7 +37,7 @@ Si el manual no tiene referencias `![alt](.../NN.png)`, ni siquiera me invoques:
 **No me uses para:**
 - Manuales destinados a chatbots o sistemas RAG — el modelo no consume imágenes; las descripciones literales del UI en el `.md` rinden mejor.
 - Productos sin UI (CLI, APIs, librerías) — no hay pantallas que capturar.
-- Redactar el manual — para eso, [`redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example).
+- Redactar el manual — para eso, [`generar-manual`](./generar-manual.skill.md).
 - Tests E2E funcionales (validar lógica de negocio); el spec que genero solo navega y captura, no asserta sobre datos.
 - Capturas creativas con anotaciones, flechas o resaltados — eso es trabajo de diseño, no de un agente.
 
@@ -51,7 +51,7 @@ Cuando este skill no aplica pero el equipo igual quiere "imágenes" en el manual
 
 ## Entradas
 
-1. **Manual destino** existente en disco con el formato canónico (referencias `![alt](.../NN.png)` activas y rutas del menú citadas como `Sección → Etiqueta`).
+1. **Manual destino** existente en disco con el formato canónico: referencias `![alt](.../NN.png)` activas o slots `Ilustración N:` para capturas pendientes, y rutas del menú citadas como `Sección → Etiqueta`.
 2. **Convenciones del proyecto** declaradas en `CLAUDE.md` o `AGENTS.md`: rutas base del frontend, librería de UI (shadcn, Material, Bootstrap), router (BrowserRouter, HashRouter, Next.js).
 3. **Acceso a credenciales** de un usuario con el rol objetivo, vía variables de entorno en un `.env` que el spec lee.
 4. **Estado del repo de docs**: path declarado para imágenes (`imagenes/<modulo>/<NN-flujo>/`) y nombres de archivo sugeridos por el manual.
@@ -60,8 +60,9 @@ Si el manual no existe todavía, debo pedirlo. Generar capturas sin manual previ
 
 ## Reglas obligatorias
 
-- **El manual es el contrato.** Solo genero capturas que el manual referencia con `![alt](.../NN.png)`. Si el manual no la pide, no la creo.
-- **Nombres de archivo idénticos al manual.** El spec usa exactamente los nombres que aparecen en el `.md`; no renombrar, no parametrizar.
+- **El manual es el contrato.** Solo genero capturas que el manual declara con `![alt](.../NN.png)` o `Ilustración N:`. Si el manual no la pide, no la creo.
+- **Nombres de archivo estables.** Si el manual ya declara `![alt](path)`, el spec usa exactamente ese nombre. Si solo declara `Ilustración N:`, genero un nombre determinístico (`NN-descripcion-kebab.png`) y actualizo el manual con esa referencia.
+- **Actualización acotada del manual.** Puedo modificar solo referencias de imagen: insertar `![alt](path)`, corregir `alt` text o ajustar una ruta al archivo generado. No reescribo pasos, resultados ni errores.
 - **Selectores estables primero.** `data-testid` cuando exista; después `getByRole`, `getByText` con `exact: true`. Selectores CSS frágiles (`.btn-primary > span`) prohibidos.
 - **Navegación por URL preferida sobre clicks de menú.** `page.goto('/ruta')` es más rápido y determinístico. Solo clickear el menú cuando la captura específicamente exige mostrarlo expandido.
 - **Sin retries especulativos.** Si un click no funciona, encontrar la causa raíz. `waitForLoadState('networkidle') + waitForTimeout(500)` antes de capturar; nada más.
@@ -131,13 +132,14 @@ El campo `screenshots` mapea claves semánticas a nombres de archivo. Eso evita 
 Antes de escribir spec, leer el `.md` del manual y extraer en una lista interna:
 
 1. Cada `![alt](.../NN-nombre.png)` con su orden y nombre de archivo exacto.
-2. Cada ruta de menú citada como `Sección → Etiqueta`.
-3. Cada referencia a un botón, dialog o tab que aparezca como **negrita** en los pasos del manual.
+2. Cada slot `Ilustración N: descripción` que todavía no tenga referencia Markdown.
+3. Cada ruta de menú citada como `Sección → Etiqueta`.
+4. Cada referencia a un botón, dialog o tab que aparezca como **negrita** en los pasos del manual.
 
 - Mal: *abrir la app y capturar lo que se vea importante*. El manual no referencia esas capturas y quedan huérfanas.
 - Bien: *armar la lista del manual primero; el spec solo cubre esa lista*.
 
-**Valor para el agente:** el manual es el contrato de imágenes, no la fuente del contenido del usuario. Si la lista del manual y la lista del spec no coinciden, hay un bug — manual desactualizado o spec inventado. Es detectable y arreglable.
+**Valor para el agente:** el manual es el contrato de imágenes, no la fuente del contenido del usuario. Si la lista del manual y la lista del spec no coinciden, hay un bug — manual desactualizado, slot sin resolver o spec inventado. Es detectable y arreglable.
 
 ### Paso 2: Mapear cada captura a su componente y selector
 
@@ -322,6 +324,7 @@ Agregar `e2e-docs/.env` al `.gitignore`. El `.env.example` sí se versiona.
 - Helpers en `e2e-docs/helpers/` (creados o actualizados según necesidad).
 - Script `docs:screenshots:<flujo>` agregado en `package.json`.
 - Imágenes generadas en el path declarado por el manual.
+- Manual actualizado solo en sus referencias de imagen cuando había slots pendientes o rutas/alt text inconsistentes.
 - Sin código de debugging residual (no `console.log`, no `page.pause()`, no `test.only`).
 
 ## Antes de entregar, verifico
@@ -335,6 +338,7 @@ Agregar `e2e-docs/.env` al `.gitignore`. El `.env.example` sí se versiona.
 - [ ] El test usa `test.skip` cuando faltan credenciales en `.env`.
 - [ ] El usuario del `.env` tiene los permisos del rol que el manual documenta (verificado contra el código de visibilidad).
 - [ ] Los nombres de archivo `.png` coinciden exactamente con los del manual.
+- [ ] Si había slots `Ilustración N:`, quedaron convertidos en referencias `![alt](path)` sin reescribir la prosa del manual.
 
 ## Errores comunes
 
@@ -366,7 +370,7 @@ Agregar `e2e-docs/.env` al `.gitignore`. El `.env.example` sí se versiona.
 - [Playwright — Locators](https://playwright.dev/docs/locators) — `getByRole`, `getByText`, `getByTestId` y cuándo usar cada uno.
 - [Testing Library — Guiding Principles](https://testing-library.com/docs/guiding-principles) — filosofía de "test the way the user uses it" que justifica priorizar roles ARIA sobre selectores CSS.
 - [WAI-ARIA Roles](https://www.w3.org/WAI/ARIA/apg/patterns/) — referencia de los roles semánticos que `getByRole` consume.
-- [Skill `redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example) — produce el manual `.md` que esta skill consume como contrato.
-- [Skill `orquestador-manual-completo`](./orquestador-manual-completo.skill.md.example) — orquestador que invoca `redactar-manual-usuario` y este skill en cadena, con validación cruzada al final.
-- [5.5 Generación de manuales con agentes](../../../docs/documentacion-y-requerimientos/05-generar-manuales-con-agentes.md) — módulo del bootcamp que describe el patrón de tres agentes; este skill es la pieza de capturas.
+- [Skill `generar-manual`](./generar-manual.skill.md) — produce el manual `.md` que esta skill consume como contrato.
+- [Skill `generar-manual-completo`](./generar-manual-completo.skill.md) — orquestador que invoca `generar-manual` y este skill en cadena, con validación cruzada al final.
+- [5.5 Generación de manuales con agentes](../../../../docs/documentacion-y-requerimientos/05-generar-manuales-con-agentes.md) — módulo del bootcamp que describe el patrón de tres agentes; este skill es la pieza de capturas.
 :::

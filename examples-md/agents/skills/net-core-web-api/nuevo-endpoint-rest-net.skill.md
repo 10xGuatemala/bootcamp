@@ -63,9 +63,9 @@ Cuando un recurso existe siempre dentro de otro, anida la ruta: `/api/empresas/{
 
 ## Decisión: ¿controlador → servicio → DbContext o controlador → DbContext?
 
-Antes de decidir, ubícate en el diagrama de [flujo de ejecución](./estructura-proyecto-net.skill.md.example#flujo-de-ejecución) del skill `estructura-proyecto-net`: el flujo principal pasa por el servicio; el atajo va directo del controlador al `DbContext`.
+Antes de decidir, ubícate en el diagrama de [flujo de ejecución](./estructura-proyecto-net.skill.md#flujo-de-ejecución) del skill `estructura-proyecto-net`: el flujo principal pasa por el servicio; el atajo va directo del controlador al `DbContext`.
 
-El módulo [1.2.1 Arquitectura de Backend API Rest en .NET Core](../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md) acepta los dos flujos. Aplica el simplificado solo si todas estas condiciones se cumplen:
+El módulo [1.2.1 Arquitectura de Backend API Rest en .NET Core](../../../../docs/desarrollo-web-y-movil/net-core-web-api/01-arquitectura-de-backend.md) acepta los dos flujos. Aplica el simplificado solo si todas estas condiciones se cumplen:
 
 - No hay reglas de negocio — solo persistencia directa.
 - El endpoint es único para ese recurso (no forma parte de un conjunto de operaciones relacionadas).
@@ -82,7 +82,7 @@ No crees capas de servicio "por si acaso". Un servicio con un solo método que s
 
 ## Naming y ubicación de archivos
 
-Los archivos que generes deben seguir el contrato del skill [`estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example). Tabla resumida de lo que aplica a un endpoint:
+Los archivos que generes deben seguir el contrato del skill [`estructura-proyecto-net`](./estructura-proyecto-net.skill.md). Tabla resumida de lo que aplica a un endpoint:
 
 | Archivo | Ubicación | Sufijo de clase | Ejemplo |
 |---|---|---|---|
@@ -345,7 +345,7 @@ Salida: tabla por endpoint con columnas "Regla", "Estado", "Corrección sugerida
 
 **Controlador delgado** *(Thin controller)* — controlador que recibe, valida forma, delega al servicio y retorna. Sin lógica de negocio. Patrón recomendado en [ASP.NET Core · Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/).
 
-**DTO** *(Data Transfer Object)* — objeto plano para transportar datos entre capas sin exponer la entidad de persistencia. Ver [1.2.2 La Capa de Controlador](../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md).
+**DTO** *(Data Transfer Object)* — objeto plano para transportar datos entre capas sin exponer la entidad de persistencia. Ver [1.2.2 La Capa de Controlador](../../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md).
 
 **Idempotencia** *(Idempotence)* — propiedad de una operación que produce el mismo resultado sin importar cuántas veces se ejecute. `GET`, `PUT` y `DELETE` son idempotentes; `POST` normalmente no. Definición en [RFC 9110 §9.2.2](https://www.rfc-editor.org/rfc/rfc9110.html#name-idempotent-methods).
 
@@ -360,7 +360,7 @@ Salida: tabla por endpoint con columnas "Regla", "Estado", "Corrección sugerida
 - [Microsoft · REST API design best practices](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design) — guía aplicada a Azure y .NET.
 - [Martin Fowler · Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html) — modelo clásico para evaluar madurez REST.
 - [ASP.NET Core · Web API controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/) — referencia oficial de controladores.
-- [1.2.2 La Capa de Controlador](../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md) y [1.2.3 La Capa de Servicios](../../../docs/desarrollo-web-y-movil/net-core-web-api/03-capa-servicios.md) — contexto del bootcamp del que este skill es la versión operativa.
-- [Skill `estructura-proyecto-net`](./estructura-proyecto-net.skill.md.example) — define carpetas, namespaces y naming que este skill consume al crear archivos.
-- [Skill `patrones-diseno-net`](./patrones-diseno-net.skill.md.example) — cuándo aplicar Strategy, Factory, Builder, Template Method o StateMachine cuando el servicio crece.
+- [1.2.2 La Capa de Controlador](../../../../docs/desarrollo-web-y-movil/net-core-web-api/02-capa-controlador.md) y [1.2.3 La Capa de Servicios](../../../../docs/desarrollo-web-y-movil/net-core-web-api/03-capa-servicios.md) — contexto del bootcamp del que este skill es la versión operativa.
+- [Skill `estructura-proyecto-net`](./estructura-proyecto-net.skill.md) — define carpetas, namespaces y naming que este skill consume al crear archivos.
+- [Skill `patrones-diseno-net`](./patrones-diseno-net.skill.md) — cuándo aplicar Strategy, Factory, Builder, Template Method o StateMachine cuando el servicio crece.
 :::

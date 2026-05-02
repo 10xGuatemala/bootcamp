@@ -20,7 +20,7 @@ Un release fallido a las 2 a.m. de un sábado casi nunca es por el código nuevo
 **No me uses para:**
 - Cortar el release — la decisión es humana, el skill solo reporta el estado.
 - Generar las notas del CHANGELOG — usa `release-notes`.
-- Definir el versionado correcto (PATCH vs MINOR vs MAJOR) — ver [5.2 Versionado semántico en equipos](../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md).
+- Definir el versionado correcto (PATCH vs MINOR vs MAJOR) — ver [5.2 Versionado semántico en equipos](../../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md).
 
 ## Entradas
 
@@ -245,6 +245,6 @@ Para parches que no pueden esperar al release regular:
 - [Keep a Changelog · 1.1.0](https://keepachangelog.com/es-ES/1.1.0/) — formato estándar de CHANGELOG.
 - [Semantic Versioning 2.0.0](https://semver.org/lang/es/) — especificación oficial de SemVer.
 - [The Twelve-Factor App](https://12factor.net/) — referencia sobre configuración por entorno, secretos y builds reproducibles.
-- [5.1 De la idea al release](../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — ciclo completo del que este skill cubre el cierre.
-- [5.2 Versionado semántico en equipos](../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md) — decisión del número de versión.
+- [5.1 De la idea al release](../../../../docs/documentacion-y-requerimientos/01-de-la-idea-al-release.md) — ciclo completo del que este skill cubre el cierre.
+- [5.2 Versionado semántico en equipos](../../../../docs/documentacion-y-requerimientos/02-versionado-semantico-en-equipos.md) — decisión del número de versión.
 :::

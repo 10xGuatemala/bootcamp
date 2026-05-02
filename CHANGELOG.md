@@ -4,19 +4,31 @@ Cambios de contenido del bootcamp público. Solo se listan adiciones y modificac
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.6.1 — 2026-05-01
+
+### Changed
+
+- **Skills de manuales** — nombres y contratos alineados con el módulo 5.5: `generar-manual-completo.skill.md` es el orquestador, `generar-manual` declara contrato de imágenes cuando aplica y `generar-capturas-manual` actualiza solo referencias de imagen.
+- **`examples-md/`** — los ejemplos Markdown quedan como archivos `.md` directamente copiables, sin sufijo `.example`.
+
+### Fixed
+
+- **5.5 Generación de manuales con agentes** — corrige inconsistencias entre diagrama, variantes y skills copiables.
+- **Referencias cruzadas de skills** — enlaces relativos corregidos hacia módulos reales de `docs/`.
+
 ## 3.6.0 — 2026-05-01
 
 ### Added
 
 - **5.5 Generación de manuales con agentes** — nuevo módulo de Documentación y Requerimientos que explica cómo orquestar agentes para producir manuales de usuario desde la UI real.
 - **Skills copiables nuevas para manuales** en `examples-md/agents/skills/general/`:
-  - `generar-capturas-manual.skill.md.example` — produce capturas versionadas solo cuando el destino del manual las necesita.
-  - `orquestador-manual-completo.skill.md.example` — coordina manual Markdown, capturas opcionales y validación final.
+  - `generar-capturas-manual.skill.md` — produce capturas versionadas solo cuando el destino del manual las necesita.
+  - `generar-manual-completo.skill.md` — coordina manual Markdown, capturas opcionales y validación final.
 
 ### Changed
 
 - **5.3 Manuales de usuario final** — mejora la explicación de audiencias, fuentes y trazabilidad: el manual se redacta desde la UI real entregada por un release/requerimiento. La plantilla reusable ahora incluye información del documento, flujo de trabajo, tabla de contenido, acceso, secciones visibles, pasos, resultado esperado, errores comunes, soporte e historial.
-- **Skill `redactar-manual-usuario`** — actualizada para dejar claro que requerimientos, notas de release y tickets son disparadores de revisión, no fuentes del contenido; la fuente del contenido es la UI real o capturas literales.
+- **Skill `generar-manual`** — actualizada para dejar claro que requerimientos, notas de release y tickets son disparadores de revisión, no fuentes del contenido; la fuente del contenido es la UI real o capturas literales.
 - **Ejemplos .NET Web API** — ejemplos de nombres de proyecto, bootstrap modular y patrones actualizados con nombres genéricos copiables.
 - **`examples-md/README.md`** — refleja las nuevas skills de manuales en el árbol de ejemplos.
 
@@ -26,9 +38,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/
 
 - **6.7 De specs a proyecto real** — nuevo módulo que cierra la ruta 6 (colaboración con agentes). Describe el flujo de arranque guiado (entrevista → contrato `specs.md` → scaffolding reproducible) con los cinco bloques ordenados (Objetivo → Stack → Estructura → Operación → Alcance) y la regla cardinal "una pregunta a la vez".
 - **Reorganización de skills copiables** en `examples-md/agents/skills/`, ahora por dominio:
-  - **`general/`** (agnósticas de stack): `code-review`, `release-notes`, `redactar-manual-usuario`, `revisar-hallazgo-sast`, `entrevista-specs`, `scaffolding-desde-specs`, `escribir-slash-command`.
+  - **`general/`** (agnósticas de stack): `code-review`, `release-notes`, `generar-manual`, `revisar-hallazgo-sast`, `entrevista-specs`, `scaffolding-desde-specs`, `escribir-slash-command`.
   - **`net-core-web-api/`** (curso 1.2): `estructura-proyecto-net`, `nuevo-endpoint-rest-net`, `nueva-entidad-ef-core`, `patrones-diseno-net`, `checklist-produccion-net`.
-- **Plantillas nuevas en `examples-md/project/`:** `specs.md.example` (contrato de arranque, Actividad 0) y `release-requirements.md.example` (requerimientos por versión, release-centric, con variante multi-repo para productos API + Web + BD).
+- **Plantillas nuevas en `examples-md/project/`:** `specs.md` (contrato de arranque, Actividad 0) y `release-requirements.md` (requerimientos por versión, release-centric, con variante multi-repo para productos API + Web + BD).
 - **Tips copiables cruzados** en 6.3 Arquitectura orientada a skills, 1.2 index (net-core-web-api), 4.5 SAST/SCA en validación, 5.2 Versionado semántico en equipos y 5.3 Manuales de usuario final — enlazan a las skills y plantillas correspondientes del repo público.
 
 ### Changed

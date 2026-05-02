@@ -1,11 +1,11 @@
-<!-- Destino sugerido: .claude/skills/orquestador-manual-completo.skill.md -->
+<!-- Destino sugerido: .claude/skills/generar-manual-completo.skill.md -->
 
 ---
-name: orquestador-manual-completo
-description: Orquesta de extremo a extremo la generación y validación de un manual de usuario. Invoca `redactar-manual-usuario` para producir el `.md`; si el destino requiere imágenes, invoca `generar-capturas-manual`; al final reporta verde / amarillo / rojo. No redacta ni captura por sí mismo; coordina y valida.
+name: generar-manual-completo
+description: Orquesta de extremo a extremo la generación y validación de un manual de usuario. Invoca `generar-manual` para producir el `.md`; si el destino requiere imágenes, invoca `generar-capturas-manual`; al final reporta verde / amarillo / rojo. No redacta ni captura por sí mismo; coordina y valida.
 ---
 
-# Skill: orquestador-manual-completo
+# Skill: generar-manual-completo
 
 Generar un manual completo es una cadena de pasos: redactar, decidir si hacen falta capturas y validar. Cuando un humano la hace a mano, los pasos pierden coherencia entre sí — una sección cita un botón **Emitir** que la UI ya no muestra, o un spec genera una imagen que el manual nunca referencia. Cada artefacto se ve bien por separado y la suma es un manual roto.
 
@@ -20,8 +20,8 @@ Este skill resuelve la cadena con un agente coordinador. Su única responsabilid
 - Un equipo nuevo adopta el patrón de tres agentes y necesita un punto de entrada único.
 
 **No me uses para:**
-- Redactar un único procedimiento aislado — usa [`redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example) directamente.
-- Generar solo capturas para un manual ya escrito — usa [`generar-capturas-manual`](./generar-capturas-manual.skill.md.example) directamente.
+- Redactar un único procedimiento aislado — usa [`generar-manual`](./generar-manual.skill.md) directamente.
+- Generar solo capturas para un manual ya escrito — usa [`generar-capturas-manual`](./generar-capturas-manual.skill.md) directamente.
 - Validar un manual existente sin regenerarlo (auditoría pura) — eso amerita un skill `validar-manual` aparte.
 
 ## Diseño
@@ -43,7 +43,7 @@ Antes de invocar las fases, identifico el destino del manual y elijo el modo:
 | Producto sin UI (CLI, API, librería) | **Solo Markdown** | Fase 1 + Fase 3 (solo reglas del `.md`) |
 | Equipo sin infra E2E aún | **Solo Markdown** | Fase 1 + Fase 3; capturas a mano si las quieren |
 
-**Heurística automática:** si el `.md` producido en fase 1 no contiene ninguna referencia `![alt](.../NN.png)`, salto la fase 2 sin pedir confirmación. Si contiene referencias pero el usuario indicó destino "chatbot", advierto y sugiero quitar las referencias del manual antes de generar imágenes que nadie va a consumir.
+**Heurística automática:** si el `.md` producido en fase 1 no contiene referencias `![alt](.../NN.png)` ni slots `Ilustración N:`, salto la fase 2 sin pedir confirmación cuando el destino es Solo Markdown. Si contiene contrato de imágenes pero el usuario indicó destino "chatbot", advierto y sugiero quitar esas referencias antes de generar imágenes que nadie va a consumir. Si el destino es lectura humana y no hay contrato de imágenes, marco amarillo para revisión humana.
 
 Multi-agente (opcional): las fases 1 y 2 son delegables a sub-agentes para mantener limpio el contexto principal. La fase 3 (validación) se queda en el contexto principal porque cruza ambos artefactos.
 
@@ -74,7 +74,7 @@ Si falta el flujo (`<NN-flujo>`), preguntar antes de continuar. Este skill produ
 
 ### Fase 1 — Generar el manual
 
-Invocar [`redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example) con los argumentos recibidos. Esta skill produce o actualiza:
+Invocar [`generar-manual`](./generar-manual.skill.md) con los argumentos recibidos. Esta skill produce o actualiza:
 
 - `manuales/<modulo>/<NN-flujo>.md`
 - `manuales/<modulo>/README.md` (si corresponde)
@@ -83,25 +83,27 @@ Antes de pasar a la fase 2, verificar:
 
 - El archivo `<NN-flujo>.md` existe.
 - Contiene al menos un procedimiento con la estructura obligatoria: tarea concreta, precondiciones, pasos, resultado esperado y recuperación ante errores.
-- Contar cuántas referencias `![alt](.../NN.png)` hay en el cuerpo. Ese conteo es el objetivo de capturas para fase 2.
+- Contar cuántas referencias `![alt](.../NN.png)` o slots `Ilustración N:` hay en el cuerpo. Ese conteo es el objetivo de capturas para fase 2.
 
 Si la fase 1 falla o el archivo no se escribe, **abortar** y reportar el error específico al usuario.
 
 ### Fase 2 — Generar las capturas (opcional)
 
-**Antes de invocar:** si el `.md` de fase 1 no contiene referencias `![alt](.../NN.png)`, saltar esta fase y pasar directamente a fase 3. El reporte final lo indica con un mensaje informativo: *"Manual sin capturas: variante Markdown puro (chatbot, sin UI o curado a mano)"*.
+**Antes de invocar:** si el `.md` de fase 1 no contiene referencias `![alt](.../NN.png)` ni slots `Ilustración N:`, saltar esta fase y pasar directamente a fase 3 cuando el destino no requiere imágenes. El reporte final lo indica con un mensaje informativo: *"Manual sin capturas: variante Markdown puro (chatbot, sin UI o curado a mano)"*. Si el destino sí es lectura humana, reportar amarillo porque puede faltar apoyo visual.
 
-Si el manual sí declara imágenes, invocar [`generar-capturas-manual`](./generar-capturas-manual.skill.md.example) con los mismos argumentos. Esta skill produce o actualiza:
+Si el manual sí declara contrato de imágenes, invocar [`generar-capturas-manual`](./generar-capturas-manual.skill.md) con los mismos argumentos. Esta skill produce o actualiza:
 
 - `e2e-docs/specs/<NN-flujo>.spec.ts`
 - (Si era necesario) infraestructura base en `e2e-docs/` (helpers, config, .env.example).
 - (Si era necesario) script `docs:screenshots:<flujo>` en `package.json`.
 - Imágenes en `imagenes/<modulo>/<NN-flujo>/`.
+- El manual actualizado solo en referencias de imagen cuando había slots pendientes o rutas/alt text inconsistentes.
 
 Antes de pasar a la fase 3, verificar:
 
 - El spec corrió limpio (`exit 0`, `1 passed`).
 - Los `.png` esperados (los que el manual referencia) existen en disco.
+- Los slots `Ilustración N:` quedaron resueltos como referencias `![alt](path)` cuando aplica.
 
 Si la fase 2 falla por entorno (credenciales faltantes, dev server no arranca, base de datos sin sembrar), reportar el problema sin abortar la fase 3 — la validación del manual sigue siendo útil aunque las capturas fallen.
 
@@ -122,7 +124,7 @@ Esta es la fase que justifica que esta skill exista. Cruzo ambos artefactos:
    - No se citan detalles internos de código o archivos técnicos en el cuerpo del manual.
 4. **Spec y script registrados** *(solo modo completo)*: `e2e-docs/specs/<NN-flujo>.spec.ts` existe y `package.json` tiene `docs:screenshots:<NN-flujo-corto>`. En modo "Solo Markdown" esta validación se omite.
 
-5. **Coherencia con el destino declarado**: si el destino es chatbot/RAG y el manual igual contiene `![alt]`, marcar como rojo y sugerir quitar las referencias. Si el destino es humanos y el manual no tiene ninguna captura, marcar como amarillo (puede ser intencional, pero conviene confirmar).
+5. **Coherencia con el destino declarado**: si el destino es chatbot/RAG y el manual igual contiene `![alt]` o slots `Ilustración N:`, marcar como rojo y sugerir quitar las referencias. Si el destino es humanos y el manual no tiene ninguna captura ni slot, marcar como amarillo (puede ser intencional, pero conviene confirmar).
 
 **Validaciones recomendadas** (amarillo si fallan):
 
@@ -179,7 +181,7 @@ Mantener el reporte conciso. No volver a explicar las reglas — solo decir cuá
 ### Modo completo (sitio web para humanos)
 
 ```text
-Usando el skill orquestador-manual-completo, genera y valida el manual
+Usando el skill generar-manual-completo, genera y valida el manual
 del flujo `02-cotizaciones` del módulo `ventas`.
 ```
 
@@ -224,7 +226,7 @@ Salida esperada (con errores accionables):
 ### Modo Solo Markdown (chatbot, sin UI o curado a mano)
 
 ```text
-Usando el skill orquestador-manual-completo, genera y valida el manual
+Usando el skill generar-manual-completo, genera y valida el manual
 del flujo `02-cotizaciones` del módulo `ventas`. Destino: chatbot
 interno (RAG sobre el catálogo de manuales). No generes capturas.
 ```
@@ -286,7 +288,7 @@ Salida esperada:
 :::info Referencias primarias
 - [Anthropic — Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — patrones de orquestación (prompt chaining, orchestrator-workers, evaluator-optimizer) y cuándo usar cada uno.
 - [Anthropic — Multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — estudio de un orquestador real coordinando sub-agentes.
-- [Skill `redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example) — fase 1 del orquestador.
-- [Skill `generar-capturas-manual`](./generar-capturas-manual.skill.md.example) — fase 2 del orquestador.
-- [5.5 Generación de manuales con agentes](../../../docs/documentacion-y-requerimientos/05-generar-manuales-con-agentes.md) — módulo del bootcamp que describe el patrón de tres agentes; este skill es el orquestador.
+- [Skill `generar-manual`](./generar-manual.skill.md) — fase 1 del orquestador.
+- [Skill `generar-capturas-manual`](./generar-capturas-manual.skill.md) — fase 2 del orquestador.
+- [5.5 Generación de manuales con agentes](../../../../docs/documentacion-y-requerimientos/05-generar-manuales-con-agentes.md) — módulo del bootcamp que describe el patrón de tres agentes; este skill es el orquestador.
 :::
