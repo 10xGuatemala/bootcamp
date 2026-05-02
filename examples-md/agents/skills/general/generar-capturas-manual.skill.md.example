@@ -1,0 +1,372 @@
+<!-- Destino sugerido: .claude/skills/generar-capturas-manual.skill.md -->
+
+---
+name: generar-capturas-manual
+description: Skill OPCIONAL del patrón de generación de manuales. Genera el spec E2E (Playwright por defecto) que produce las capturas de pantalla referenciadas por un manual de usuario, las guarda en el path declarado por el manual y deja la suite ejecutable como un script reutilizable. Solo aplica cuando el manual va a leerse en un sitio web por humanos — saltar para manuales destinados a chatbots/RAG, productos sin UI o equipos sin infra E2E.
+---
+
+# Skill: generar-capturas-manual
+
+Las capturas de pantalla son la parte del manual que envejece más rápido y la primera que el lector humano usa para decidir si confiar en el documento. Si el manual dice "haz clic en **Emitir**" y la captura muestra un botón **Guardar**, el lector cierra el manual y abre soporte. Generar capturas a mano además multiplica el costo: 12 pantallas × 5 min × cada release = horas perdidas en algo que un agente puede automatizar.
+
+Este skill produce el código de un test E2E que recorre la app real, navega a cada pantalla referenciada por el manual y deja los `.png` en el directorio que el manual ya declara. El spec queda en el repo como ciudadano de primera clase: corre como cualquier otro test, falla si la UI cambia, y vive junto al código que captura.
+
+## Soy opcional — primero decide si te necesito
+
+Antes de invocarme, confirma que el manual realmente necesita capturas. No todos los proyectos las requieren:
+
+| Destino del manual | ¿Necesita capturas? | Acción |
+|--------------------|---------------------|--------|
+| Sitio web leído por humanos | Sí | Invocarme |
+| Chatbot, RAG, soporte automatizado | **No** — el modelo lee texto, no imágenes | Saltar; bastan las descripciones literales del UI en el `.md` |
+| Producto sin UI (CLI, API, librería) | **No** — no hay pantallas | Saltar; usar bloques de código en el `.md` |
+| Equipo sin infra E2E todavía | **Aún no** | Saltar; agregar capturas curadas a mano o esperar a tener Playwright/Cypress |
+| Manual de migración entre versiones | Solo de pantallas que cambiaron | Invocarme con la lista filtrada |
+
+Si el manual no tiene referencias `![alt](.../NN.png)`, ni siquiera me invoques: el orquestador `generar-manual-completo` salta automáticamente la fase 2 cuando el `.md` no las declara.
+
+## Cuándo invocarme
+
+Úsame cuando:
+- Existe un manual de usuario en `manuales/<modulo>/<NN-flujo>.md` con referencias `![alt](.../NN.png)` a imágenes que aún no existen.
+- El destino del manual son humanos leyendo en un sitio web (no un chatbot).
+- Se libera una versión nueva y las capturas del manual quedaron desactualizadas; necesitas regenerarlas.
+- Se inicia un módulo nuevo y hay que crear la infraestructura E2E para capturas.
+- El equipo quiere convertir un proceso manual de "tomar capturas con shift+cmd+4" en un spec versionado.
+
+**No me uses para:**
+- Manuales destinados a chatbots o sistemas RAG — el modelo no consume imágenes; las descripciones literales del UI en el `.md` rinden mejor.
+- Productos sin UI (CLI, APIs, librerías) — no hay pantallas que capturar.
+- Redactar el manual — para eso, [`redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example).
+- Tests E2E funcionales (validar lógica de negocio); el spec que genero solo navega y captura, no asserta sobre datos.
+- Capturas creativas con anotaciones, flechas o resaltados — eso es trabajo de diseño, no de un agente.
+
+## Variantes alternativas si no soy aplicable
+
+Cuando este skill no aplica pero el equipo igual quiere "imágenes" en el manual, las opciones son:
+
+- **Capturas curadas a mano:** una persona toma la captura, la guarda en el path declarado por el manual, sin spec. Útil mientras se monta la infra E2E. La mantenibilidad cae a la primera versión nueva.
+- **Capturas con otra herramienta:** Cypress, Selenium, Puppeteer. La estructura del spec cambia pero el contrato sigue igual: leer el manual, mapear pantallas, generar `.png` en el path declarado. Adaptar los helpers al runner elegido.
+- **Diagramas en lugar de capturas:** para flujos abstractos, un diagrama Mermaid (`flowchart`, `sequenceDiagram`) en el `.md` puede sustituir varias capturas. No requiere infra ni envejece con la UI.
+
+## Entradas
+
+1. **Manual destino** existente en disco con el formato canónico (referencias `![alt](.../NN.png)` activas y rutas del menú citadas como `Sección → Etiqueta`).
+2. **Convenciones del proyecto** declaradas en `CLAUDE.md` o `AGENTS.md`: rutas base del frontend, librería de UI (shadcn, Material, Bootstrap), router (BrowserRouter, HashRouter, Next.js).
+3. **Acceso a credenciales** de un usuario con el rol objetivo, vía variables de entorno en un `.env` que el spec lee.
+4. **Estado del repo de docs**: path declarado para imágenes (`imagenes/<modulo>/<NN-flujo>/`) y nombres de archivo sugeridos por el manual.
+
+Si el manual no existe todavía, debo pedirlo. Generar capturas sin manual previo produce imágenes huérfanas que nadie referencia.
+
+## Reglas obligatorias
+
+- **El manual es el contrato.** Solo genero capturas que el manual referencia con `![alt](.../NN.png)`. Si el manual no la pide, no la creo.
+- **Nombres de archivo idénticos al manual.** El spec usa exactamente los nombres que aparecen en el `.md`; no renombrar, no parametrizar.
+- **Selectores estables primero.** `data-testid` cuando exista; después `getByRole`, `getByText` con `exact: true`. Selectores CSS frágiles (`.btn-primary > span`) prohibidos.
+- **Navegación por URL preferida sobre clicks de menú.** `page.goto('/ruta')` es más rápido y determinístico. Solo clickear el menú cuando la captura específicamente exige mostrarlo expandido.
+- **Sin retries especulativos.** Si un click no funciona, encontrar la causa raíz. `waitForLoadState('networkidle') + waitForTimeout(500)` antes de capturar; nada más.
+- **Un spec por flujo del manual.** Mismo numerador (`02-cotizaciones.md` ↔ `02-cotizaciones.spec.ts`), mismo módulo, misma carpeta destino de imágenes.
+- **Helpers compartidos antes que duplicar.** `loginAs`, `waitForPageReady`, `dismissToasts`, `dialogByHeader` viven en `helpers/` y se reusan.
+
+## Estructura obligatoria del spec
+
+Cada spec sigue este esqueleto, sin excepciones:
+
+```typescript
+import { expect, test } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { getRoleCredentials } from '../helpers/env';
+import { loginAs } from '../helpers/auth';
+import { closeDialog, dialogByHeader } from '../helpers/dialog';
+import { makeCapture, waitForPageReady } from '../helpers/page';
+
+const repoRoot = path.resolve(__dirname, '../../..');
+const screenshotsDir = path.join(
+  repoRoot,
+  '<docs-repo>/imagenes/<modulo>/<NN-flujo>',
+);
+const credentials = getRoleCredentials('DEFAULT');
+const capture = makeCapture(screenshotsDir);
+
+const screenshots = {
+  pantallaPrincipal: '01-pantalla-principal.png',
+  formularioNuevo: '02-formulario-nuevo.png',
+  // un campo por archivo .png referenciado en el manual, en orden
+} as const;
+
+test.describe('Manual <Módulo> - <Flujo>', () => {
+  test.skip(
+    !credentials.user || !credentials.password,
+    'Defina las credenciales en .env para generar capturas.',
+  );
+
+  test.beforeEach(async () => {
+    fs.mkdirSync(screenshotsDir, { recursive: true });
+  });
+
+  test('genera capturas de <flujo>', async ({ page }) => {
+    await loginAs(page, 'DEFAULT');
+
+    // Captura 1: pantalla principal
+    await page.goto('/ruta');
+    await capture(page, screenshots.pantallaPrincipal);
+
+    // Captura 2: formulario nuevo (vía click)
+    await page.getByRole('button', { name: 'Nuevo', exact: true }).click();
+    await expect(dialogByHeader(page, 'Crear nuevo')).toBeVisible();
+    await page.waitForTimeout(400); // animación del dialog
+    await capture(page, screenshots.formularioNuevo);
+    await closeDialog(page, 'Crear nuevo');
+  });
+});
+```
+
+El campo `screenshots` mapea claves semánticas a nombres de archivo. Eso evita strings duplicados y permite renombrar el archivo en un solo lugar.
+
+## Pasos para generar capturas
+
+### Paso 1: Leer el manual destino y extraer el contrato
+
+Antes de escribir spec, leer el `.md` del manual y extraer en una lista interna:
+
+1. Cada `![alt](.../NN-nombre.png)` con su orden y nombre de archivo exacto.
+2. Cada ruta de menú citada como `Sección → Etiqueta`.
+3. Cada referencia a un botón, dialog o tab que aparezca como **negrita** en los pasos del manual.
+
+- Mal: *abrir la app y capturar lo que se vea importante*. El manual no referencia esas capturas y quedan huérfanas.
+- Bien: *armar la lista del manual primero; el spec solo cubre esa lista*.
+
+**Valor para el agente:** el manual es el contrato de imágenes, no la fuente del contenido del usuario. Si la lista del manual y la lista del spec no coinciden, hay un bug — manual desactualizado o spec inventado. Es detectable y arreglable.
+
+### Paso 2: Mapear cada captura a su componente y selector
+
+Para cada item de la lista del paso 1, identificar:
+
+- **Ruta del menú** y **`href`** correspondiente en la fuente autoritativa del menú lateral del proyecto (ej. `navigationSections` en React, configuración de `routes` en Vue, etc.).
+- **Componente destino** siguiendo el router de la app.
+- **Selectores estables** del componente, en este orden de preferencia:
+  1. `data-testid` específico del elemento.
+  2. `getByRole('heading', { name: 'Texto exacto' })` o equivalente ARIA.
+  3. `getByText('Texto', { exact: true })`.
+  4. Selector CSS solo como último recurso, scopeado al contenedor correcto.
+
+- Mal: *`page.locator('.modal .btn-success')`*. Frágil; cualquier refactor de CSS lo rompe.
+- Bien: *`page.getByRole('dialog').getByRole('button', { name: /confirmar/i })`*. Resiste cambios de estilo y solo falla si el rol semántico cambia.
+
+**Valor para el agente:** los selectores estables son el contrato entre la UI y el spec. Mientras la UI mantenga roles semánticos correctos, el spec sobrevive a refactors de estilo.
+
+### Paso 3: Confirmar que el rol del `.env` puede ver lo que el manual documenta
+
+El manual está escrito desde la perspectiva de un rol concreto (Administrador, Operador, etc.). Si las credenciales del `.env` no tienen ese rol, las capturas mostrarán pantallas vacías o botones ocultos.
+
+- Mal: *generar capturas con un usuario "DEFAULT" sin verificar permisos; las capturas salen sin el botón **Eliminar** que el manual documenta*.
+- Bien: *leer el código de visibilidad (`<PermissionGate requiredPermissions={['x.write']}>`, guards de ruta, `[Authorize(Roles="...")]`) y confirmar que el usuario del `.env` cumple. Si no, abortar y pedir credenciales del rol correcto*.
+
+**Valor para el agente:** una captura "correcta" pero sin la acción que el manual documenta es peor que una captura faltante — engaña al lector haciéndole creer que la opción no existe.
+
+### Paso 4: Aplicar las reglas de captura según el tipo de pantalla
+
+No todas las capturas se hacen igual. El spec las clasifica:
+
+- **Pantalla principal** (lista, dashboard): `page.goto('/ruta')` + `capture`. Una línea, una imagen.
+- **Dialog** (modal de creación, confirmación): click en el botón disparador + `expect(dialogByHeader).toBeVisible()` + `waitForTimeout(300-500)` por la animación + `capture` + `closeDialog`.
+- **Dropdown** (select abierto, menú contextual): abrir + esperar `[role="listbox"]` o `[data-radix-popper-content-wrapper]` visible + `capture` **antes** de seleccionar (la selección lo cierra).
+- **Estado de error**: provocar el error con datos inválidos + esperar el toast/inline error + `capture` + limpiar.
+
+- Mal: *capturar el dropdown después de hacer click en una opción*. El dropdown ya se cerró; la captura sale sin él.
+- Bien: *abrir → esperar visible → capturar → después seleccionar*.
+
+**Valor para el agente:** clasificar por tipo permite reusar patrones probados y evita reinventar selectores frágiles para cada caso.
+
+### Paso 5: Crear o reusar los helpers compartidos
+
+Antes de escribir código duplicado en el spec, revisar los helpers en `e2e-docs/helpers/`. Si no existen, crearlos.
+
+Helpers base mínimos:
+
+| Helper | Funciones |
+|--------|-----------|
+| `auth.ts` | `loginAs(page, role)`, `ensureLoggedIn(page)` |
+| `env.ts` | `getRoleCredentials(role)` — lee `.env` con prefijo por rol |
+| `page.ts` | `waitForPageReady(page)`, `dismissToasts(page)`, `makeCapture(dir)` |
+| `dialog.ts` | `dialogByHeader(page, header)`, `closeDialog(page, header)` |
+| `menu.ts` | `navigateToMenu(page, sectionLabel, itemLabel)` |
+
+Si una función nueva va a servir a más de un spec, agregarla al helper correspondiente. Nunca duplicar `loginAs` en un spec.
+
+**Valor para el agente:** los helpers son la API estable que todos los specs comparten. Si el flujo de login cambia, se actualiza en un solo lugar y todos los specs siguen funcionando.
+
+### Paso 6: Registrar el script en `package.json`
+
+Cada spec corresponde a un script invocable:
+
+```json
+"scripts": {
+  "docs:screenshots:cotizaciones": "playwright test -c e2e-docs/playwright.config.ts 02-cotizaciones.spec.ts"
+}
+```
+
+Convención: `docs:screenshots:<nombre-corto>`, donde el nombre corto es el del flujo sin el numerador. Permite invocar la regeneración aislada de un flujo: `pnpm run docs:screenshots:cotizaciones`.
+
+**Valor para el agente:** el script es la interfaz pública de la skill. Cualquier desarrollador (o el orquestador) puede regenerar las capturas sin saber dónde vive el spec.
+
+### Paso 7: Correr y validar el resultado
+
+Después de escribir el spec, ejecutarlo y verificar cuatro cosas:
+
+1. **El test pasa**: `exit 0`, `1 passed`. Si falla, arreglar el spec; nunca dejar un spec rojo merged.
+2. **Las imágenes esperadas existen**: cada `.png` que el manual referencia está en `imagenes/<modulo>/<NN-flujo>/`.
+3. **Bytes distintos**: dos `.png` que deberían mostrar pantallas distintas no pueden pesar **exactamente** lo mismo. Si pasa, probablemente la segunda captura es una copia de la primera.
+4. **Inspección visual** rápida: abrir 2–3 imágenes y confirmar que muestran lo que el alt-text promete.
+
+**Valor para el agente:** la validación post-corrida es lo único que distingue una skill que genera capturas de una que genera basura silenciosamente.
+
+## Crear infraestructura si no existe
+
+Si la carpeta `e2e-docs/` no existe, crearla con:
+
+### `e2e-docs/playwright.config.ts`
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './specs',
+  timeout: 60_000,
+  use: {
+    baseURL: process.env.DOCS_BASE_URL || 'http://localhost:5173',
+    screenshot: 'off',
+    video: 'off',
+  },
+  projects: [
+    {
+      name: 'docs-screenshots',
+      use: { browserName: 'chromium', viewport: { width: 1440, height: 900 } },
+    },
+  ],
+});
+```
+
+### `e2e-docs/helpers/env.ts`
+
+```typescript
+import dotenv from 'dotenv';
+import path from 'node:path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+export function getRoleCredentials(role: string) {
+  const prefix = `DOCS_${role.toUpperCase()}`;
+  return {
+    user: process.env[`${prefix}_USER`] || process.env['DOCS_USER'] || '',
+    password: process.env[`${prefix}_PASSWORD`] || process.env['DOCS_PASSWORD'] || '',
+  };
+}
+```
+
+### `e2e-docs/helpers/page.ts`
+
+```typescript
+import type { Page } from '@playwright/test';
+import path from 'node:path';
+
+export async function waitForPageReady(page: Page) {
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(500);
+}
+
+export async function dismissToasts(page: Page) {
+  // Adaptar al sistema de toasts del proyecto (sonner, react-hot-toast, etc.)
+  const toasts = page.locator('[data-sonner-toast], [role="status"]');
+  const count = await toasts.count();
+  for (let i = 0; i < count; i++) {
+    const closeBtn = toasts.nth(i).locator('button[aria-label="Close"]');
+    if (await closeBtn.isVisible()) await closeBtn.click();
+  }
+}
+
+export function makeCapture(screenshotsDir: string) {
+  return async (page: Page, filename: string) => {
+    await waitForPageReady(page);
+    await dismissToasts(page);
+    await page.screenshot({
+      path: path.join(screenshotsDir, filename),
+      fullPage: false,
+    });
+  };
+}
+```
+
+### `e2e-docs/.env.example`
+
+```env
+DOCS_BASE_URL=http://localhost:5173
+DOCS_USER=admin@example.com
+DOCS_PASSWORD=cambia-esto
+```
+
+Agregar `e2e-docs/.env` al `.gitignore`. El `.env.example` sí se versiona.
+
+## Lecciones aprendidas (no repetir)
+
+- **Scope los selectores al contenedor correcto**: librerías como shadcn/ui o Radix renderizan dropdowns y dialogs en portales (`[data-radix-popper-content-wrapper]`). Un selector que busca dentro del `div` padre del componente no encontrará el portal abierto. Usar `page.locator('[role="dialog"]')` o `page.locator('[role="listbox"]')` para elementos portaleados.
+- **`getByText` con `exact: true` cuando haya ambigüedad**: sin `exact`, "Clientes" matchea "Clientes" y también "Servicios de Clientes". Errores silenciosos que cuestan media hora de debugging.
+- **Acciones que dependen de datos: best-effort**. Botones en filas de tabla solo existen si la tabla tiene filas. El helper retorna `boolean` y el spec condiciona la captura — no asume que la base está sembrada.
+- **No capturar dropdowns ya cerrados**: `getByText('opción').click()` cierra el dropdown. Capturar **antes** de seleccionar.
+- **Toasts residuales tapan el header**: siempre ejecutar `dismissToasts` antes de capturar para evitar toasts de operaciones previas.
+
+## Formato de salida
+
+- Spec en `e2e-docs/specs/<NN-flujo>.spec.ts` con la estructura obligatoria.
+- Helpers en `e2e-docs/helpers/` (creados o actualizados según necesidad).
+- Script `docs:screenshots:<flujo>` agregado en `package.json`.
+- Imágenes generadas en el path declarado por el manual.
+- Sin código de debugging residual (no `console.log`, no `page.pause()`, no `test.only`).
+
+## Antes de entregar, verifico
+
+- [ ] El spec está en `e2e-docs/specs/<NN-flujo>.spec.ts`.
+- [ ] El spec importa de `helpers/` todo lo reutilizable. No duplica `login`, `waitForPageReady`, `dialogByHeader`, etc.
+- [ ] Cada captura referenciada por el manual existe como archivo `.png` después de correr el spec.
+- [ ] Las imágenes tienen bytes distintos entre sí (no hay duplicados sospechosos).
+- [ ] El script `docs:screenshots:<flujo>` está agregado en `package.json` y se ejecuta limpio.
+- [ ] El spec no tiene retries especulativos ni código de diagnóstico.
+- [ ] El test usa `test.skip` cuando faltan credenciales en `.env`.
+- [ ] El usuario del `.env` tiene los permisos del rol que el manual documenta (verificado contra el código de visibilidad).
+- [ ] Los nombres de archivo `.png` coinciden exactamente con los del manual.
+
+## Errores comunes
+
+- **Inventar capturas que el manual no referencia**. Producen imágenes huérfanas y confusión sobre cuál es la versión final.
+- **Usar selectores CSS frágiles** (`.btn.btn-primary:nth-child(2)`). Cualquier refactor de estilo rompe el spec.
+- **Capturar antes de que la página termine de cargar**. Sin `waitForLoadState('networkidle')`, las capturas salen con esqueletos de loading o datos parciales.
+- **Capturar con toasts residuales** tapando el header. `dismissToasts` antes de cada captura.
+- **Hacer click en el menú lateral cuando `page.goto` resuelve igual**. El click es más lento y tiene más puntos de fallo. Solo clickear el menú si la captura debe mostrarlo expandido.
+- **Olvidar el `closeDialog` después de capturar un modal**. La siguiente captura sale con el modal anterior visible encima.
+- **Generar capturas con un rol distinto al del manual**. Las acciones documentadas no aparecen y el lector cree que no existen.
+- **No registrar el script en `package.json`**. La regeneración futura tiene que descubrir el path del spec a mano cada vez.
+
+## Glosario
+
+**Spec E2E** *(End-to-end specification)* — archivo de test que recorre la aplicación real desde la perspectiva del usuario. En este skill, su único propósito es producir capturas; no asserta sobre lógica de negocio.
+
+**Selector estable** *(Stable selector)* — referencia a un elemento del DOM que sobrevive a refactors de estilo. Por orden de estabilidad: `data-testid` → roles ARIA → texto literal → CSS.
+
+**Helper compartido** *(Shared helper)* — función reutilizable entre múltiples specs (login, captura, manejo de dialogs). Vive en `helpers/` y se actualiza una sola vez cuando cambia la convención.
+
+**Captura best-effort** *(Best-effort capture)* — captura que depende de datos preexistentes (filas de tabla, registros sembrados). El helper retorna `boolean` y el spec decide si capturar o saltar, sin abortar el resto.
+
+**Portal** *(Portal)* — patrón de renderizado donde un componente (modal, dropdown, tooltip) se monta fuera del DOM padre, en `document.body`. Requiere selectores scopeados al contenedor del portal, no al padre semántico.
+
+**Toast residual** *(Residual toast)* — notificación que quedó visible de una operación previa y aparece superpuesta a la captura. Se elimina con `dismissToasts` antes de cada `screenshot`.
+
+:::info Referencias primarias
+- [Playwright — Best Practices](https://playwright.dev/docs/best-practices) — guía oficial de selectores estables, waits y patrones de tests confiables.
+- [Playwright — Locators](https://playwright.dev/docs/locators) — `getByRole`, `getByText`, `getByTestId` y cuándo usar cada uno.
+- [Testing Library — Guiding Principles](https://testing-library.com/docs/guiding-principles) — filosofía de "test the way the user uses it" que justifica priorizar roles ARIA sobre selectores CSS.
+- [WAI-ARIA Roles](https://www.w3.org/WAI/ARIA/apg/patterns/) — referencia de los roles semánticos que `getByRole` consume.
+- [Skill `redactar-manual-usuario`](./redactar-manual-usuario.skill.md.example) — produce el manual `.md` que esta skill consume como contrato.
+- [Skill `orquestador-manual-completo`](./orquestador-manual-completo.skill.md.example) — orquestador que invoca `redactar-manual-usuario` y este skill en cadena, con validación cruzada al final.
+- [5.5 Generación de manuales con agentes](../../../docs/documentacion-y-requerimientos/05-generar-manuales-con-agentes.md) — módulo del bootcamp que describe el patrón de tres agentes; este skill es la pieza de capturas.
+:::

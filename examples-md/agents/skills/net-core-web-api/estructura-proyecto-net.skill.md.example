@@ -2,12 +2,12 @@
 
 ---
 name: estructura-proyecto-net
-description: Establece y mantiene la estructura de un proyecto .NET 8 Web API con arquitectura modular — carpetas por dominio (`Modules/{Dominio}/{SubDominio}/`), capa común compartida (`Commons/`), módulo de autenticación aparte (`Auth/`), naming por rol (`XxxModel`, `XxxController`, `XxxService`, `XxxRequest`, `XxxResponse`), namespaces que reflejan la estructura de carpetas, y manejo disciplinado de paquetes NuGet. Toma como referencia la estructura de Qovium API.
+description: Establece y mantiene la estructura de un proyecto .NET 8 Web API con arquitectura modular — carpetas por dominio (`Modules/{Dominio}/{SubDominio}/`), capa común compartida (`Commons/`), módulo de autenticación aparte (`Auth/`), naming por rol (`XxxModel`, `XxxController`, `XxxService`, `XxxRequest`, `XxxResponse`), namespaces que reflejan la estructura de carpetas, y manejo disciplinado de paquetes NuGet.
 ---
 
 # Skill: estructura-proyecto-net
 
-Un proyecto .NET que arranca con `dotnet new webapi` y nunca se organiza termina con cuarenta controladores sueltos en la raíz, modelos mezclados con DTOs, dos `ClienteService` que hacen cosas distintas, y un equipo que pasa el primer año buscando dónde poner lo nuevo. El otro extremo — Clean Architecture con ocho proyectos separados y referencias cruzadas el día 1 — genera overhead de mantenimiento antes de que el producto tenga dos clientes reales. Este skill existe para el punto medio con evidencia de producción: **un solo proyecto, carpetas por dominio, namespaces que reflejan carpetas, naming por rol, y capa común con sub-arquitectura**. No es arquitectura académica; es lo que Qovium API usa hoy para sostener una docena de módulos de negocio sin volverse una bola de pelo.
+Un proyecto .NET que arranca con `dotnet new webapi` y nunca se organiza termina con cuarenta controladores sueltos en la raíz, modelos mezclados con DTOs, dos `ClienteService` que hacen cosas distintas, y un equipo que pasa el primer año buscando dónde poner lo nuevo. El otro extremo — Clean Architecture con ocho proyectos separados y referencias cruzadas el día 1 — genera overhead de mantenimiento antes de que el producto tenga dos clientes reales. Este skill existe para el punto medio con evidencia de producción: **un solo proyecto, carpetas por dominio, namespaces que reflejan carpetas, naming por rol, y capa común con sub-arquitectura**. No es arquitectura académica; es una referencia pública de organización para APIs modulares que necesitan sostener varios dominios de negocio sin volverse una bola de pelo.
 
 ## Cuándo invocarme
 
@@ -25,7 +25,7 @@ Un proyecto .NET que arranca con `dotnet new webapi` y nunca se organiza termina
 
 ## Entradas
 
-1. **Nombre del proyecto** en formato `Empresa.Producto.Api` (ej. `DiezX.Qovium.Api`) — define el namespace raíz y el `.csproj`.
+1. **Nombre del proyecto** en formato `Empresa.Api.Dominio` (ej. `DiezX.Api.Clientes`) — define el namespace raíz y el `.csproj`.
 2. **Lista de dominios de negocio** conocidos al día 1 (ej. `Compras`, `Clientes`, `Inventario`, `Nomina`, `RRHH`, `Finanzas`).
 3. **Existencia de autenticación** — si sí, `Auth/` como módulo aparte con su propio `DbContext`.
 4. **Convenciones específicas del proyecto** si existen (CLAUDE.md / AGENTS.md del repo).
@@ -77,12 +77,12 @@ Regla derivada: **cada flecha del diagrama corresponde a una carpeta del árbol*
 
 **Valor para el agente:** el diagrama es el contrato de cómo fluye una petición. Si un agente genera un controlador que llama a otro controlador, o un servicio que expone un endpoint HTTP, violó el flujo — y esa violación es detectable leyendo el diagrama antes que el código.
 
-## Árbol de referencia (basado en Qovium API)
+## Árbol de referencia
 
 ```
-{Empresa}.{Producto}.Api/
-├── {Empresa}.{Producto}.Api.csproj       # Único proyecto
-├── {Empresa}.{Producto}.Api.sln           # Solution (conveniencia para IDEs)
+{Empresa}.Api.{Dominio}/
+├── {Empresa}.Api.{Dominio}.csproj         # Único proyecto
+├── {Empresa}.Api.{Dominio}.sln            # Solution (conveniencia para IDEs)
 ├── Program.cs                              # Entrypoint + bootstrapping
 ├── appsettings.json
 ├── appsettings.Development.json
@@ -177,11 +177,11 @@ Regla derivada: **cada flecha del diagrama corresponde a una carpeta del árbol*
 
 ### Paso 1: Definir el namespace raíz y el nombre del proyecto
 
-Formato: `{Empresa}.{Producto}.Api`. Ejemplo: `DiezX.Qovium.Api`.
+Formato: `{Empresa}.Api.{Dominio}`. Ejemplo: `DiezX.Api.Clientes`.
 
-- Mal: `QoviumApi` (sin empresa → colisiona en NuGet si llega a publicarse).
-- Mal: `api-qovium` (kebab-case → no es válido en C#; el assembly no puede llamarse así limpio).
-- Bien: `DiezX.Qovium.Api` → assembly `DiezX.Qovium.Api.dll`, namespace raíz idéntico, archivo `.csproj` homónimo.
+- Mal: `ClientesApi` (sin empresa → colisiona en NuGet si llega a publicarse).
+- Mal: `api-clientes` (kebab-case → no es válido en C#; el assembly no puede llamarse así limpio).
+- Bien: `DiezX.Api.Clientes` → assembly `DiezX.Api.Clientes.dll`, namespace raíz idéntico, archivo `.csproj` homónimo.
 
 Registrar en `.csproj`:
 
@@ -191,7 +191,7 @@ Registrar en `.csproj`:
   <Nullable>enable</Nullable>
   <ImplicitUsings>enable</ImplicitUsings>
   <Version>1.0.0</Version>
-  <Product>Qovium API</Product>
+  <Product>Clientes API</Product>
   <Company>10X de Guatemala S.A.</Company>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <NoWarn>$(NoWarn);1591</NoWarn>
@@ -317,15 +317,15 @@ Antes de agregar un paquete, confirmar:
 ```csharp
 // Program.cs
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddQoviumApi(builder.Configuration);
+builder.Services.AddClientesApi(builder.Configuration);
 var app = builder.Build();
-app.UseQoviumApi();
+app.UseClientesApi();
 app.Run();
 ```
 
 ```csharp
 // Extensions/ServiceCollectionExtensions.cs
-public static IServiceCollection AddQoviumApi(this IServiceCollection services, IConfiguration config)
+public static IServiceCollection AddClientesApi(this IServiceCollection services, IConfiguration config)
 {
     services.AddAuthModule(config);
     services.AddCommonsInfrastructure(config);
@@ -337,7 +337,7 @@ public static IServiceCollection AddQoviumApi(this IServiceCollection services, 
 Cada área (Auth, Commons, Modules) expone su propio método de extensión. Un módulo nuevo registra sus servicios en su propio método (`AddComprasModule()`) y se llama desde `AddBusinessModules()`.
 
 - Mal: un solo `Program.cs` con cien líneas de `services.AddScoped<...>()`. Imposible de revisar sin scroll.
-- Bien: `Program.cs` de diez líneas que llama a `AddQoviumApi()`; cada módulo sabe qué registrar.
+- Bien: `Program.cs` de diez líneas que llama a `AddClientesApi()`; cada módulo sabe qué registrar.
 
 **Valor para el agente:** el bootstrapping modular permite que un módulo nuevo entre con un solo cambio en `Extensions/` — sin tocar código de otros módulos.
 
@@ -383,7 +383,7 @@ Al cerrar el scaffolding, agregar (o crear) `CLAUDE.md` con:
 
 ## Glosario
 
-**Namespace raíz** *(Root namespace)* — prefijo común de todos los namespaces del proyecto (ej. `DiezX.Qovium.Api`). Debe coincidir con el nombre del assembly y del `.csproj`.
+**Namespace raíz** *(Root namespace)* — prefijo común de todos los namespaces del proyecto (ej. `DiezX.Api.Clientes`). Debe coincidir con el nombre del assembly y del `.csproj`.
 
 **Módulo de negocio** *(Business module)* — carpeta bajo `Modules/` que agrupa toda la lógica de un dominio (Compras, RRHH, Finanzas). Tiene su propio `Controllers/`, `Services/`, `Dtos/`.
 

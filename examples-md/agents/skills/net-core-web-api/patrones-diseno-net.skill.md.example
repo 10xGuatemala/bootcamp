@@ -2,7 +2,7 @@
 
 ---
 name: patrones-diseno-net
-description: Decide cuándo introducir Strategy, Factory, Builder, Template Method o Máquina de Estados en un servicio .NET que creció. Aplica el patrón correcto en la carpeta correcta con los sufijos correctos (`XxxStrategy`, `XxxFactory`, `XxxBuilder`, `XxxServiceBase`, `XxxMaquinaEstados`), evita la introducción prematura, y documenta la decisión. Toma como referencia los patrones implementados en Qovium API.
+description: Decide cuándo introducir Strategy, Factory, Builder, Template Method o Máquina de Estados en un servicio .NET que creció. Aplica el patrón correcto en la carpeta correcta con los sufijos correctos (`XxxStrategy`, `XxxFactory`, `XxxBuilder`, `XxxServiceBase`, `XxxMaquinaEstados`), evita la introducción prematura, y documenta la decisión.
 ---
 
 # Skill: patrones-diseno-net
@@ -326,15 +326,15 @@ Cada strategy, factory, builder, máquina de estados debe tener tests unitarios 
 
 **Regla del tres** *(Rule of three)* — heurística que dice: refactorizar hacia una abstracción reutilizable solo cuando el caso se repite tres veces. Dos es coincidencia; tres es patrón.
 
-**Strategy** *(Strategy pattern)* — familia de algoritmos intercambiables encapsulados detrás de una interfaz común; cada algoritmo es un objeto seleccionable en runtime. En Qovium API se aplica para filtros de queries.
+**Strategy** *(Strategy pattern)* — familia de algoritmos intercambiables encapsulados detrás de una interfaz común; cada algoritmo es un objeto seleccionable en runtime. En una API modular, suele aplicar para filtros de queries o reglas seleccionables por contexto.
 
 **Factory** *(Factory pattern)* — encapsulación de la creación de objetos en un método o clase dedicada que centraliza validaciones, pasos y variantes. Reduce duplicación en los puntos que crean el mismo tipo.
 
 **Builder** *(Builder pattern)* — construcción paso a paso de un objeto complejo con interfaz fluida; `Build()` valida y retorna el resultado final. Usado para objetos con muchos parámetros y cálculos intermedios.
 
-**Template Method** *(Template method pattern)* — clase base abstracta que define el esqueleto de un algoritmo y delega pasos específicos a subclases mediante métodos virtuales (hooks). Usado para CRUD común de catálogos en Qovium API.
+**Template Method** *(Template method pattern)* — clase base abstracta que define el esqueleto de un algoritmo y delega pasos específicos a subclases mediante métodos virtuales (hooks). Útil para CRUD común de catálogos cuando varias entidades comparten el mismo flujo.
 
-**Máquina de estados** *(State machine)* — modelo que define estados válidos de una entidad y las transiciones permitidas entre ellos, rechazando transiciones inválidas con error contextual. En Qovium API hay un motor genérico + máquinas específicas por entidad.
+**Máquina de estados** *(State machine)* — modelo que define estados válidos de una entidad y las transiciones permitidas entre ellos, rechazando transiciones inválidas con error contextual. En una API modular puede implementarse como un motor genérico + máquinas específicas por entidad.
 
 **Disparador** *(Trigger)* — en una máquina de estados, la acción del dominio que provoca una transición (ej. `DisparadorBoleta.Aceptar`). Forma parte de la clave del diccionario de transiciones junto al estado actual.
 

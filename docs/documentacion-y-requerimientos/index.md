@@ -39,13 +39,14 @@ flowchart LR
     D --> V[Versión<br/>módulo 02]
     V --> M[Manual<br/>módulo 03]
     V --> T[Trazabilidad<br/>módulo 04]
-    M --> U[Usuario final]
+    M --> O[Orquestación<br/>con agentes<br/>módulo 05]
+    O --> U[Usuario final]
     T --> A[Agente / auditoría]
     U -.feedback / métricas.-> I
     A -.hallazgos / auditoría.-> I
     classDef node fill:#ffffff,stroke:#0d4d92,stroke-width:2px,color:#0d4d92,rx:8,ry:8
     classDef out fill:#ef9b50,color:#1a2f4d,stroke:#b56a2a,rx:8,ry:8
-    class I,R,D,V,M,T node
+    class I,R,D,V,M,T,O node
     class U,A out
 ```
 
@@ -63,6 +64,7 @@ Las flechas punteadas cierran el ciclo: sin retroalimentación desde producción
 - [5.2 Versionado semántico en equipos](./02-versionado-semantico-en-equipos.md)
 - [5.3 Manuales de usuario final](./03-manuales-de-usuario-final.md)
 - [5.4 Trazabilidad requerimiento → release](./04-trazabilidad-requerimiento-release.md)
+- [5.5 Generación de manuales con agentes](./05-generar-manuales-con-agentes.md)
 
 </div>
 

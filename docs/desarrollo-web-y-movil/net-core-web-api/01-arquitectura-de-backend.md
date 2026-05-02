@@ -164,15 +164,15 @@ La reproducibilidad del `package.json` aplica igual en `.csproj`: **nada de rang
 ```csharp
 // Program.cs — diez líneas
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddQoviumApi(builder.Configuration);
+builder.Services.AddClientesApi(builder.Configuration);
 var app = builder.Build();
-app.UseQoviumApi();
+app.UseClientesApi();
 app.Run();
 ```
 
 ```csharp
 // Extensions/ServiceCollectionExtensions.cs
-public static IServiceCollection AddQoviumApi(
+public static IServiceCollection AddClientesApi(
     this IServiceCollection services, IConfiguration config)
 {
     services.AddAuthModule(config);

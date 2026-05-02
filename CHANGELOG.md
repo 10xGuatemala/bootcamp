@@ -4,6 +4,22 @@ Cambios de contenido del bootcamp público. Solo se listan adiciones y modificac
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.6.0 — 2026-05-01
+
+### Added
+
+- **5.5 Generación de manuales con agentes** — nuevo módulo de Documentación y Requerimientos que explica cómo orquestar agentes para producir manuales de usuario desde la UI real.
+- **Skills copiables nuevas para manuales** en `examples-md/agents/skills/general/`:
+  - `generar-capturas-manual.skill.md.example` — produce capturas versionadas solo cuando el destino del manual las necesita.
+  - `orquestador-manual-completo.skill.md.example` — coordina manual Markdown, capturas opcionales y validación final.
+
+### Changed
+
+- **5.3 Manuales de usuario final** — mejora la explicación de audiencias, fuentes y trazabilidad: el manual se redacta desde la UI real entregada por un release/requerimiento. La plantilla reusable ahora incluye información del documento, flujo de trabajo, tabla de contenido, acceso, secciones visibles, pasos, resultado esperado, errores comunes, soporte e historial.
+- **Skill `redactar-manual-usuario`** — actualizada para dejar claro que requerimientos, notas de release y tickets son disparadores de revisión, no fuentes del contenido; la fuente del contenido es la UI real o capturas literales.
+- **Ejemplos .NET Web API** — ejemplos de nombres de proyecto, bootstrap modular y patrones actualizados con nombres genéricos copiables.
+- **`examples-md/README.md`** — refleja las nuevas skills de manuales en el árbol de ejemplos.
+
 ## 3.5.0 — 2026-04-22
 
 ### Added

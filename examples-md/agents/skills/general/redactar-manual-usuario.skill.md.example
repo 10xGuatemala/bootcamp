@@ -2,7 +2,7 @@
 
 ---
 name: redactar-manual-usuario
-description: Genera o actualiza secciones de un manual de usuario final a partir de una captura de pantalla, un flujo descrito en prosa o una entrada del CHANGELOG que describa un cambio visible. Ordena por workflow real (no por menú) y, en apps multi-tenant, separa un manual por sistema × rol.
+description: Genera o actualiza secciones de un manual de usuario final a partir de la UI real navegada con el rol objetivo (o capturas literales cuando no hay acceso vivo). Un requerimiento entregado en un release, una nota del release o un ticket de soporte solo sirven como disparadores de qué revisar — nunca como fuente del contenido. Ordena por workflow real (no por menú) y, en apps multi-tenant, separa un manual por sistema × rol.
 ---
 
 # Skill: redactar-manual-usuario
@@ -20,22 +20,30 @@ El manual de usuario final muere el día que alguien escribe "haz clic en el bot
 **No me uses para:**
 - Documentación técnica (API, arquitectura, guías para desarrolladores). La audiencia y el vocabulario son distintos.
 - Release notes — para eso, usa `release-notes`.
-- Modificar un manual aprobado sin actualizar su versión y su entrada en el CHANGELOG del producto.
+- Modificar un manual aprobado sin actualizar su versión y enlazar el requerimiento, release o ticket que originó el cambio.
 
 ## Entradas
 
-Una de estas tres, **obligatoriamente**:
+**La UI real es siempre obligatoria** (en alguna de sus dos formas). Los demás insumos son disparadores o complementos.
 
-1. Captura o descripción literal del flujo en la UI (textos de botones, campos, mensajes de error, mensajes de confirmación).
-2. Entrada del CHANGELOG que describe un cambio visible al usuario final.
-3. Prompt del usuario con el nombre de la tarea a documentar **más** acceso a la UI o al diseño aprobado.
+Fuente del contenido (uno de los dos, obligatorio):
 
-Además, siempre:
+1. **Acceso a la app real** con un usuario del rol objetivo — la opción preferida. Permite verificar visibilidad de botones, mensajes de error reales, microcopy actualizado.
+2. **Captura literal del flujo** (capturas + transcripción de textos: botones, campos, mensajes de error, mensajes de confirmación) — solo cuando no hay acceso vivo a la app.
 
-4. **Sistema y rol** del lector objetivo si la app es multi-tenant.
-5. **Permisos y precondiciones** del rol — qué puede ver, qué puede escribir, qué le bloquea el sistema.
+Disparador (uno o más, opcional):
 
-Si falta información de la UI real, debo pedirla antes de redactar. **Nunca inventar elementos** — ni botones, ni campos, ni validaciones, ni rutas de imagen.
+3. Prompt del usuario con el nombre de la tarea a documentar.
+4. Requerimiento entregado en un release.
+5. Nota del release que indica qué pantalla revisar.
+6. Ticket de soporte que reporta confusión sobre una pantalla.
+
+Contexto (siempre):
+
+7. **Sistema y rol** del lector objetivo si la app es multi-tenant.
+8. **Permisos y precondiciones** del rol — qué puede ver, qué puede escribir, qué le bloquea el sistema.
+
+Si llega un disparador sin acceso a la UI ni capturas, debo pedir la UI antes de redactar. **Nunca inventar elementos** — ni botones, ni campos, ni validaciones, ni rutas de imagen — y nunca redactar pasos a partir del requerimiento o de la nota del release: esos artefactos dicen qué cambió; la UI muestra cómo se usa.
 
 ## Reglas obligatorias
 
@@ -264,5 +272,5 @@ Antes de entregar, confirmar que todo archivo listado existe y no hay archivos h
 - [Nielsen Norman Group — User Manuals](https://www.nngroup.com/articles/instruction-manuals/) — principios de usabilidad aplicados a manuales orientados a tarea.
 - [Plain Language Guidelines](https://www.plainlanguage.gov/guidelines/) — principios de redacción clara aplicables al tono corporativo sin condescender.
 - [5.3 Manuales de usuario final](../../../docs/documentacion-y-requerimientos/03-manuales-de-usuario-final.md) — módulo del bootcamp que describe el flujo completo de redacción; este skill es la forma operativa del módulo.
-- [Skill `release-notes`](./release-notes.skill.md.example) — genera las entradas del CHANGELOG público que este skill consume como entrada cuando se documenta una versión nueva.
+- [Skill `release-notes`](./release-notes.skill.md.example) — ayuda a redactar notas de release; este skill puede usarlas como señal de qué revisar, pero redacta el manual desde la UI real.
 :::

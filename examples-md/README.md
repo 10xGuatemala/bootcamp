@@ -16,8 +16,11 @@ examples-md/
 │       │   ├── code-review.skill.md.example
 │       │   ├── release-notes.skill.md.example
 │       │   ├── redactar-manual-usuario.skill.md.example
+│       │   ├── generar-capturas-manual.skill.md.example
+│       │   ├── orquestador-manual-completo.skill.md.example
 │       │   ├── revisar-hallazgo-sast.skill.md.example
 │       │   ├── entrevista-specs.skill.md.example
+│       │   ├── escribir-slash-command.skill.md.example
 │       │   └── scaffolding-desde-specs.skill.md.example
 │       └── net-core-web-api/                # Skills específicas del curso .NET
 │           ├── estructura-proyecto-net.skill.md.example

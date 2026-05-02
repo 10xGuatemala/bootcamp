@@ -13,31 +13,29 @@ Confundir estas audiencias produce los dos peores escenarios posibles: manuales 
 ## Dos documentos, dos audiencias
 
 ```mermaid
-mindmap
-    root((Documento))
-        Requerimiento
-            Audiencia
-                Equipo técnico
-                QA
-                Producto
-            Objetivo
-                Definir qué construir
-                Definir cómo validar
-            Tono
-                Preciso y formal
-                Con jerga controlada
-        Manual de usuario
-            Audiencia
-                Usuario final
-                Soporte
-                Capacitación
-            Objetivo
-                Completar una tarea
-                Recuperarse de errores
-            Tono
-                Directo y amable
-                Sin jerga innecesaria
+flowchart LR
+    R[Requerimiento<br/>define qué construir]
+    D[Desarrollo<br/>implementa el cambio]
+    M[Manual de usuario<br/>explica cómo usarlo]
+
+    R --> D --> M
+
+    classDef req fill:#f5f5f5,stroke:#777,color:#333,stroke-width:1.5px
+    classDef dev fill:#fff3e0,stroke:#ef9b50,color:#1a2f4d,stroke-width:2px
+    classDef man fill:#e8f1fb,stroke:#0d4d92,color:#0d4d92,stroke-width:2px
+    class R req
+    class D dev
+    class M man
 ```
+
+El requerimiento y el manual no compiten; viven en momentos distintos del ciclo. El requerimiento guía al equipo que construye. El manual guía a la persona que usa lo construido.
+
+| Documento | Audiencia principal | Pregunta que responde | Buen resultado |
+|-----------|---------------------|-----------------------|----------------|
+| Requerimiento | Producto, desarrollo, QA | ¿Qué hay que construir y cómo se valida? | El equipo puede implementar y probar sin adivinar intención |
+| Manual de usuario | Usuario final, soporte, capacitación | ¿Cómo completo esta tarea en el producto? | La persona puede operar, reconocer éxito y recuperarse de errores |
+
+La diferencia más importante está en la fuente: el requerimiento describe la intención antes o durante el desarrollo; el manual se redacta contra la **UI real entregada**. Si el botón final dice **Guardar y emitir**, el manual usa ese texto aunque el requerimiento haya dicho "Confirmar".
 
 ## Los tres principios que no fallan
 
@@ -125,11 +123,14 @@ Regla: **texto primero, imágenes como apoyo**. Siempre incluye `alt` descriptiv
 
 ## Versiona junto al producto
 
-Un manual sin versión es un manual que envejece en silencio. Mínimo:
+Un manual sin trazabilidad envejece en silencio. No siempre necesitas publicar la versión del producto dentro de cada manual, pero sí debes dejar evidencia de cuándo aplica y qué entrega lo originó.
 
-- Indica la versión del producto desde la cual aplica (*"Disponible desde v1.5.0"*).
-- Mantén una nota en la parte superior con la fecha de última revisión.
-- Si una sección se reescribe, indica qué cambió en el CHANGELOG del manual o del producto.
+Mínimo:
+
+- Mantén `Fecha de actualización` en la sección de información del documento.
+- Indica módulo, rol, área y alcance del manual.
+- Si el manual responde a un release o requerimiento específico, enlázalo en el historial del manual o en la metadata del documento.
+- Si tu producto publica versiones para usuarios finales, agrega `Versión del producto` o `Disponible desde vX.Y.Z`; si no, no lo inventes.
 
 Esto también ayuda a que un agente que genere soporte automatizado pueda citar la fuente con confianza.
 
@@ -165,62 +166,141 @@ Mantén un historial por versión si algún usuario aún está en versiones anti
 
 ## Plantilla reusable
 
-La plantilla tiene **secciones fijas** (en todos los manuales) y **secciones opcionales** según el producto. Un manual que omita cualquier sección fija probablemente está incompleto.
+La plantilla tiene **secciones fijas** (en todos los manuales) y **secciones opcionales** según el destino. Está pensada para manuales generados por agentes: primero produce un Markdown completo y, si el destino lo requiere, deja puntos claros para insertar capturas.
 
-```markdown
-# {Nombre del producto} — Manual de usuario
+````markdown
+# Manual de Usuario para {Área o tarea} de {Módulo}
 
-Última revisión: YYYY-MM-DD · Versión del producto: vX.Y.Z
+> **Nota para el redactor:** si el manual es para usuarios que ya conocen
+> el sistema, puedes omitir la introducción y empezar en "Información del
+> documento". Si el destino es chatbot/RAG, prioriza texto literal sobre
+> capturas.
 
-## Quién es el usuario                         <!-- [requerido] -->
-- Perfil: quién debería leer este manual (rol, contexto).
-- Supuestos: qué se asume que ya sabe o tiene.
+## Introducción                                 <!-- opcional -->
 
-## Objetivos del producto                      <!-- [requerido] -->
-- Qué resuelve, en 2-4 frases sin jerga técnica.
+{Una explicación breve: para qué sirve el módulo, a quién ayuda y qué
+tareas cubre. No repetir historia del producto ni detalles técnicos.}
 
-## Requisitos previos                          <!-- [requerido] -->
-- Accesos, datos, permisos, dispositivos o navegadores soportados.
+## Información del documento                    <!-- requerido -->
 
-## Flujo principal                              <!-- [requerido] -->
-La tarea que la mayoría de usuarios necesita. Estructura:
-- Antes de empezar, necesitas: ...
-- Pasos (numerados).
-- Resultado esperado.
-- Si algo sale mal: ...
+- Fecha de actualización: YYYY-MM-DD
+- Requerimiento/release relacionado: {ID o enlace, si aplica}
+- Módulo: {Nombre del módulo}
+- Rol: {Rol objetivo}
+- Área: {Área o tarea cubierta}
+- Alcance: {Qué cubre y qué no cubre este archivo}
 
-## Tareas secundarias                           <!-- [requerido] — al menos una -->
-### Cómo {tarea 2}
-### Cómo {tarea 3}
-...
+## Flujo de trabajo                              <!-- requerido si aplica -->
 
-## Resolución de errores comunes               <!-- [requerido] -->
-Formato por error:
-- **Mensaje literal que ve el usuario**: causa probable y pasos de resolución.
-
-## Glosario                                    <!-- (opcional) -->
-- Términos técnicos con definición sencilla.
-
-## Historial de cambios                        <!-- [requerido] -->
-- vX.Y.Z (YYYY-MM-DD): qué cambió en este manual. Enlaza al CHANGELOG del producto.
-
-## ¿Necesitas ayuda?                           <!-- [requerido] -->
-- Canal de soporte, horario, forma de contacto.
+```mermaid
+flowchart LR
+    A[Paso 1] --> B[Paso 2] --> C[Paso 3]
 ```
 
-## Manual ↔ CHANGELOG: una relación explícita
+Omitir este bloque en manuales de pura consulta. Usarlo cuando el usuario
+debe completar una tarea con varias etapas.
 
-Cuando el producto sube de versión, el manual debe reflejar lo que cambió en la UI o en los flujos del usuario. La relación es directa:
+## Tabla de contenido                            <!-- requerido -->
 
-| Entrada del CHANGELOG | Acción en el manual |
-|-----------------------|---------------------|
-| `Added` — capacidad nueva visible | Añadir sección o paso nuevo; actualizar "Historial de cambios" |
-| `Changed` — comportamiento visible distinto | Reescribir el paso afectado; mantener nota si el usuario viene de la versión anterior |
-| `Fixed` — bug que el usuario notaba | Revisar si la sección de errores comunes debe retirar la mención al bug |
-| `Deprecated` — capacidad que se va a retirar | Añadir aviso en la sección afectada con la fecha estimada |
-| `Removed` — capacidad eliminada | Archivar la sección; dejar referencia en el historial |
+- [1. Descripción general](#1-descripción-general)
+- [2. Cómo {tarea principal}](#2-cómo-tarea-principal)
+- [3. Errores comunes](#3-errores-comunes)
 
-El manual cita la versión del producto en la portada y en cada aviso. Un agente que lea el CHANGELOG puede proponer los cambios del manual automáticamente siguiendo esta tabla.
+---
+
+## 1. Descripción general
+
+Esta sección explica qué permite hacer esta pantalla o flujo, usando el
+vocabulario que ve el usuario en la UI.
+
+### 1.1 Acceso a la opción
+
+Para acceder a esta opción, abre **{Sección del menú} → {Opción visible}**.
+
+### 1.2 Secciones visibles
+
+- **{Nombre de sección visible}:** qué muestra o permite.
+- **{Nombre de otra sección}:** qué muestra o permite.
+
+Ilustración 1: {Descripción de la captura, si aplica}.
+
+---
+
+## 2. Cómo {tarea principal}
+
+### Antes de empezar, necesitas:
+
+- {Permiso, rol o dato previo}.
+- {Precondición adicional, o "Ninguna" si no aplica}.
+
+### Pasos
+
+1. {Acción concreta con texto literal de la UI}.
+2. {Siguiente acción}.
+3. {Acción final}.
+
+### Resultado esperado
+
+- {Mensaje literal, cambio de estado o pantalla resultante}.
+- {Dónde confirmar que la tarea terminó correctamente}.
+
+Ilustración 2: {Descripción de la captura, si aplica}.
+
+### Si algo sale mal
+
+- **"{Mensaje literal de error}"**: causa probable y cómo resolver.
+- **"{Otro mensaje}"**: causa probable y cómo resolver.
+
+---
+
+## 3. Errores comunes
+
+- **{Situación o mensaje visible}:** qué significa y qué hacer.
+- **{Situación o mensaje visible}:** qué significa y qué hacer.
+
+## Glosario                                      <!-- opcional -->
+
+- **{Término}:** definición en una línea, escrita para usuario final.
+
+## Soporte                                       <!-- opcional -->
+
+- Canal oficial: {correo, mesa de ayuda o ruta interna}.
+- Horario o SLA: {si aplica}.
+
+## Historial del manual                          <!-- requerido -->
+
+- vX.Y.Z (YYYY-MM-DD): actualizado por {requerimiento/release/ticket}.
+````
+
+## Cómo se relacionan releases, requerimientos y manual
+
+El manual se actualiza cuando un **release entrega un requerimiento que cambia la experiencia del usuario**. Esa es la relación importante: requerimiento entregado → UI real → manual.
+
+El release indica qué requerimientos ya están disponibles para usuarios. El manual traduce esos requerimientos entregados en instrucciones operativas: qué necesita la persona, qué pasos sigue, qué resultado debe ver y cómo recuperarse si algo falla.
+
+La cadena correcta es:
+
+```mermaid
+flowchart LR
+    R[Requerimiento aprobado] --> V[Release entregado]
+    V --> UI[UI real disponible]
+    UI --> M[Manual actualizado]
+    M --> S[Soporte / usuario final / chatbot]
+```
+
+Cada tipo de cambio produce una acción distinta en el manual:
+
+| Cambio entregado en el release | Qué hacer en el manual | Fuente principal |
+|--------------------------------|------------------------|------------------|
+| Funcionalidad nueva visible | Crear procedimiento nuevo | UI real del requerimiento entregado |
+| Flujo existente cambió | Reescribir los pasos afectados | UI real comparada contra el manual anterior |
+| Validación o mensaje cambió | Actualizar requisitos, errores comunes o resultado esperado | UI real y mensaje literal del sistema |
+| Funcionalidad se deprecó | Añadir aviso al inicio de la sección | Requerimiento/release que declara la deprecación |
+| Funcionalidad se eliminó | Archivar o retirar la sección | Requerimiento/release que elimina la función |
+
+**Regla práctica:** no redactes procedimientos desde el requerimiento ni desde la nota del release. Úsalos para saber **qué revisar**. Redacta desde la UI real, porque ahí aparecen los permisos, estados, textos y restricciones que el usuario final sí enfrenta.
+
+El módulo [5.5](./05-generar-manuales-con-agentes.md) toma esta relación y la convierte en un flujo ejecutable con agentes: una skill redacta desde la UI, otra puede generar capturas si el destino lo necesita, y un orquestador valida que el resultado sea consistente.
 
 ## Skill reusable: generar un manual de usuario
 
@@ -239,15 +319,16 @@ El bloque siguiente es una versión reducida del contrato, útil para entender l
 
 ## Propósito
 Generar o actualizar secciones de un manual de usuario final a partir
-de una captura, un flujo descrito o una entrada del CHANGELOG.
+de la UI real navegada con el rol objetivo. La fuente de verdad es
+siempre la pantalla, no la prosa de un requerimiento o release.
 
 ## Reglas obligatorias
 
 - **Audiencia:** escribir para el usuario final, no para desarrolladores.
 - **Lenguaje:** claro y directo; sin jerga técnica interna.
 - **Fidelidad:** no inventar botones, campos, pantallas ni opciones que
-  no estén presentes en el flujo o en la captura proporcionada.
-  Si falta información, pedirla antes de redactar.
+  no estén presentes en la UI. Si falta información, pedir acceso a la
+  pantalla antes de redactar.
 - **Tono:** corporativo y profesional; en segunda persona; sin
   condescender ("simplemente", "solo").
 
@@ -270,10 +351,19 @@ Cada procedimiento del manual debe incluir, en este orden:
 
 ## Entrada esperada
 
-Una de estas tres:
-- Captura o descripción literal del flujo en la UI.
-- Entrada del CHANGELOG que describe un cambio visible al usuario.
+Una combinación de estas tres, con la UI siempre presente:
+- Acceso a la app real con un usuario del rol objetivo (obligatorio).
+- Captura o descripción literal del flujo en la UI (obligatorio si no
+  hay acceso vivo a la app).
 - Prompt del usuario indicando la tarea a documentar.
+
+Adicionalmente, como **disparadores** de cuándo redactar (no como fuente):
+- Un requerimiento entregado en un release.
+- Una nota del release que indique qué pantalla revisar.
+- Un ticket de soporte que mencione una pantalla confusa.
+
+Si el disparador llega sin acceso a la UI, pedir el acceso antes de
+redactar — nunca inventar pasos a partir del requerimiento o de la nota del release.
 
 ## Salida esperada
 
@@ -285,7 +375,7 @@ Una de estas tres:
 ## Antes de entregar, verificar
 
 - [ ] Cada procedimiento tiene las 5 secciones obligatorias.
-- [ ] Todos los botones/campos mencionados existen en la captura o flujo.
+- [ ] Todos los botones/campos mencionados existen en la UI navegada.
 - [ ] El lenguaje es comprensible para alguien sin formación técnica.
 - [ ] No se usan palabras como "simplemente" ni "solo".
 - [ ] Los mensajes del sistema están citados con su texto literal.
