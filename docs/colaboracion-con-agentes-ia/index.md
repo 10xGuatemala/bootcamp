@@ -43,6 +43,8 @@ Un **archivo de contexto** es un documento en la raíz del repositorio que le di
 
 ## Ruta sugerida
 
+La ruta tiene tres tramos. Los módulos **6.1 a 6.7** cubren los fundamentos: cómo colaborar con agentes, escribir contexto útil, diseñar skills, prevenir riesgos de seguridad y arrancar un proyecto desde un contrato `specs.md`. Los módulos **6.8 a 6.11** suben un nivel: presentan **AIDLC 10X**, un ciclo de vida de software con tres fases y gates humanos para que el equipo pueda construir productos completos con su agente sin perder control. El módulo **6.12** mira hacia adelante: las evaluaciones automáticas del trabajo del agente, el activo que reduce la dependencia del review humano y abre el camino a operación más autónoma.
+
 ```mermaid
 flowchart TB
     M1[01 · Fundamentos de colaboración]
@@ -52,9 +54,18 @@ flowchart TB
     M5[05 · Diseño de prompts y verificación]
     M6[06 · Seguridad de chatbots con IA]
     M7[07 · De specs a proyecto real]
-    M1 --> M2 --> M3 --> M4 --> M5 --> M6 --> M7
+    M8[08 · Ciclo de vida AIDLC 10X]
+    M9[09 · Fase 1 · Concepción]
+    M10[10 · Fase 2 · Construcción]
+    M11[11 · Fase 3 · Operación]
+    M12[12 · Evaluaciones del trabajo del agente]
+    M1 --> M2 --> M3 --> M4 --> M5 --> M6 --> M7 --> M8 --> M9 --> M10 --> M11 --> M12
     classDef step fill:#0d4d92,color:#fff,stroke:#0b417b,stroke-width:1px,rx:8,ry:8,font-size:15px,padding:10px
+    classDef cycle fill:#1a6cb5,color:#fff,stroke:#0b417b,stroke-width:1px,rx:8,ry:8,font-size:15px,padding:10px
+    classDef future fill:#2b8cba,color:#fff,stroke:#0b417b,stroke-width:1px,rx:8,ry:8,font-size:15px,padding:10px
     class M1,M2,M3,M4,M5,M6,M7 step
+    class M8,M9,M10,M11 cycle
+    class M12 future
 ```
 
 **Alternativa en lista** (accesible y útil si el diagrama no carga):
@@ -66,6 +77,11 @@ flowchart TB
 5. [**6.5 Diseño de prompts y verificación**](./05-diseno-de-prompts-y-verificacion.md) — instrucciones claras y verificables.
 6. [**6.6 Seguridad de chatbots con IA**](./06-seguridad-de-chatbots.md) — prompt injection, exposición de datos.
 7. [**6.7 De specs a proyecto real**](./07-de-specs-a-proyecto-real.md) — arranque guiado: entrevista, contrato `specs.md`, scaffolding reproducible.
+8. [**6.8 Ciclo de vida AIDLC 10X**](./08-ciclo-de-vida-aidlc-10x.md) — introducción al ciclo de tres fases con gates humanos para construir software con agentes.
+9. [**6.9 Fase 1 · Concepción del release**](./09-fase-1-concepcion-del-release.md) — del backlog al `releases/vX.Y.Z.md` aprobado como contrato.
+10. [**6.10 Fase 2 · Construcción dirigida por release.md**](./10-fase-2-construccion-dirigida-por-release.md) — implementación sin scope creep, migraciones BD probadas, CHANGELOG por repo.
+11. [**6.11 Fase 3 · Operación con humano en el bucle**](./11-fase-3-operacion-con-humano-en-el-bucle.md) — bump, backup, deploy, verificación post-deploy, tag, modo incidente.
+12. [**6.12 Evaluaciones del trabajo del agente**](./12-evaluaciones-del-trabajo-del-agente.md) — el harness que reduce la dependencia del review humano y habilita la autonomía progresiva del agente.
 
 ## Cómo aprovechar este contenido
 
@@ -88,5 +104,10 @@ flowchart TB
 - [6.5 Diseño de prompts y verificación](./05-diseno-de-prompts-y-verificacion.md)
 - [6.6 Seguridad de chatbots con IA](./06-seguridad-de-chatbots.md)
 - [6.7 De specs a proyecto real](./07-de-specs-a-proyecto-real.md)
+- [6.8 Ciclo de vida AIDLC 10X](./08-ciclo-de-vida-aidlc-10x.md)
+- [6.9 Fase 1 · Concepción del release](./09-fase-1-concepcion-del-release.md)
+- [6.10 Fase 2 · Construcción dirigida por release.md](./10-fase-2-construccion-dirigida-por-release.md)
+- [6.11 Fase 3 · Operación con humano en el bucle](./11-fase-3-operacion-con-humano-en-el-bucle.md)
+- [6.12 Evaluaciones del trabajo del agente](./12-evaluaciones-del-trabajo-del-agente.md)
 
 </div>

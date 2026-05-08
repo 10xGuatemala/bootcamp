@@ -32,16 +32,29 @@ examples-md/
 │   ├── DESIGN.md
 │   ├── component-brief.md
 │   └── screen-spec.md
-└── project/             # Plantillas de gestión ágil + arranque + release
-    ├── specs.md                     # Contrato de arranque (Actividad 0)
-    ├── release-requirements.md      # Requerimientos por versión (release-centric)
-    ├── product-backlog.md
-    ├── sprint-plan.md
-    ├── sprint-goal.md
-    └── retrospective.md
+├── project/             # Plantillas de gestión ágil + arranque + release
+│   ├── specs.md                     # Contrato de arranque (Actividad 0)
+│   ├── release-requirements.md      # Requerimientos por versión (release-centric)
+│   ├── product-backlog.md
+│   ├── sprint-plan.md
+│   ├── sprint-goal.md
+│   └── retrospective.md
+└── aidlc-10x/           # Ciclo de vida completo (Concepción → Construcción → Operación)
+    ├── README.md                    # Cómo instalarlo en un proyecto
+    ├── core-workflow.md             # Reglas maestras + frase de activación
+    ├── principios.md                # Tenets no negociables
+    ├── concepcion.md                # Fase 1
+    ├── construccion.md              # Fase 2
+    ├── operacion.md                 # Fase 3
+    └── plantillas/
+        ├── _release-template.md
+        ├── BACKLOG.md
+        └── RELEASING.md
 ```
 
 Las skills se organizan por dominio. Las de `general/` aplican a cualquier stack; las de `net-core-web-api/` son específicas del curso [1.2 Desarrollo de Web APIs en .NET Core](../docs/desarrollo-web-y-movil/net-core-web-api/index.md) y asumen .NET 8 + Entity Framework Core.
+
+`aidlc-10x/` es un paquete autocontenido que se copia entero al proyecto (típicamente como `aidlc/` en la raíz del repo de docs del producto). Es la versión 10X del [AI-DLC de AWS Labs](https://github.com/awslabs/aidlc-workflows), destilada del flujo de release usado en productos de 10X. Útil cuando un equipo arranca un producto nuevo o quiere formalizar el ciclo de uno existente. Mientras `project/release-requirements.md` y `project/specs.md` son **plantillas individuales**, `aidlc-10x/` es un **flujo completo** que orquesta esas plantillas en tres fases con gates humanos explícitos.
 
 ## Uso
 

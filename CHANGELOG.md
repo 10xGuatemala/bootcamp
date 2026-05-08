@@ -4,6 +4,23 @@ Cambios de contenido del bootcamp público. Solo se listan adiciones y modificac
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.7.0 — 2026-05-07
+
+### Added
+
+- **6.8 Ciclo de vida AIDLC 10X** — módulo introductorio al ciclo de vida de software con agentes en tres fases (Concepción → Construcción → Operación) con gates humanos. Versión 10X del [AI-DLC de AWS Labs](https://github.com/awslabs/aidlc-workflows).
+- **6.9 Fase 1 · Concepción del release** — del backlog al `releases/vX.Y.Z.md` aprobado como contrato. Triage SemVer, descripción autocontenida y prompt de auditoría.
+- **6.10 Fase 2 · Construcción dirigida por release.md** — implementación sin scope creep, migraciones BD numeradas, CHANGELOG por repo, verificación local.
+- **6.11 Fase 3 · Operación con humano en el bucle** — bump, backup, migraciones una por una, deploy, verificación post-deploy, tag SemVer y modo incidente.
+- **6.12 Evaluaciones del trabajo del agente** — el rol de eval champion y el harness de casos dorados que reduce la dependencia del review humano y abre el camino a operación más autónoma.
+- **Primer día (`/docs/primer-dia`)** — guía de onboarding por rol (dev, lead/PM, diseño UX/UI, BI) que ordena la lectura del bootcamp para nuevos miembros del equipo.
+- **`examples-md/aidlc-10x/`** — paquete copiable con las reglas operacionales del ciclo: `core-workflow.md`, `principios.md`, las tres fases en detalle y plantillas (`_release-template.md`, `BACKLOG.md`, `RELEASING.md`).
+
+### Changed
+
+- **Ruta 6 — Colaboración con Agentes de IA** — el índice extiende el diagrama a 12 módulos en tres tramos visuales (fundamentos 6.1–6.7, ciclo AIDLC 6.8–6.11, futuro 6.12) y actualiza la lista accesible.
+- **Bienvenida del bootcamp** — la descripción de la ruta 6 refleja la nueva estructura de doce módulos en tres tramos, e incluye el enlace a la guía Primer día.
+
 ## 3.6.1 — 2026-05-01
 
 ### Changed

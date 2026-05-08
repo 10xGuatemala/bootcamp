@@ -65,7 +65,7 @@ De la idea al release: requerimientos funcionales versionados, manuales de usuar
 
 ## Colaboración con Agentes de IA **(Nuevo)**
 
-Seis módulos que cubren **fundamentos de colaboración**, **context engineering** (cómo redactar un archivo `CLAUDE.md` o `AGENTS.md` útil), **arquitectura orientada a skills**, **seguridad al ejecutar herramientas externas** (validación de entradas, ReDoS, timeouts), **diseño de prompts** y **seguridad de chatbots con IA**. Aplicable a cualquier stack.
+Doce módulos en tres tramos. Los primeros siete cubren **fundamentos de colaboración**, **context engineering** (`CLAUDE.md` / `AGENTS.md`), **arquitectura orientada a skills**, **seguridad al ejecutar herramientas externas**, **diseño de prompts**, **seguridad de chatbots con IA** y **arranque de proyectos desde un contrato `specs.md`**. Cuatro presentan **AIDLC 10X**, un ciclo de vida de software con tres fases (Concepción → Construcción → Operación) y gates humanos para construir productos completos con un agente sin perder control. El último módulo introduce las **evaluaciones automáticas del trabajo del agente**, el habilitador clave hacia operación más autónoma. Aplicable a cualquier stack.
 
 [Explorar más](/docs/colaboracion-con-agentes-ia)
 
@@ -76,6 +76,7 @@ Seis módulos que cubren **fundamentos de colaboración**, **context engineering
 1. **Para estudiar**: sigue una ruta de aprendizaje completa o combina módulos según tus objetivos.
 2. **Para trabajar con agentes**: copia un módulo al repositorio de un proyecto y pide al agente que lo convierta en una skill o en una sección de `CLAUDE.md` específica para ese producto.
 3. **Para equipos**: usa las plantillas y estructuras como base común de decisiones arquitectónicas y de documentación.
+4. **Para tu primer día en un equipo que adoptó este bootcamp**: empieza por la guía [Primer día](/docs/primer-dia), que ordena la lectura según tu rol.
 
 ¡Bienvenido! Cada módulo está diseñado para ayudarte a avanzar paso a paso.
 
