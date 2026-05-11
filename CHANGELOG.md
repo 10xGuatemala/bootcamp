@@ -4,6 +4,15 @@ Cambios de contenido del bootcamp público. Solo se listan adiciones y modificac
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/) y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.8.0 — 2026-05-11
+
+### Added
+
+- **1.4.4 Inventario y extracción desde Oracle Forms** — módulo operativo de la ruta de Modernización de Sistemas Legacy. Inventario cruzado entre filesystem (`.fmb`, `.pll`, `.mmb`, `.rdf`) y base de datos (`USER_OBJECTS`, `USER_DEPENDENCIES`), clasificación de triggers en cinco categorías que deciden su destino, ciclo de migración pantalla por pantalla con operación en paralelo y reconciliación diaria, y plan de retiro del legacy con ventana de cold storage.
+- **1.4.5 Consultas parametrizadas en migraciones** — módulo basado en el artículo del blog 10X. Cuatro patrones vulnerables (PL/SQL `EXECUTE IMMEDIATE` concatenado, Java/JPA con `+`, .NET con interpolación, Python con `%`/`format`) y su conversión a bind variables, manejo seguro de `ORDER BY` dinámico, `IN (...)` con cantidad variable y `LIKE` con comodines literales, verificación con `V$SQL`.
+- **Skills `oracle-forms/`** — dos skills nuevos en `examples-md/agents/skills/`: `migracion-forms` (playbook completo de la migración) y `consultas-parametrizadas-plsql` (remediación de SQL dinámico). Ambos referencian al blog 10X y a los módulos 1.4.3/1.4.4/1.4.5.
+- **Paquete `project/forms-migration/`** — paquete copiable con slash command `/migrar-forms`, scripts SQL/bash listos para extraer (inventario y reconciliación) y plantillas vivas que un agente de migración produce y mantiene (`inventario-fuentes-forms.md`, `inventario-objetos-bd.md`, `triggers-clasificados.md`, `contrato-pantalla.md`, `backlog-migracion-pantallas.md`, `plan-retiro-legacy.md`).
+
 ## 3.7.0 — 2026-05-07
 
 ### Added
